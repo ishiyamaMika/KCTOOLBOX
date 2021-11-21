@@ -1,0 +1,225 @@
+info: 
+    name: rendersetup_preset
+
+data:
+    order: 
+        - color
+        - shade
+        - hiColor
+        - Line
+        - LineThin
+        - shadeMask
+        - gagMouthColor
+        - hiMask
+        - Mask
+        - reflec
+
+    preset:
+        - name: color
+          required: false
+          tooltip: 全塗り
+          required: true
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+          collections:
+              - name: color_collection
+                mesh_pattern: "*_mdl"
+
+        - name: shadeMask
+          required: false
+          tooltip: 固定影マスク
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+          collections:
+              - name: shadeMask_collection
+                info:
+                    material_group: true
+                texture_pattern: <asset_directory>/*_texture/*_sdw_*
+                mesh_pattern: "*"
+
+        - name: shade
+          required: false
+          tooltip: 全影塗り
+          required: true
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+
+          collections:
+              - name: shade_collection
+                mesh_pattern: "*"
+
+        - name: hiColor
+          tooltip: ハイライト塗り
+          required: true
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+
+          collections:
+              - name: hiColor_collection
+                mesh_pattern: "*_mdl"
+
+        - name: gagMouthColor
+          tooltip: 口パーツ塗り(gag)
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+
+          collections:
+              - name: gagMouthColor_collection
+                mesh_pattern: "*gag*"
+
+        - name: hiMask
+          tooltip: ハイライトマスク
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+          collections:
+              - name: hiMask_collection
+
+        - name: Mask
+          tooltip: キャラマスク
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+          collections:
+              - name: mask_color_collection
+
+        - name: reflec
+          tooltip: 床映り込み
+          info:
+            pencil_line_group: true
+            pencil_line_check: false
+            renderer_group: true
+            renderer_combo: mayaHardware2
+
+          collections:
+              - name: reflec_collection
+
+        - name: Line
+          tooltip: ペンシルのライン
+          required: true
+
+          collections:
+              - name: line_collection
+                mesh_pattern: "*_mdl"
+
+        - name: LineThin
+          tooltip: ペンシルのライン。細い
+          required: true
+          collections:
+              - name: lineThin_collection
+                mesh_pattern: "*_mdl"
+
+        - name: shadow
+          tooltip: シーンの落ち影
+          required: false
+
+          info: 
+              light_group: true
+              light_type_combo: directionalLight
+              use_depthmap_check: true
+              depthmap_spin: 4096
+              pencil_line_group: true
+              pencil_line_check: false
+              renderer_group: true
+              renderer_combo: mayaSoftware
+
+
+          collections:
+              - name: shadow_collection
+                mesh_pattern: "*_mdl"
+                info:
+                    primary_vis_group: true
+                    primary_vis_on_check: false
+                    cast_shadow_check: true
+                    cast_shadow_group: true
+
+
+              - name: floor_collection
+                info:
+                    drop_shadow_plane_check: true
+                    material_group: true
+                    mat_color_group: true
+                    mat_r_spin: 0
+                    mat_g_spin: 0
+                    mat_b_spin: 0
+                    mat_type_combo: useBackground
+
+        - name: hiLightMask
+          tooltip: ハイライトマスク
+          info:
+              light_group: true
+              light_type_combo: ambientLight
+              renderer_group: true
+              renderer_combo: mayaSoftware
+              raytracing_group: true
+              raytracing_quality_check: true
+              renderer_group: true
+              renderer_combo: mayaSoftware
+
+              pencil_line_group: true
+              pencil_line_check: false
+
+
+          collections:
+              - name: model_collection
+                mesh_pattern: "*_mdl"
+                info: 
+                    material_group: true
+                    mat_color_group: true
+                    mat_r_spin: 255
+                    mat_g_spin: 255
+                    mat_b_spin: 255
+                    mat_type_combo: useBackground
+                    reflectivity_spin: 1
+                    reflection_limit_spin: 1
+
+
+              - name: hiLight_collection
+                mesh_pattern: "*Hilight*"
+                info:
+                    primary_vis_group: true
+                    primary_vis_on_check: false
+
+        - name: lightingMask
+          tooltip: ライティングマスク
+          info:
+              light_group: true
+              light_type_combo: directionalLight
+              renderer_group: true
+              renderer_combo: mayaSoftware
+              pencil_line_group: true
+              pencil_line_check: false
+
+          collections:
+              - name: model_collection
+                mesh_pattern: "*_mdl"
+                info: 
+                    material_group: true
+                    mat_type_combo: PencilMaterial
+
