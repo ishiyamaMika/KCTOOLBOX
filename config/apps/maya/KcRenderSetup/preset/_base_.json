@@ -1,0 +1,370 @@
+{
+    "info": {}, 
+    "data": {
+        "preset": [
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "required": true, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "name": "color_collection"
+                    }
+                ], 
+                "name": "color", 
+                "tooltip": "\u5168\u5857\u308a"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "required": false, 
+                "collections": [
+                    {
+                        "info": {
+                            "material_group": true
+                        }, 
+                        "mesh_pattern": "*", 
+                        "name": "shadeMask_collection", 
+                        "texture_pattern": "<asset_directory>/*_texture/*_sdw_*"
+                    }
+                ], 
+                "name": "shadeMask", 
+                "tooltip": "\u56fa\u5b9a\u5f71\u30de\u30b9\u30af"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "required": true, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*", 
+                        "name": "shade_collection"
+                    }
+                ], 
+                "name": "shade", 
+                "tooltip": "\u5168\u5f71\u5857\u308a"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "required": true, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "name": "hiColor_collection"
+                    }
+                ], 
+                "name": "hiColor", 
+                "tooltip": "\u30cf\u30a4\u30e9\u30a4\u30c8\u5857\u308a"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*gag*", 
+                        "name": "gagMouthColor_collection"
+                    }
+                ], 
+                "name": "gagMouthColor", 
+                "tooltip": "\u53e3\u30d1\u30fc\u30c4\u5857\u308a(gag)"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "collections": [
+                    {
+                        "name": "hiMask_collection"
+                    }
+                ], 
+                "name": "hiMask", 
+                "tooltip": "\u30cf\u30a4\u30e9\u30a4\u30c8\u30de\u30b9\u30af"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "collections": [
+                    {
+                        "name": "mask_color_collection"
+                    }
+                ], 
+                "name": "Mask", 
+                "tooltip": "\u30ad\u30e3\u30e9\u30de\u30b9\u30af"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaHardware2", 
+                    "renderer_group": true
+                }, 
+                "collections": [
+                    {
+                        "name": "reflec_collection"
+                    }
+                ], 
+                "name": "reflec", 
+                "tooltip": "\u5e8a\u6620\u308a\u8fbc\u307f"
+            }, 
+            {
+                "required": true, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "name": "line_collection"
+                    }
+                ], 
+                "name": "Line", 
+                "tooltip": "\u30da\u30f3\u30b7\u30eb\u306e\u30e9\u30a4\u30f3"
+            }, 
+            {
+                "required": true, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "name": "lineThin_collection"
+                    }
+                ], 
+                "name": "LineThin", 
+                "tooltip": "\u30da\u30f3\u30b7\u30eb\u306e\u30e9\u30a4\u30f3\u3002\u7d30\u3044"
+            }, 
+            {
+                "info": {
+                    "light_group": true, 
+                    "light_type_combo": "directionalLight", 
+                    "renderer_group": true, 
+                    "use_depthmap_check": true, 
+                    "pencil_line_group": true, 
+                    "depthmap_spin": 4096, 
+                    "pencil_line_check": false, 
+                    "renderer_combo": "mayaSoftware"
+                }, 
+                "required": false, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "info": {
+                            "cast_shadow_check": true, 
+                            "cast_shadow_group": true, 
+                            "primary_vis_group": true, 
+                            "primary_vis_on_check": false
+                        }, 
+                        "name": "shadow_collection"
+                    }, 
+                    {
+                        "info": {
+                            "mat_g_spin": 0, 
+                            "mat_b_spin": 0, 
+                            "drop_shadow_plane_check": true, 
+                            "mat_color_group": true, 
+                            "material_group": true, 
+                            "mat_type_combo": "useBackground", 
+                            "mat_r_spin": 0
+                        }, 
+                        "name": "floor_collection"
+                    }
+                ], 
+                "name": "shadow", 
+                "tooltip": "\u30b7\u30fc\u30f3\u306e\u843d\u3061\u5f71"
+            }, 
+            {
+                "info": {
+                    "light_group": true, 
+                    "light_type_combo": "ambientLight", 
+                    "raytracing_quality_check": true, 
+                    "renderer_group": true, 
+                    "pencil_line_group": true, 
+                    "raytracing_group": true, 
+                    "pencil_line_check": false, 
+                    "renderer_combo": "mayaSoftware"
+                }, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "info": {
+                            "mat_b_spin": 255, 
+                            "mat_type_combo": "useBackground", 
+                            "material_group": true, 
+                            "reflection_limit_spin": 1, 
+                            "mat_g_spin": 255, 
+                            "mat_r_spin": 255, 
+                            "mat_color_group": true, 
+                            "reflectivity_spin": 1
+                        }, 
+                        "name": "model_collection"
+                    }, 
+                    {
+                        "mesh_pattern": "*Hilight*", 
+                        "info": {
+                            "primary_vis_group": true, 
+                            "primary_vis_on_check": false
+                        }, 
+                        "name": "hiLight_collection"
+                    }
+                ], 
+                "name": "hiLightMask", 
+                "tooltip": "\u30cf\u30a4\u30e9\u30a4\u30c8\u30de\u30b9\u30af"
+            }, 
+            {
+                "info": {
+                    "pencil_line_check": false, 
+                    "light_group": true, 
+                    "light_type_combo": "directionalLight", 
+                    "renderer_group": true, 
+                    "pencil_line_group": true, 
+                    "renderer_combo": "mayaSoftware"
+                }, 
+                "collections": [
+                    {
+                        "mesh_pattern": "*_mdl", 
+                        "info": {
+                            "material_group": true, 
+                            "mat_type_combo": "PencilMaterial"
+                        }, 
+                        "name": "model_collection"
+                    }
+                ], 
+                "name": "lightingMask", 
+                "tooltip": "\u30e9\u30a4\u30c6\u30a3\u30f3\u30b0\u30de\u30b9\u30af"
+            }, 
+            {
+                "info": {
+                    "light_name_line": "", 
+                    "light_group": false, 
+                    "light_type_combo": "ambientLight", 
+                    "raytracing_quality_check": true, 
+                    "renderer_group": true, 
+                    "use_depthmap_check": false, 
+                    "pencil_line_group": false, 
+                    "depthmap_spin": 512, 
+                    "raytracing_group": true, 
+                    "pencil_line_check": false, 
+                    "renderer_combo": "mayaSoftware", 
+                    "light_intensity_spin": 1.0
+                }, 
+                "collections": [
+                    {
+                        "info": {
+                            "primary_vis_group": false, 
+                            "reflection_limit_spin": 2, 
+                            "drop_shadow_plane_check": false, 
+                            "start_frame_spin": 0, 
+                            "mat_b_spin": 5, 
+                            "mat_texture_group": false, 
+                            "mat_g_spin": 5, 
+                            "mat_name_line": "AAAAA", 
+                            "mat_type_combo": "surfaceShader", 
+                            "render_to_group": false, 
+                            "end_frame_spin": 0, 
+                            "frame_group": false, 
+                            "cast_shadow_on_check": true, 
+                            "fps_spin": 24, 
+                            "mat_color_group": false, 
+                            "material_group": true, 
+                            "mat_texture_line": "", 
+                            "mat_r_spin": 5, 
+                            "primary_vis_on_check": false, 
+                            "cast_shadow_group": true, 
+                            "reflectivity_spin": 0.5
+                        }, 
+                        "name": "aaaa_collection"
+                    }, 
+                    {
+                        "info": {
+                            "primary_vis_group": false, 
+                            "reflection_limit_spin": 2, 
+                            "drop_shadow_plane_check": false, 
+                            "start_frame_spin": 0, 
+                            "mat_b_spin": 5, 
+                            "mat_texture_group": false, 
+                            "mat_g_spin": 5, 
+                            "mat_name_line": "CCCCCCC", 
+                            "mat_type_combo": "phong", 
+                            "render_to_group": false, 
+                            "end_frame_spin": 0, 
+                            "frame_group": false, 
+                            "cast_shadow_on_check": false, 
+                            "fps_spin": 24, 
+                            "mat_color_group": true, 
+                            "material_group": true, 
+                            "mat_texture_line": "", 
+                            "mat_r_spin": 200, 
+                            "primary_vis_on_check": false, 
+                            "cast_shadow_group": false, 
+                            "reflectivity_spin": 0.5
+                        }, 
+                        "name": "cccc_collection"
+                    }, 
+                    {
+                        "info": {
+                            "primary_vis_group": true, 
+                            "reflection_limit_spin": 2, 
+                            "drop_shadow_plane_check": false, 
+                            "start_frame_spin": 0, 
+                            "mat_b_spin": 5, 
+                            "mat_texture_group": true, 
+                            "mat_g_spin": 5, 
+                            "mat_name_line": "BBBBBBBBB", 
+                            "mat_type_combo": "layeredShader", 
+                            "render_to_group": false, 
+                            "end_frame_spin": 0, 
+                            "frame_group": false, 
+                            "cast_shadow_on_check": false, 
+                            "fps_spin": 24, 
+                            "mat_color_group": false, 
+                            "material_group": true, 
+                            "mat_texture_line": "AAAAAAADDDDDDD", 
+                            "mat_r_spin": 5, 
+                            "primary_vis_on_check": false, 
+                            "cast_shadow_group": false, 
+                            "reflectivity_spin": 0.5
+                        }, 
+                        "name": "bbbb_collection"
+                    }
+                ], 
+                "name": "AAAA"
+            }
+        ], 
+        "order": [
+            "color", 
+            "shade", 
+            "hiColor", 
+            "Line", 
+            "LineThin", 
+            "shadeMask", 
+            "gagMouthColor", 
+            "hiMask", 
+            "Mask", 
+            "reflec"
+        ]
+    }
+}

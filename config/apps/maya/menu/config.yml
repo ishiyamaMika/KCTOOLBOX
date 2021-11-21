@@ -1,0 +1,10 @@
+info: 
+    name: menu order
+
+data:
+    order:
+        - modeling
+        - rigging
+        - animation
+        - palette_tools
+        - centrum

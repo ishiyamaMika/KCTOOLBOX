@@ -1,0 +1,7 @@
+info:
+    name: project
+    parent: ../_base_.yml
+
+data:
+    extra_fields: 
+        root: X:/Project/Project/_942_ZIZ

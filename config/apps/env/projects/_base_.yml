@@ -1,0 +1,73 @@
+info:
+    name: project
+
+data:
+    extra_fields: 
+        root: E:/works/client/keica/_942_ZIZ
+        asset_root: <root>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
+
+    general: 
+        directory: "E:/works/client/keica/_942_ZIZ"
+        fps: 24
+
+        padding: 
+            "<scene>": 2
+            "<cut>": 3
+            "<take>": 1
+            "<version>": 2
+
+    asset: 
+        category:
+            - BG
+            - camera
+            - CH
+            - LO
+            - POSE
+            - PP 
+
+        namespaces:
+            default:
+                "<category>_<asset_name>"
+
+        meta:
+            - namespace
+            - asset_name
+            - take
+            - version
+            - category
+            - update_at
+            - update_by
+
+        mobu:
+            paths:
+                default:
+                    rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx
+                    sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_sotai_t<take>.fbx
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<type>.json
+    shot: 
+        header:
+            "<scene>": "s"
+            "<cut>": "c"
+
+        name_pattern: "s<scene>c<cut>"
+
+        mobu:
+            paths:
+                edit: <root_directory>/3D/s<scene>/c<cut>/edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.fbx
+                master: <root_directory>/3D/s<scene>/c<cut>/master/<project>_s<scene>c<cut>_anim.fbx
+
+    puzzle:
+        get_cameras:
+            main:
+                - name: get cameras
+                  piece: KcHooks.pieces.mobu.default.get_cameras
+                  description: get camera from scene
+
+        get_assets:
+            main:
+                - name: get assets
+                  piece: KcHooks.pieces.mobu.default.get_assets
+                  description: get asset from scene
+
+
+
