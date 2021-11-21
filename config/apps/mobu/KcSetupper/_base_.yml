@@ -64,7 +64,7 @@ data:
 
         - name: add_folder
           view: "create/update folder"
-          piece: KcHooks.pieces.mobu.default.create_folder
+          piece: KcHooks.pieces.mobu.default.asset_create_folder
 
         - name: create_groups
           view: "create/update groups"
