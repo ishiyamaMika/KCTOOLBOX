@@ -69,7 +69,7 @@ class AssetCreateFolder(Piece):
                 else:
                     item = items.pop(0)
                     folder = _create_folder(name, item)
-                print folder
+
                 for item in items:
                     folder.ConnectSrc(item)
 

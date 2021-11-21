@@ -93,7 +93,6 @@ class AssetCreateGroups(Piece):
                         parent = self.scene_groups[parent_name]
 
                     group = FBGroup(name)
-                    print "create"
                     if parent:
                         parent.ConnectSrc(group)
                         

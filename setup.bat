@@ -2,7 +2,7 @@
 setx KEICA_TOOL_PATH %~dp0
 
 
-set /P _KCUSERNAME_="ユーザー名(shotgunのアカウント名 like: Taro.Yamada): " 
+set /P _KCUSERNAME_="ユーザー名: " 
 echo %_KCUSERNAME_%
 
 setx KEICA_USERNAME %_KCUSERNAME_%

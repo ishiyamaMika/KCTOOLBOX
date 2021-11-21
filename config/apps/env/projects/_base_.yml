@@ -3,11 +3,11 @@ info:
 
 data:
     extra_fields: 
-        root: E:/works/client/keica/_942_ZIZ
+        root: X:/Project/_942_ZIZ
         asset_root: <root>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
 
     general: 
-        directory: "E:/works/client/keica/_942_ZIZ"
+        directory: "X:/Project/_942_ZIZ"
         fps: 24
 
         padding: 

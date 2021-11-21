@@ -68,7 +68,7 @@ class AssetCreateJson(Piece):
                 item_names.append({"namespace": namespace, "name": name})
 
             info = kc_env.get_info(name="config json")
-            print self.data
+
             path = "{}/config/{}_{}.json".format(d, self.data["namespace"], each)
             if not os.path.lexists(os.path.dirname(path)):
                 os.makedirs(os.path.dirname(path))

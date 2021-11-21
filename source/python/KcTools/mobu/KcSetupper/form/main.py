@@ -82,9 +82,6 @@ class KcSetupper(QtWidgets.QWidget):
 
     def update_asset_config(self):
         data = self.get_data()
-        import pprint
-        pprint.pprint(data)
-
         path = kc_file_io.get_file_path()
         if path == "":
             return
@@ -149,7 +146,7 @@ class KcSetupper(QtWidgets.QWidget):
 
         self.project_combo_changed()
         if self.user_config.get("variation"):
-            index = sef.project_combo.findText(self.user_config["variation"])
+            index = self.project_combo.findText(self.user_config["variation"])
             if index != -1:
                 self.variation_combo.setCurrentIndex(index)
 
@@ -352,7 +349,6 @@ class KcSetupper(QtWidgets.QWidget):
             index = 0
 
         widget.combo.setCurrentIndex(index)
-        print "SSS:", widget.combo.currentText(), widget.combo.objectName()
 
     def get_default(self):
         pass
@@ -385,8 +381,6 @@ class KcSetupper(QtWidgets.QWidget):
             else:
                 pattern = namespace_pattern[category]
 
-            print "ooo", namespace_pattern
-
             namespace = self.project.path_generate(pattern, {"<asset_name>": data["asset_name"], "<category>": category})
         else:
             return False
@@ -416,13 +410,12 @@ class KcSetupper(QtWidgets.QWidget):
         mod = importlib.import_module(piece_data["piece"])
         reload(mod)
 
-
-
         mod = getattr(mod, mod._PIECE_NAME_)(piece_data=piece_data,
                                              data=data)
 
         mod.execute()
         self.update_user_config()
+        QtWidgets.QMessageBox.information(self, u"info", u"実行しました\n{}".format(piece_data["view"]), QtWidgets.QMessageBox.Ok)
 
     def save_config_btn_clicked(self):
         self.update_asset_config()
@@ -442,7 +435,7 @@ class KcSetupperCmd(object):
             scene = scenes[0]
             if "version" in scene:
                 scene["version"] += 1
-            print 234234343, scene
+
         return scene
 
     def get_groups(self):
