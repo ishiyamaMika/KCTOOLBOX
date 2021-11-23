@@ -49,29 +49,6 @@ class GetAssets(Piece):
 
             assets.append(meta_data)
 
-
-        print ":::", assets
-
-        """
-        for model in FBSystem().Scene.RootModel.Children:
-            if model.Name == "Reference" and "_Ctrl" in model.LongName:
-                continue
-
-            if model.LongName.count(":") != 1:
-                continue
-
-            namespace, name = model.LongName.split(":")
-
-            if re.match("s[0-9]{2}_c[0-9]{3}.*", namespace):
-                continue
-
-            number = _number(namespace)
-
-            if self.piece_data.get("include_model"):
-                assets.append({"namespace": namespace, "name": name, "model": model, "number": number, "category": "asset"})
-            else:
-                assets.append({"namespace": namespace, "name": name, "number": number, "category": "asset"})
-        """
         self.pass_data["assets"] = assets
 
         return flg, self.pass_data, header, detail
@@ -82,5 +59,5 @@ if __name__ == "__builtin__":
 
     x = GetAssets(piece_data=piece_data, data=data)
     x.execute()
-
-    print x.pass_data
+    import pprint
+    pprint.pprint(x.pass_data)

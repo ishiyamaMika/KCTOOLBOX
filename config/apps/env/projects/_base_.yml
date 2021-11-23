@@ -28,10 +28,13 @@ data:
         namespaces:
             default:
                 "<category>_<asset_name>"
+            LO:
+                "<category>_<asset_name>_<variation>"
 
         meta:
             - namespace
             - asset_name
+            - variation
             - take
             - version
             - category
@@ -43,7 +46,13 @@ data:
                 default:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx
                     sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_sotai_t<take>.fbx
-                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<type>.json
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<config_type>.json
+
+                LO:
+                    rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_t<take>_<version>.fbx
+                    sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<variation>_<config_type>.json
+
     shot: 
         header:
             "<scene>": "s"

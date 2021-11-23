@@ -34,7 +34,6 @@ class AssetAddProperties(Piece):
         header = ""
         detail = ""
         root_model_name = self.piece_data["parent_name"].replace("<namespace>", self.data["namespace"])
-        model = kc_model.to_object(root_model_name)
 
         model = kc_model.find_model_by_name(self.piece_data["parent_name"].split(":")[-1], ignore_namespace=True)
 
@@ -47,9 +46,11 @@ class AssetAddProperties(Piece):
 
         property_list = {l.Name: l for l in meta_model.PropertyList if l.Name != ""}
         take = -1
-        for prop, value in self.data["properties"].items():
-            if not prop in self.data["meta"]:
+        for prop in self.data["meta"]:
+            if not prop in self.data["properties"]:
                 continue
+
+            value = self.data["properties"][prop]
 
             if isinstance(value, int):
                 create_type = "number"
@@ -99,12 +100,14 @@ if __name__ == "__builtin__":
             "namespace": "CH_tsukikoQuad",
             "properties": {"namespace": "CH_tsukikoQuad", 
                            "asset_name": "tsukikoQuad",
+                           "variation": "TEST",
                            "take": 2,
                            "version": 1, 
                            "category": "CH"},
             "meta": [
                      "namespace",
                      "asset_name",
+                     "variation",
                      "take",
                      "version",
                      "category",
@@ -112,7 +115,7 @@ if __name__ == "__builtin__":
                      "update_by"]   
             }
     piece_data = {
-            "parent_name": "<namespace>:root",
+            "parent_name": "root",
             "meta_model_name": "<namespace>:meta",
             "color": {
                 1: (255, 0, 0),

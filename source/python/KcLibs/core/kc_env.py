@@ -12,9 +12,11 @@ if not mod in sys.path:
 
 
 
-if os.environ["USERNAME"] == "ame_k":
+try:
     import KcLibs.core.kc_sentry as kc_sentry
     kc_sentry.load()
+except:
+    pass
 
 mode = None
 try:

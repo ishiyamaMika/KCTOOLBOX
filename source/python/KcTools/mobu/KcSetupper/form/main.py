@@ -8,6 +8,7 @@ import re
 import traceback
 import importlib
 import glob
+import datetime
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if mod not in sys.path:
@@ -17,6 +18,7 @@ import KcLibs.core.kc_env as kc_env
 from KcLibs.core.KcProject import *
 
 import KcLibs.mobu.kc_file_io as kc_file_io
+import KcLibs.mobu.kc_model as kc_model
 import KcLibs.win.kc_qt as kc_qt
 
 from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
@@ -46,7 +48,7 @@ class CompleterLineEdit(QtWidgets.QLineEdit):
 
 class KcSetupper(QtWidgets.QWidget):
     NAME = "KcSetupper"
-    VER = 1.0
+    VER = 1.1
 
     def __init__(self, parent=None):
         super(KcSetupper, self).__init__(parent)
@@ -87,7 +89,7 @@ class KcSetupper(QtWidgets.QWidget):
             return
 
         d, f = os.path.split(path)
-        config_path = "{}/config/setting_{}.json".format(d, data["asset_name"])
+        config_path = "{}/config/setting_{}.json".format(d, data["namespace"])
 
         kc_env.save_config(config_path, self.NAME, "asset", data)
 
@@ -109,7 +111,6 @@ class KcSetupper(QtWidgets.QWidget):
 
         hlayout.addWidget(self.project_combo)
         hlayout.addWidget(self.variation_combo)
-
 
         project = unicode(self.project_combo.currentText())
         variations = self.project.project_variations[project]
@@ -135,11 +136,6 @@ class KcSetupper(QtWidgets.QWidget):
         top_layout.addItem(spacer)
   
 
-        save_config_btn = QtWidgets.QPushButton()
-        save_config_btn.setText("save config")
-
-        save_config_btn.clicked.connect(self.save_config_btn_clicked)
-        top_layout.addWidget(save_config_btn)
         self.setLayout(top_layout)
 
         self.show()
@@ -158,19 +154,18 @@ class KcSetupper(QtWidgets.QWidget):
         self.variation_combo.clear()
         self.variation_combo.addItems(variations)
 
-
-
     def get_settings(self):
         path = kc_file_io.get_file_path()
-        if not path:
-            return "", []
-
-        d, f = os.path.split(path)
-
-
-
-        rig = self.project.config["asset"]["mobu"]["paths"]["default"]["rig"]
-        fields = self.project.path_split(os.path.dirname(rig), d)
+        fields = {}
+        if path:
+            d, f = os.path.split(path)
+            for k, v in self.project.config["asset"]["mobu"]["paths"].items():
+                rig = self.project.config["asset"]["mobu"]["paths"][k].get("rig", "")
+                fields = self.project.path_split(os.path.dirname(rig), d)
+                print k, rig
+                print fields
+                if fields:
+                    break
 
         if "<asset_name>" in fields:
             asset_name = fields["<asset_name>"]
@@ -216,17 +211,30 @@ class KcSetupper(QtWidgets.QWidget):
 
             btn.row_data = preset
 
-            btn.clicked.connect(self.btn_clicked)
 
             if "widgets" in preset:
                 for widget_set in preset["widgets"]:
                     hlayout = QtWidgets.QHBoxLayout()
-                    text = QtWidgets.QLabel(widget_set["name"])
+                    if "view" in widget_set:
+                        text = QtWidgets.QLabel(widget_set["view"])
+                    else:
+                        text = QtWidgets.QLabel(widget_set["name"])
+                    text.setMinimumWidth(200)
+                    text.setMaximumWidth(200)
 
                     value = False
 
                     widget = getattr(QtWidgets, widget_set["widget"])()
                     widget.setObjectName(widget_set["name"])
+
+                    if "place_holder" in widget_set:
+                        widget.setPlaceholderText(widget_set["place_holder"])
+
+                    filters = [l for l in widget_set.keys() if l.endswith("filter")]
+                    for filter_ in filters:
+                        setattr(widget, filter_, widget_set[filter_])
+                        print "ooo", filter_
+                        print getattr(widget, filter_)
 
                     hlayout.addWidget(text)
                     hlayout.addWidget(widget)
@@ -245,10 +253,13 @@ class KcSetupper(QtWidgets.QWidget):
                         getattr(self, widget_set["btn"]["init"])(btn_)
                         hlayout.addWidget(btn_)
                     hlayout.setMargin(0)
+                    hlayout.setSpacing(2)
                     self.layout.addLayout(hlayout)
 
                     if widget_set["widget"] == "QComboBox":
                         widget.addItems(widget_set.get("items", []))
+                        if "function" in widget_set:
+                            widget.currentIndexChanged.connect(getattr(self, widget_set["function"]))
 
                     if value:
                         if widget_set["widget"] in ["QSpinBox", "QDoubleSpinBox"]:
@@ -258,14 +269,29 @@ class KcSetupper(QtWidgets.QWidget):
                         else:
                             widget.setText(value)
 
+                    if "enabled" in widget_set:
+                        widget.setEnabled(widget_set["enabled"])
                     self.preset_value_widgets[widget_set["name"]] = {"widget": widget, 
                                                                      "type": widget_set["widget"]}
+            if "function" in preset:
+                btn.clicked.connect(getattr(self, preset["function"]))
+            else:
+                btn.clicked.connect(self.btn_clicked)
 
             self.layout.addWidget(btn)
 
         spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.layout.addSpacerItem(spacer)
         self.update_from_settings(asset_name)
+
+    def filter_combo_changed(self):
+        combo_name = unicode(self.sender().objectName())
+        for name, widget in self.preset_value_widgets.items():
+            if hasattr(widget["widget"], "{}_filter".format(combo_name)):
+                if unicode(self.sender().currentText()) in getattr(widget["widget"], "{}_filter".format(combo_name)):
+                    widget["widget"].setEnabled(True)
+                else:
+                    widget["widget"].setEnabled(False)
 
     def asset_name_changed(self):
         wid = self.sender()
@@ -297,30 +323,30 @@ class KcSetupper(QtWidgets.QWidget):
 
         #name = unicode(self.sender().text())
         setting_path = "{}/config/setting_{}.json".format(d, name)
-
+        data = {"properties": {}}
         if os.path.exists(setting_path):
             data = kc_env.load_config(setting_path)
-            data["properties"]["take"] = take
-            data["properties"]["version"] = version
-            for k, v in data["properties"].items():
-                if k in self.preset_value_widgets:
-                    widget = self.preset_value_widgets[k]["widget"]
-                    if isinstance(widget, QtWidgets.QLineEdit):
-                        widget.setText(v)
 
-                    elif isinstance(widget, QtWidgets.QComboBox):
-                        index = widget.findText(v)
-                        for i in range(widget.count()):
-                            print widget.itemText(i), widget.itemText(i) == v
-                        if index != -1:
-                            widget.setCurrentIndex(index)
+        else:
+            data["properties"].update(self.cmd.get_meta())
 
-                    elif isinstance(widget, QtWidgets.QSpinBox):
-                        widget.setValue(v)
+        data["properties"]["take"] = take
+        data["properties"]["version"] = version
+        for k, v in data["properties"].items():
+            if k in self.preset_value_widgets:
+                widget = self.preset_value_widgets[k]["widget"]
+                if isinstance(widget, QtWidgets.QLineEdit):
+                    widget.setText(v)
 
+                elif isinstance(widget, QtWidgets.QComboBox):
+                    index = widget.findText(v)
+                    for i in range(widget.count()):
+                        print widget.itemText(i), widget.itemText(i) == v
+                    if index != -1:
+                        widget.setCurrentIndex(index)
 
-    def set_group_btn_clicked(self):
-        self.get_groups(self.sender())
+                elif isinstance(widget, QtWidgets.QSpinBox):
+                    widget.setValue(v)
 
     def get_groups(self, widget):
         if widget is None:
@@ -332,6 +358,8 @@ class KcSetupper(QtWidgets.QWidget):
         widget.combo.clear()
         groups = self.cmd.get_groups()
         widget.combo.addItems(groups)
+        print "------------------------------"
+        print "****", groups, widget.objectName()
         f = ""
         for group in groups:
             if isinstance(widget.row_data["btn"]["find"], list):
@@ -373,15 +401,24 @@ class KcSetupper(QtWidgets.QWidget):
             data["properties"][k] = value
             if k == "category":
                 category = value
-
+       
         if category:
             namespace_pattern = self.project.config["asset"]["namespaces"]
             if not category in namespace_pattern:
                 pattern = namespace_pattern["default"]
             else:
                 pattern = namespace_pattern[category]
+            fields = {}
+            for k, v in data["properties"].items():
+                print k, v
+                if isinstance(v, list):
+                    continue
+                elif isinstance(v, dict):
+                    continue
+                else:
+                    fields["<{}>".format(k)] = v
 
-            namespace = self.project.path_generate(pattern, {"<asset_name>": data["asset_name"], "<category>": category})
+            namespace = self.project.path_generate(pattern, fields)
         else:
             return False
 
@@ -398,14 +435,26 @@ class KcSetupper(QtWidgets.QWidget):
 
         data["rig_path"] = self.project.path_generate(rig_path, data["properties"])
         data["sotai_path"] = self.project.path_generate(sotai_path, data["properties"])
+
         return data
 
+    def set_group_btn_clicked(self):
+        self.get_groups(self.sender())
+
     def btn_clicked(self):
+        self.execute(self.sender())
+
+    def save_btn_clicked(self):
+        self.cmd.update_meta_date()
+        self.execute(self.sender())
+        self.update_asset_config()
+
+    def execute(self, widget):
         data = self.get_data()
         if not data:
             return
 
-        piece_data = self.sender().row_data
+        piece_data = widget.row_data
 
         mod = importlib.import_module(piece_data["piece"])
         reload(mod)
@@ -417,30 +466,37 @@ class KcSetupper(QtWidgets.QWidget):
         self.update_user_config()
         QtWidgets.QMessageBox.information(self, u"info", u"実行しました\n{}".format(piece_data["view"]), QtWidgets.QMessageBox.Ok)
 
-    def save_config_btn_clicked(self):
-        self.update_asset_config()
-
     def keyPressEvent(self, event):
         pass
-
 
 class KcSetupperCmd(object):
     def __init__(self):
         pass
 
-    def get_scene(self):
-        scene = {}
-        scenes = self.project.get_assets()
-        if len(scenes) > 0:
-            scene = scenes[0]
-            if "version" in scene:
-                scene["version"] += 1
+    def get_meta(self):
+        meta = {}
+        metas = self.project.get_assets()
+        if len(metas) > 0:
+            meta = metas[0]
+            if "version" in meta:
+                meta["version"] += 1
 
-        return scene
+        return meta
 
     def get_groups(self):
         return [l.LongName for l in FBSystem().Scene.Groups]
 
+    def update_meta_date(self):
+        model = kc_model.find_model_by_name("meta", ignore_namespace=True)
+        if model:
+            update_at = model.PropertyList.Find("update_at")
+            update_by = model.PropertyList.Find("update_by")
+            if update_at:
+                now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                update_at.Data = now
+
+            if update_by:
+                update_by.Data = kc_env.get_user()
 
 def start_app():
     kc_qt.start_app(KcSetupper, name="KcSetupper", x=400, y=500)

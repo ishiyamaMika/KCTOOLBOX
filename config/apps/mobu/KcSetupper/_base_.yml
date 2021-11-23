@@ -13,8 +13,18 @@ data:
                 items: 
                     - CH
                     - PR
+                    - LO
                     - VC
                     - BG
+                function: filter_combo_changed
+
+              - name: variation
+                widget: QLineEdit
+                view: variation (LO only)
+
+                category_filter: 
+                  - LO
+                enabled: false
 
               - name: take
                 widget: QSpinBox
@@ -84,10 +94,6 @@ data:
               - template: <asset_name>_top/<asset_name>_plot
               - template: <asset_name>_top/<asset_name>_export
 
-        - name: save_sotai
-          view: "save sotai"
-          piece: KcHooks.pieces.mobu.default.asset_save_sotai
-          path: E:/works/client/keica/data/sotai
 
         - name: create_json
           piece: KcHooks.pieces.mobu.default.asset_create_json
@@ -114,15 +120,21 @@ data:
             - name: export
               widget: QComboBox
               btn:
-                function: get_groups
+                function: set_group_btn_clicked
                 init: get_groups
                 icon: reload.png
                 find: 
                     - export
                     - plot
 
+        - name: save_sotai
+          view: "save sotai"
+          piece: KcHooks.pieces.mobu.default.asset_save_sotai
+          path: E:/works/client/keica/data/sotai
+
         - name: file_save
           view: save
+          function: save_btn_clicked
           piece: KcHooks.pieces.mobu.default.file_save
           paint:
               path: rig_path
