@@ -13,7 +13,7 @@ data:
         padding: 
             "<scene>": 2
             "<cut>": 3
-            "<take>": 1
+            "<take>": 2
             "<version>": 2
 
     asset: 

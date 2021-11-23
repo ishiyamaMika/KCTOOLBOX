@@ -91,7 +91,7 @@ class KcProject(object):
 
         return self.puzzle.pass_data.get("assets", [])
 
-    def path_generate(self, template, fields):
+    def path_generate(self, template, fields, force=False):
         fields_ = copy.deepcopy(fields)
         for k, v in fields_.items():
             if not "<" in k:
@@ -110,7 +110,7 @@ class KcProject(object):
 
         fields_.update(self.config["extra_fields"])
 
-        return self.field_generator.generate(template, fields_)
+        return self.field_generator.generate(template, fields_, force=force)
 
     def path_split(self, template, path):
         return self.field_generator.get_field_value(template, path)
