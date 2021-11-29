@@ -34,15 +34,21 @@ class FileOpen(Piece):
         flg = True
         header = ""
         detail = ""
-        print self.data
+        if self.piece_data.get("new"):
+            FBApplication().FileNew()
+            if self.logger: self.logger.debug("file new")
+
         if file_io.file_open(self.data["path"]):
-            flg = True
+            if self.logger: self.logger.debug("file open: {}".format(self.data["path"]))
+        else:
+            if self.logger: self.logger.debug("file open failed: {}".format(self.data["path"]))
+            flg = False
+
         return flg, self.pass_data, header, detail
 
 if __name__ == "__builtin__":
 
     piece_data = {}
-
 
     data = {"path": "E:/works/client/keica/data/assets/Mia.v1.1.fbx"}
 
