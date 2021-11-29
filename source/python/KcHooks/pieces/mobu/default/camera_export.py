@@ -33,12 +33,12 @@ class CameraExport(Piece):
         flg = True
         header = ""
         detail = ""
+        print "export camera"
 
         if not self.data["category"] == "cam":
             return flg, self.pass_data, header, detail
 
         print "select models"
-        print "export camera"
 
         print self.data
 

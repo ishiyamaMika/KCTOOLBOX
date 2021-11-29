@@ -18,7 +18,7 @@ from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
 
-_PIECE_NAME_ = "MasterSceneCreate"
+_PIECE_NAME_ = "FileMasterSceneCreate"
 
 class FileMasterSceneCreate(Piece):
     def __init__(self, **args):
@@ -26,7 +26,7 @@ class FileMasterSceneCreate(Piece):
         description:
             open_path - open path
         """
-        super(MasterSceneCreate, self).__init__(**args)
+        super(FileMasterSceneCreate, self).__init__(**args)
         self.name = _PIECE_NAME_
 
     def execute(self):
@@ -57,5 +57,5 @@ if __name__ == "__builtin__":
                        {"namespace": "", "name": "", "category": "cam", "sotai_path": ""}]
             }
 
-    x = MasterSceneCreate(piece_data=piece_data, data=data)
+    x = FileMasterSceneCreate(piece_data=piece_data, data=data)
     x.execute()

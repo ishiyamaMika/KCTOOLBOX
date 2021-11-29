@@ -3,8 +3,8 @@ info:
 
 data:
     extra_fields: 
-        root: X:/Project/_942_ZIZ
-        asset_root: <root>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
+        root_directory: X:/Project/_942_ZIZ
+        asset_root: <root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
 
     general: 
         directory: "X:/Project/_942_ZIZ"
@@ -46,12 +46,15 @@ data:
                 default:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx
                     sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_sotai_t<take>.fbx
-                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<config_type>.json
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<config_type>.json
+                    edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+
 
                 LO:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_t<take>_<version>.fbx
                     sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
-                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<variation>_<config_type>.json
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<variation>_<config_type>.json
+                    edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
     shot: 
         header:

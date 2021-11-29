@@ -49,8 +49,6 @@ class GetCameras(Piece):
                 cameras.append({"namespace": namespace, "name": name, "category": "cam"})
 
         self.pass_data["cameras"] = cameras
-        print "XXXXXXXXXXXXXXXXXXX", cameras
-
         return flg, self.pass_data, header, detail
 
 if __name__ == "__builtin__":
