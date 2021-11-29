@@ -26,7 +26,6 @@ class FileSave(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
-
         self.logger.debug("file save: {}".format(self.data["path"]))
 
         flg = True
