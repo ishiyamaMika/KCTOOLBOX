@@ -24,9 +24,15 @@ class AddNamespace(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
-        flg = False
+        flg = True
         header = ""
         detail = ""
+
+        if not "namespace" in self.data:
+            return False, self.pass_data, u"ネームスペースが設定されていません", detail
+
+        if self.data["namespace"] == "":
+            return False, self.pass_data, u"ネームスペースが設定されていません", detail
 
         m_list = FBModelList()
         FBGetSelectedModels(m_list)

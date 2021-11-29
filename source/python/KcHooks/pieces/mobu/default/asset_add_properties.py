@@ -17,7 +17,7 @@ from puzzle.Piece import Piece
 import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_model as kc_model
 
-
+reload(kc_model)
 _PIECE_NAME_ = "AssetAddProperties"
 
 class AssetAddProperties(Piece):
@@ -30,19 +30,29 @@ class AssetAddProperties(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
-        flg = False
+        flg = True
         header = ""
         detail = ""
+        if not "namespace" in self.data:
+            print "namespace is not exists"
+            return flg, self.pass_data, u"namespaceが設定されていません", detail
+
         root_model_name = self.piece_data["parent_name"].replace("<namespace>", self.data["namespace"])
 
         model = kc_model.find_model_by_name(self.piece_data["parent_name"].split(":")[-1], ignore_namespace=True)
 
         meta_model = kc_model.find_model_by_name("meta", ignore_namespace=True)
+        meta_color = kc_model.find_material_by_name("meta_color")
 
         if not meta_model:
-            meta_model = FBModelMarker("meta")
+            meta_model = FBModelCube("meta")
+            meta_model.Show = True
             if model:
                 model.ConnectSrc(meta_model)
+
+        if not meta_color:
+            meta_color = FBMaterial("meta_color")
+            meta_model.ConnectSrc(meta_color)
 
         property_list = {l.Name: l for l in meta_model.PropertyList if l.Name != ""}
         take = -1
@@ -79,7 +89,8 @@ class AssetAddProperties(Piece):
             if color == "random":
                 color = (random.randint(0, 255)/255.0, random.randint(0, 255)/255.0, random.randint(0, 255)/255.0)
 
-            meta_model.Color = FBColor(*color)
+            prop = meta_color.PropertyList.Find("Diffuse")
+            prop.Data = FBColor(*color)
        
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         if "update_at" in property_list:
@@ -93,7 +104,7 @@ class AssetAddProperties(Piece):
             kc_model.create_custom_property(meta_model, "update_by", "String", kc_env.get_user())
         
 
-        return flg, self.pass_data, header, detail
+        return True, self.pass_data, header, detail
 
 if __name__ == "__builtin__":
     data = {

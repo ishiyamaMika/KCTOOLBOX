@@ -1,4 +1,4 @@
-from pyfbsdk import FBSystem, FBGetSelectedModels, FBModelList, FBModel, FBPropertyType, FBModel, FBModelNull, FBModelMarker, FBCamera, FBLight
+from pyfbsdk import FBSystem, FBGetSelectedModels, FBModelList, FBModel, FBPropertyType, FBModel, FBModelNull, FBModelMarker, FBCamera, FBLight, FBMaterial
 if FBSystem().Version < 14000.0:
     from pyfbsdk import FBFindModelByName
 else:
@@ -149,11 +149,20 @@ def is_in_schematic_view(model):
 
     return False
 
+def find_material_by_name(name):
+    for material in FBSystem().Scene.Materials:
+        if material.Name == name:
+            return material
+
+    return False
+
 
 if __name__ == "__builtin__":
     print "-------------------------"
     print
-    m_list = FBModelList()
-    FBGetSelectedModels(m_list)
-    create_custom_property(m_list[0], "TEST", "String", "testABC", False)
+    # m_list = FBModelList()
+    # FBGetSelectedModels(m_list)
+    # create_custom_property(m_list[0], "TEST", "String", "testABC", False)
+
+    print get_material("meta_colorX")
 

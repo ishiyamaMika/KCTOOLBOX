@@ -68,7 +68,7 @@ class AssetCreateGroups(Piece):
 
 
     def execute(self):
-        flg = False
+        flg = True
         header = ""
         detail = ""
 

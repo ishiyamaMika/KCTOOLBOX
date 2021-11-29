@@ -43,7 +43,7 @@ class AssetCreateFolder(Piece):
             return FBFolder(str(name), item)
 
         folders = {l.Name: l for l in FBSystem().Scene.Folders}
-        flg = False
+        flg = True
         header = ""
         detail = ""
         ignore_type = ["ORCharacterSolver_HIK", "FBCharacter"]

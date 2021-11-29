@@ -30,7 +30,7 @@ class AssetSaveSotai(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
-        flg = False
+        flg = True
         header = ""
         detail = ""
         namespace = self.data["namespace"]

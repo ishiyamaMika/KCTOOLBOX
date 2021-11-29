@@ -13,7 +13,7 @@ import datetime
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if mod not in sys.path:
     sys.path.append(mod)
-print mod
+
 import KcLibs.core.kc_env as kc_env
 from KcLibs.core.KcProject import *
 
@@ -48,7 +48,7 @@ class CompleterLineEdit(QtWidgets.QLineEdit):
 
 class KcSetupper(QtWidgets.QWidget):
     NAME = "KcSetupper"
-    VER = 1.1
+    VER = 1.2
 
     def __init__(self, parent=None):
         super(KcSetupper, self).__init__(parent)
@@ -135,7 +135,6 @@ class KcSetupper(QtWidgets.QWidget):
                                        QtWidgets.QSizePolicy.Expanding)
         top_layout.addItem(spacer)
   
-
         self.setLayout(top_layout)
 
         self.show()
@@ -157,27 +156,26 @@ class KcSetupper(QtWidgets.QWidget):
     def get_settings(self):
         path = kc_file_io.get_file_path()
         fields = {}
+        settings = []
         if path:
             d, f = os.path.split(path)
             for k, v in self.project.config["asset"]["mobu"]["paths"].items():
                 rig = self.project.config["asset"]["mobu"]["paths"][k].get("rig", "")
                 fields = self.project.path_split(os.path.dirname(rig), d)
-                print k, rig
-                print fields
                 if fields:
                     break
+    
+            setting_path = "{}/config/setting_*.json".format(d)
+            for path in glob.glob(setting_path):
+                search = re.search(setting_path.replace("*", "(.*)").replace("\\", "/"), path.replace("\\", "/"))
+                if search:
+                    settings.append(search.groups()[0])
 
         if "<asset_name>" in fields:
             asset_name = fields["<asset_name>"]
         else:
             asset_name = ""
 
-        setting_path = "{}/config/setting_*.json".format(d)
-        settings = []
-        for path in glob.glob(setting_path):
-            search = re.search(setting_path.replace("*", "(.*)").replace("\\", "/"), path.replace("\\", "/"))
-            if search:
-                settings.append(search.groups()[0])
 
         return asset_name, settings
 
@@ -233,8 +231,6 @@ class KcSetupper(QtWidgets.QWidget):
                     filters = [l for l in widget_set.keys() if l.endswith("filter")]
                     for filter_ in filters:
                         setattr(widget, filter_, widget_set[filter_])
-                        print "ooo", filter_
-                        print getattr(widget, filter_)
 
                     hlayout.addWidget(text)
                     hlayout.addWidget(widget)
@@ -358,8 +354,6 @@ class KcSetupper(QtWidgets.QWidget):
         widget.combo.clear()
         groups = self.cmd.get_groups()
         widget.combo.addItems(groups)
-        print "------------------------------"
-        print "****", groups, widget.objectName()
         f = ""
         for group in groups:
             if isinstance(widget.row_data["btn"]["find"], list):
@@ -385,8 +379,9 @@ class KcSetupper(QtWidgets.QWidget):
         data = {}
         data["asset_name"] = str(self.preset_value_widgets["asset_name"]["widget"].text())
         if data["asset_name"] == "":
-            print "asset_name is blank"
+            QtWidgets.QMessageBox.warning(self, "info", u"asset名が空です", QtWidgets.QMessageBox.Cancel)
             return 
+
         data["meta"] = self.project.config["asset"]["meta"]
         data["properties"] = {}
         category = False
@@ -410,7 +405,6 @@ class KcSetupper(QtWidgets.QWidget):
                 pattern = namespace_pattern[category]
             fields = {}
             for k, v in data["properties"].items():
-                print k, v
                 if isinstance(v, list):
                     continue
                 elif isinstance(v, dict):
@@ -435,7 +429,6 @@ class KcSetupper(QtWidgets.QWidget):
 
         data["rig_path"] = self.project.path_generate(rig_path, data["properties"])
         data["sotai_path"] = self.project.path_generate(sotai_path, data["properties"])
-
         return data
 
     def set_group_btn_clicked(self):
@@ -462,9 +455,12 @@ class KcSetupper(QtWidgets.QWidget):
         mod = getattr(mod, mod._PIECE_NAME_)(piece_data=piece_data,
                                              data=data)
 
-        mod.execute()
-        self.update_user_config()
-        QtWidgets.QMessageBox.information(self, u"info", u"実行しました\n{}".format(piece_data["view"]), QtWidgets.QMessageBox.Ok)
+        flg, pass_data, header, detail = mod.execute()
+        if not flg:
+            QtWidgets.QMessageBox.information(self, u"info", u"実行できませんでした\n{}".format(header), QtWidgets.QMessageBox.Ok)
+        else:
+            self.update_user_config()
+            QtWidgets.QMessageBox.information(self, u"info", u"実行しました\n{}".format(piece_data["view"]), QtWidgets.QMessageBox.Ok)
 
     def keyPressEvent(self, event):
         pass

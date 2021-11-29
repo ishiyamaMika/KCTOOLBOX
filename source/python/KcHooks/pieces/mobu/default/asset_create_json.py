@@ -43,7 +43,7 @@ class AssetCreateJson(Piece):
 
             return namespace, name
 
-        flg = False
+        flg = True
         header = ""
         detail = ""
         groups = {l.LongName: l for l in FBSystem().Scene.Groups}

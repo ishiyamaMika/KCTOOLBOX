@@ -30,7 +30,7 @@ class AssetExport(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
-        flg = False
+        flg = True
         header = ""
         detail = ""
         print "AssetExport---"

@@ -34,7 +34,7 @@ class GetAssets(Piece):
                     return int(groups[0])
             return 1
 
-        flg = False
+        flg = True
         header = ""
         detail = ""
 
