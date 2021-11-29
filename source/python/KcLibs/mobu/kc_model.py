@@ -170,35 +170,13 @@ def unselected_all():
     for m in m_list:
         m.Selected = False
 
+
 def find_material_by_name(name):
     for material in FBSystem().Scene.Materials:
         if material.Name == name:
             return material
 
     return False
-
-def select(model):
-    if isinstance(model, list):
-        models = []
-        for m in model:
-            obj = select(m)
-            if obj is not None:
-                models.append(obj)
-        return models
-    else:
-
-        obj = to_object(model)
-        if obj:
-            obj.Selected = True
-            return obj
-        else:
-            return None
-
-def unselected_all():
-    m_list = FBModelList()
-    FBGetSelectedModels(m_list)
-    for m in m_list:
-        m.Selected = False
 
 
 if __name__ == "__builtin__":
