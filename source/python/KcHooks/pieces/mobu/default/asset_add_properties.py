@@ -73,7 +73,7 @@ class AssetAddProperties(Piece):
                 value = str(value)
 
             if prop in property_list:
-                print "already exists"
+                print "update property", prop, ":", value
                 property_list[prop].Data = value
             else:
                 if meta_model.PropertyList.Find(str(prop)):
@@ -87,10 +87,24 @@ class AssetAddProperties(Piece):
         if take > 0:
             color = self.piece_data["color"].get(take, "random")
             if color == "random":
-                color = (random.randint(0, 255)/255.0, random.randint(0, 255)/255.0, random.randint(0, 255)/255.0)
+                color = [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
+            color = [l for l in color]
+            if color[0] > 0:
+                color[0] = color[0]/255.0
+            if color[1] > 0:
+                color[1] = color[1]/255.0
+            if color[2] > 0:
+                color[2] = color[2]/255.0
 
-            prop = meta_color.PropertyList.Find("Diffuse")
-            prop.Data = FBColor(*color)
+            prop = meta_color.PropertyList.Find("DiffuseColor")
+
+            if isinstance(prop.Data, FBVector3d):
+                prop.Data = FBVector3d(*color)
+            else:
+                try:
+                    prop.Data = FBColor(*color)
+                except:
+                    print "set color failed:", color
        
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         if "update_at" in property_list:
@@ -111,9 +125,9 @@ if __name__ == "__builtin__":
             "namespace": "CH_tsukikoQuad",
             "properties": {"namespace": "CH_tsukikoQuad", 
                            "asset_name": "tsukikoQuad",
-                           "variation": "TEST",
+                           "variation": "",
                            "take": 2,
-                           "version": 1, 
+                           "version": 2, 
                            "category": "CH"},
             "meta": [
                      "namespace",
