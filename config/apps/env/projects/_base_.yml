@@ -58,7 +58,7 @@ data:
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
                 camera:
-                    rig: <asset_root>/<category>/MB/cam_t<take>_t<version>.FBX
+                    rig: <asset_root>/<category>/MB/cam_t<take>_<version>.FBX
                     sotai: <asset_root>/<category>/MB/cam_sotai_t<take>.FBX
                     config: <asset_root>/<category>/MB/config/cam_s00c000_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
