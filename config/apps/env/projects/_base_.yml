@@ -75,7 +75,7 @@ data:
 
         mobu:
             paths:
-                edit: <root_directory>/3D/s<scene>/c<cut>/edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>_<progress>.fbx
+                edit: <root_directory>/3D/s<scene>/c<cut>/edit/<project>_s<scene>c<cut>_edit_t<take>_<version>_<user>_<progress>.fbx
                 master: <root_directory>/3D/s<scene>/c<cut>/master/<project>_s<scene>c<cut>_anim.fbx
                 edit_movie: <root_directory>/3D/s<scene>/c<cut>/edit/mov_edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.mov
                 master_movie: <root_directory>/3D/s<scene>/c<cut>/movie_convert/MB/<project>_s<scene>c<cut>_MB.mov
