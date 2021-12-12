@@ -44,13 +44,11 @@ class GetCameras(Piece):
 
             name = each.Name
             if self.piece_data.get("include_model"):
-                cameras.append({"namespace": namespace, "name": name, "model": each, "category": "cam"})
+                cameras.append({"namespace": namespace, "name": name, "model": each, "category": "camera"})
             else:
-                cameras.append({"namespace": namespace, "name": name, "category": "cam"})
+                cameras.append({"namespace": namespace, "name": name, "category": "camera"})
 
         self.pass_data["cameras"] = cameras
-        print "XXXXXXXXXXXXXXXXXXX", cameras
-
         return flg, self.pass_data, header, detail
 
 if __name__ == "__builtin__":

@@ -34,13 +34,8 @@ class CameraExport(Piece):
         header = ""
         detail = ""
 
-        if not self.data["category"] == "cam":
+        if not self.data["category"] == "camera":
             return flg, self.pass_data, header, detail
-
-        print "select models"
-        print "export camera"
-
-        print self.data
 
         return flg, self.pass_data, header, detail
 
@@ -52,7 +47,7 @@ if __name__ == "__builtin__":
     data = {
             "namespace": "", 
             "name": "", 
-            "category": "cam", 
+            "category": "camera", 
             "number": 1
             }
 

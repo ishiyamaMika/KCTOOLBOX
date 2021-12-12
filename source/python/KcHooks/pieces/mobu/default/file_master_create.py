@@ -17,8 +17,9 @@ for mod in mods:
 from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
+import KcLibs.mobu.kc_transport_time as kc_transport_time
 
-_PIECE_NAME_ = "MasterSceneCreate"
+_PIECE_NAME_ = "FileMasterSceneCreate"
 
 class FileMasterSceneCreate(Piece):
     def __init__(self, **args):
@@ -26,7 +27,7 @@ class FileMasterSceneCreate(Piece):
         description:
             open_path - open path
         """
-        super(MasterSceneCreate, self).__init__(**args)
+        super(FileMasterSceneCreate, self).__init__(**args)
         self.name = _PIECE_NAME_
 
     def execute(self):
@@ -43,6 +44,12 @@ class FileMasterSceneCreate(Piece):
             print "check exists"
             print "if not exists.append sotai"
 
+        kc_transport_time.set_scene_time(self.data["start"], 
+                                         self.data["end"], 
+                                         self.data["start"], 
+                                         self.data["end"], 
+                                         self.data["fps"])
+
         return flg, self.pass_data, header, detail
 
 if __name__ == "__builtin__":
@@ -57,5 +64,5 @@ if __name__ == "__builtin__":
                        {"namespace": "", "name": "", "category": "cam", "sotai_path": ""}]
             }
 
-    x = MasterSceneCreate(piece_data=piece_data, data=data)
+    x = FileMasterSceneCreate(piece_data=piece_data, data=data)
     x.execute()

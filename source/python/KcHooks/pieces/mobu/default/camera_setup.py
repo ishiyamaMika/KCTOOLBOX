@@ -44,7 +44,7 @@ if __name__ == "__builtin__":
     piece_data = {}
 
     data = {
-           "namespace": "camera name"
+           "namespace": "camera name",
            "width": 1920,
            "height": 1080
             }

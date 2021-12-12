@@ -76,6 +76,23 @@ def load_ui(ui_file, tool_instance=None):
             tool_instance.setLayout(layout)
         return ui
 
+def set_table(widget, lst, dic):
+    widget.setColumnCount(len(lst))
+    names = []
+    for i, l in enumerate(lst):
+        if l in dic:
+            if "view" in dic[l]:
+                names.append(dic[l]["view"])
+            else:
+                names.append(l)
+            
+            if "width" in dic[l]:
+                widget.setColumnWidth(i, dic[l]["width"])
+        else:
+            names.append(l)
+
+    widget.setHorizontalHeaderLabels(names)
+
 
 def get_root_window():
     app_ = QtWidgets.QApplication.instance()
@@ -87,12 +104,11 @@ def get_root_window():
         while current:
             result, current = current, current.parent()
     else:
-        print "-----------"
         for widget in QtWidgets.QApplication.topLevelWidgets():
             if widget.accessibleName() in ["Mainboard", "MainBoard"]:
                 result = widget
                 break
-    print result
+
     return result
 
 

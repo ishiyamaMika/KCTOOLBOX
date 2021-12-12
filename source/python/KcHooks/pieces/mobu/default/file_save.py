@@ -26,15 +26,17 @@ class FileSave(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
+        if self.logger: self.logger.debug("file save: {}".format(self.data["path"]))
+
         flg = True
-        header = ""
-        detail = ""
         
         path = self.data["path"]
         if not os.path.lexists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
         
         file_io.file_save(path)
+        header = u"ファイルを保存しました: {}".format(os.path.basename(path))
+        detail = u"path\n{}".format(path)
         return flg, self.pass_data, header, detail
 
 if __name__ == "__builtin__":
@@ -53,3 +55,6 @@ if __name__ == "__builtin__":
 
     x = FileSave(piece_data=piece_data, data=data)
     x.execute()
+
+
+ 

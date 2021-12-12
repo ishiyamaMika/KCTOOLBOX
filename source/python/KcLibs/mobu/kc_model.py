@@ -102,8 +102,6 @@ def to_object(name):
     else:
         return _change_name_to_obj(name)
 
-
-
 def _change_name_to_obj(name):
     if isinstance(name, list) or isinstance(name, FBModelList):
         objs = []
@@ -113,7 +111,7 @@ def _change_name_to_obj(name):
     elif isinstance(name, FBModel):
         return name
     else:
-        model = find_model_by_name(name)
+        model = find_model_by_name(str(name))
         if model:
             return model
 #        else:
@@ -149,12 +147,34 @@ def is_in_schematic_view(model):
 
     return False
 
+
 def find_material_by_name(name):
     for material in FBSystem().Scene.Materials:
         if material.Name == name:
             return material
 
     return False
+
+
+def select(models):
+    select_models = []
+    if not isinstance(models, list):
+        models = [models]
+
+    for model in models:
+        obj = to_object(model)
+        if obj:
+            obj.Selected = True
+            select_models.append(obj)
+
+    return select_models
+
+
+def unselected_all():
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    for m in m_list:
+        m.Selected = False
 
 
 if __name__ == "__builtin__":
@@ -164,5 +184,5 @@ if __name__ == "__builtin__":
     # FBGetSelectedModels(m_list)
     # create_custom_property(m_list[0], "TEST", "String", "testABC", False)
 
-    print get_material("meta_colorX")
+    print to_object(["eye_L_dmy", "eye_R_dmy"])
 

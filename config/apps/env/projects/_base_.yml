@@ -3,11 +3,10 @@ info:
 
 data:
     extra_fields: 
-        root: X:/Project/_942_ZIZ
-        asset_root: <root>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
+        asset_root: <root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
 
     general: 
-        directory: "X:/Project/_942_ZIZ"
+        root_directory: "X:/Project/_942_ZIZ"
         fps: 24
 
         padding: 
@@ -30,6 +29,8 @@ data:
                 "<category>_<asset_name>"
             LO:
                 "<category>_<asset_name>_<variation>"
+            camera:
+                cam_s<scene>c<cut>
 
         meta:
             - namespace
@@ -46,12 +47,21 @@ data:
                 default:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx
                     sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_sotai_t<take>.fbx
-                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<config_type>.json
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<config_type>.json
+                    edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+
 
                 LO:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_t<take>_<version>.fbx
                     sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
-                    config: <asset_root>/<category>/<asset_name>/MB/config/<asset_name>_<variation>_<config_type>.json
+                    config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<variation>_<config_type>.json
+                    edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+
+                camera:
+                    rig: <asset_root>/<category>/MB/cam_t<take>_t<version>.FBX
+                    sotai: <asset_root>/<category>/MB/cam_sotai_t<take>.FBX
+                    config: <asset_root>/<category>/MB/config/cam_s00c000_<config_type>.json
+                    edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
 
     shot: 
         header:
@@ -60,10 +70,16 @@ data:
 
         name_pattern: "s<scene>c<cut>"
 
+        progress:
+            - anim
+
         mobu:
             paths:
-                edit: <root_directory>/3D/s<scene>/c<cut>/edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.fbx
+                edit: <root_directory>/3D/s<scene>/c<cut>/edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>_<progress>.fbx
                 master: <root_directory>/3D/s<scene>/c<cut>/master/<project>_s<scene>c<cut>_anim.fbx
+                edit_movie: <root_directory>/3D/s<scene>/c<cut>/edit/mov_edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.mov
+                master_movie: <root_directory>/3D/s<scene>/c<cut>/movie_convert/MB/<project>_s<scene>c<cut>_MB.mov
+
 
     puzzle:
         get_cameras:
@@ -71,6 +87,11 @@ data:
                 - name: get cameras
                   piece: KcHooks.pieces.mobu.default.get_cameras
                   description: get camera from scene
+        change_camera:
+            main:
+                - name: change camera
+                  piece: KcHooks.pieces.mobu.default.change_camera
+                  description: change camera to
 
         get_assets:
             main:

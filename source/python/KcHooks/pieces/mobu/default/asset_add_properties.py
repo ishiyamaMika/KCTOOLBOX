@@ -33,15 +33,22 @@ class AssetAddProperties(Piece):
         flg = True
         header = ""
         detail = ""
+        category = self.data["properties"]["category"]
         if not "namespace" in self.data:
             print "namespace is not exists"
             return flg, self.pass_data, u"namespaceが設定されていません", detail
 
-        root_model_name = self.piece_data["parent_name"].replace("<namespace>", self.data["namespace"])
+        if category in self.piece_data["parent_name"]:
+            parent_name = self.piece_data["parent_name"][category]
+        else:
+            parent_name = self.piece_data["parent_name"]["default"]
 
-        model = kc_model.find_model_by_name(self.piece_data["parent_name"].split(":")[-1], ignore_namespace=True)
+
+        root_model_name = parent_name.replace("<namespace>", self.data["namespace"])
+        model = kc_model.find_model_by_name(parent_name.split(":")[-1], ignore_namespace=True)
 
         meta_model = kc_model.find_model_by_name("meta", ignore_namespace=True)
+
         meta_color = kc_model.find_material_by_name("meta_color")
 
         if not meta_model:
@@ -88,6 +95,7 @@ class AssetAddProperties(Piece):
             color = self.piece_data["color"].get(take, "random")
             if color == "random":
                 color = [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
+
             color = [l for l in color]
             if color[0] > 0:
                 color[0] = color[0]/255.0
@@ -140,7 +148,7 @@ if __name__ == "__builtin__":
                      "update_by"]   
             }
     piece_data = {
-            "parent_name": "root",
+            "parent_name": {"camera": "cam_root"},
             "meta_model_name": "<namespace>:meta",
             "color": {
                 1: (255, 0, 0),
@@ -155,4 +163,4 @@ if __name__ == "__builtin__":
             }
 
     x = AssetAddProperties(piece_data=piece_data, data=data)
-    x.execute()
+    print x.execute()

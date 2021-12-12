@@ -16,6 +16,7 @@ data:
                     - LO
                     - VC
                     - BG
+                    - camera
                 function: filter_combo_changed
 
               - name: variation
@@ -32,7 +33,9 @@ data:
               - name: version
                 widget: QSpinBox
 
-          parent_name: <namespace>:root
+          parent_name: 
+            default: "<namespace>:root"
+            camera: "<namespace>:cam_root"
           meta_model_name: <namespace>:meta
           color: 
                 1: 

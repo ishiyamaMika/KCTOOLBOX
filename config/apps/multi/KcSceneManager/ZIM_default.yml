@@ -1,0 +1,207 @@
+info: 
+    name: tool
+    parent: ../_base_.yml
+
+data: 
+    directory: "X:/Project/tools/project/ZIM"
+    schema:
+        shot:
+            shot_name: ""
+            paths: 
+                mobu: 
+                    edit: ""
+                    master: ""
+                max:
+                    edit: ""
+                    master: ""
+
+            fields:
+              scene: 0
+              cut: 0
+              take: 0
+              version: 0
+              progress: anim
+              project: ""
+              project_variation: ""
+
+            frame:
+              start: 0
+              end: 0
+              fps: 0
+
+            assets: []
+
+    default_shot_name:
+        "<project>": "ZIM"
+        "<scene>": "01"
+        "<cut>": "001"
+        "<take>": "01"
+        "<version>": "01"
+
+
+    puzzle:
+        orders:
+            default: 
+                - primary
+                - main
+                - post
+
+            mobu_edit_export: 
+                - primary
+                - main
+                - post_primary
+                - post_main
+                - post_end
+
+        mobu_edit_export_varidate:
+            primary:
+                - name: open_file
+                  piece: KcHooks.pieces.mobu.default.file_open
+                  description: open file
+
+            main:
+                - name: export asset
+                  piece: KcHooks.pieces.mobu.default.asset_export
+                  description: export asset
+                  mode: varidate
+                  # filters: 
+                  #     - category: ["CH", "BG", "PR", "LO"]
+                  paint:
+                      export_path: mobu_edit_export_path
+
+                #- name: export camera
+                #  piece: KcHooks.pieces.mobu.default.camera_export
+                #  description: export camera
+                #  mode: varidate
+                #  filters:
+                #      - category: [cam]
+
+                #  paint:
+                #      export_path: mobu_edit_export_path
+
+        mobu_edit_export:
+            primary:
+                - name: open_file
+                  piece: KcHooks.pieces.mobu.default.file_open
+                  description: open file
+                  force: true
+
+                - name: change scene time
+                  piece: KcHooks.pieces.mobu.default.change_time
+                  description: "change scene time. result set to pass_data"
+                  fps: 24
+                  mode: change
+
+                - name: plot_all
+                  piece: KcHooks.pieces.mobu.default.plot_all
+                  description: plot all
+                  paint:
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+            main:
+                - name: koma save
+                  piece: KcHooks.pieces.mobu.default.get_koma
+                  description: save koma config
+
+                - name: export asset
+                  piece: KcHooks.pieces.mobu.default.asset_export
+                  description: export asset
+                  paint:
+                      export_path: mobu_edit_export_path
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+                # - name: export camera
+                #   piece: KcHooks.pieces.mobu.default.camera_export
+                #   description: export camera
+                #   paint:
+                #       export_path: mobu_edit_export_path
+
+            post_primary:
+                - name: create
+                  piece: KcHooks.pieces.mobu.default.file_open
+                  new: true
+                  description: ""
+                  paint:
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+            post_main:
+                - name: story clip create
+                  piece: KcHooks.pieces.mobu.default.story_create
+                  description: create story clip
+                  paint:
+                      export_path: mobu_edit_export_path
+                      asset_path: mobu_sotai_path
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+            post_end:
+                #- name: cam_setup
+                #  piece: KcHooks.pieces.mobu.default.camera_setup
+                #  description: ""
+
+                - name: file_save
+                  piece: KcHooks.pieces.mobu.default.file_save
+                  description: ""
+                  paint: 
+                      path: mobu_master_path
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+                - name: render_scene
+                  piece: KcHooks.pieces.mobu.default.render_scene
+                  description: ""
+                  paint:
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+        mobu_master_export:
+            primary:
+                - name: open
+                  piece: KcHooks.pieces.mobu.file_open
+                  description: ""
+
+                - name: plot_all
+                  piece: KcHooks.pieces.mobu.default.plot_all
+                  description: plot all
+
+            main:
+                - name: export asset
+                  piece: KcHooks.pieces.mobu.default.asset_export
+                  description: export asset
+
+                - name: export camera
+                  piece: KcHooks.pieces.mobu.default.camera_export
+                  description: export camera
+
+        mobu_edit_render:
+            primary:
+                - name: open
+                  piece: KcHooks.pieces.mobu.default.file_open
+                  description: ""
+
+                - name: change scene time
+                  piece: KcHooks.pieces.mobu.default.change_time
+                  description: "change scene time. result set to pass_data"
+                  fps: 24
+                  mode: change
+
+                - name: render
+                  piece: KcHooks.pieces.mobu.default.render_scene
+                  description: "render scene"
+                  paint:
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+            finally:
+                - name: revert scene time
+                  piece: KcHooks.pieces.mobu.default.change_time
+                  description: "revert scene time"
+                  mode: revert

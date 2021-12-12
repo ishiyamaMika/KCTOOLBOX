@@ -45,9 +45,14 @@ class GetAssets(Piece):
             for meta_name in self.data["meta"]:
                 meta_property = meta_model.PropertyList.Find(meta_name)
                 if meta_property:
+                    if meta_name == "namespace":
+                        meta_name = "true_namespace"
                     meta_data[meta_name] = meta_property.Data
+            namespace = meta_model.LongName.split(":")[0]
+            meta_data["namespace"] = namespace
 
             assets.append(meta_data)
+            if self.logger: self.logger.debug("namespace: {}".format(namespace))
 
         self.pass_data["assets"] = assets
 

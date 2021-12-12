@@ -396,7 +396,7 @@ class KcSetupper(QtWidgets.QWidget):
             data["properties"][k] = value
             if k == "category":
                 category = value
-       
+
         if category:
             namespace_pattern = self.project.config["asset"]["namespaces"]
             if not category in namespace_pattern:
@@ -411,7 +411,10 @@ class KcSetupper(QtWidgets.QWidget):
                     continue
                 else:
                     fields["<{}>".format(k)] = v
-
+           
+            if category == "camera": 
+                fields["<scene>"] = "00"
+                fields["<cut>"] = "000"
             namespace = self.project.path_generate(pattern, fields)
         else:
             return False

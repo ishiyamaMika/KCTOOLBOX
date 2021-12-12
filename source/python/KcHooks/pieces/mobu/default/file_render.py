@@ -44,7 +44,7 @@ if __name__ == "__builtin__":
     piece_data = {}
 
     data = {
-           "mobu_movie_path": ""
+           "mobu_movie_path": "",
            "width": 1920,
            "height": 1080,
            "start": 0,
