@@ -46,7 +46,6 @@ class StoryCreate(Piece):
                 exists = True
 
         if not exists:
-            print os.path.exists(asset_path)
             detail += u"assetを追加しました\n{}\n".format(asset_path)
             kc_file_io.file_merge(asset_path, str(self.data["namespace"]))
         else:

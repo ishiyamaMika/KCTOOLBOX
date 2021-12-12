@@ -9,7 +9,7 @@ from pyfbsdk import *
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
     sys.path.append(mod)
-print mod
+
 from puzzle.Piece import Piece
 import KcLibs.mobu.kc_model as kc_model
 

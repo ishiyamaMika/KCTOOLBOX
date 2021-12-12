@@ -30,8 +30,6 @@ class ChangeCamera(Piece):
         header = ""
         detail = ""
 
-        print self.data
-
         cameras = []
         for cam in FBSystem().Scene.Cameras:
             if cam.SystemCamera:

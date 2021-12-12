@@ -49,8 +49,6 @@ class PlotAll(Piece):
             if not config:
                 continue
 
-            print config
-
             if not os.path.lexists(config):
                 continue
             

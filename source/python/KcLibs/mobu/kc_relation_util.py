@@ -79,7 +79,6 @@ def find_box_by_model(const, model, src=True):
                     if direction == "dst":
                         return box
         elif isinstance(box, FBBoxPlaceHolder):
-            print dir(box), 
             if box.Box == model:
                 direction = check_direction(box)
                 if src:

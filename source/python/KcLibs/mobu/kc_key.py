@@ -40,7 +40,6 @@ def _comp_property(a, b):
     tx = open(tx_path, "w")
     tx.write("\n".join(ls))
     tx.close()
-    print tx_path
 
 def _get_property_list_data(src=True):
     m_list = FBModelList()

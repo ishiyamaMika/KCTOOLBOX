@@ -121,7 +121,6 @@ class GetConfigs(QtCore.QThread):
             try:
                 js = json.load(open(path, "r"), "utf8")
                 info, data = js["info"], js["data"]
-                print 12345, path
                 self.each_signal.emit(info, data, path)
                 time.sleep(0.05)
             except:
@@ -828,7 +827,6 @@ class KcSceneManager(QtWidgets.QWidget):
             return 
 
         item = selected_items[0]
-        print item.row_data
         if item.row_data["type"] == "config":
             self.delete_from_config_action.setVisible(True)
         else:
@@ -856,7 +854,6 @@ class KcSceneManager(QtWidgets.QWidget):
             for i, asset in enumerate(config_assets[::-1]):
                 if namespace == asset["namespace"]:
                     poped = config_assets.pop(i)
-                    print "poped:", poped["namespace"]
                     self.ui.asset_table.setRowHidden(row, True)
 
         self.current_shot_item.row_data = data
@@ -1216,7 +1213,6 @@ class KcSceneManager(QtWidgets.QWidget):
         self.project.set(self.project_name, self.variation_name)
         self.project.set_tool_config("multi", self.NAME)
 
-        pprint.pprint(self.project.config["extra_fields"])
 
         # info, self.project_config = self.project.sticky.read("{}/config.json".format(self.project.tool_config["directory"]))
 
@@ -1353,7 +1349,6 @@ class KcSceneManager(QtWidgets.QWidget):
 
             if not data["path"]:
                 print "parse error:", self.project.config["shot"][kc_env.mode]["paths"]["master"]
-                pprint.pprint(data)
                 continue
             if not os.path.exists(data["path"]):
                 print "master not exists:", data["path"]
@@ -1704,10 +1699,8 @@ class KcSceneManager(QtWidgets.QWidget):
 
     def set_icon(self, btn):
         if btn.is_active:
-            print "on"
             btn.setIcon(self.on_check_icon)
         else:
-            print "off"
             btn.setIcon(self.off_check_icon)
 
     def set_table(self, widget):
@@ -1745,7 +1738,6 @@ class KcSceneManager(QtWidgets.QWidget):
             else:
                 self.ui.shot_table.setRowHidden(r, False)
 
-            print r, item.info_data
                     
     def is_current_user(self, item):
         if item.info_data.get("update_by") == self.user:
@@ -1828,7 +1820,6 @@ class KcSceneManager(QtWidgets.QWidget):
             self.list_asset_table(item)
 
         self.connect_signals(True)
-        print "D"
 
     def append_scene_table(self, data, selection_name):
         if isinstance(data, list):
@@ -2015,7 +2006,6 @@ class KcSceneManager(QtWidgets.QWidget):
             info = self.asset_table_state["both"]
             item.setForeground(info["color"])
             item.setToolTip(info["tooltip"])
-        print assets
         # data = {"data": self.current_shot_item.row_data, 
         #         "info": self.current_shot_item.info_data}
         kc_env.save_config(self.current_shot_item.config_path, self.NAME, "shot_config", self.current_shot_item.row_data)
@@ -2201,7 +2191,6 @@ class KcSceneManagerCmd(object):
     def get_config_path(self, asset_path, namespace, config_type):
         d, f = os.path.split(asset_path)
         path = "{}/config/{}_{}.json".format(d, namespace, config_type)
-        print "ooo:::", path
         if os.path.exists(path):
             return path
         return False
@@ -2209,8 +2198,6 @@ class KcSceneManagerCmd(object):
     def select_from_config(self, path):
         js = json.load(open(path, "r"), "utf8")
         data = [str("{}:{}".format(l["namespace"], l["name"])) for l in js["data"]]
-        print
-        print data
         kc_model.select(data)
 
 

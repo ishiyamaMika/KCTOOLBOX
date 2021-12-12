@@ -83,10 +83,6 @@ def file_merge(file_path, namespace=None, padding=2):
                 pattern = "{}_" + "{{:0{}d}}".format(padding)
                 namespace = pattern.format(namespace, number)
 
-
-            print 1, current
-            print 2, namespace
-
             for comp in FBSystem().Scene.Components:
                 comp_s = comp.LongName.split(":")
                 if len(comp_s) == 1:
