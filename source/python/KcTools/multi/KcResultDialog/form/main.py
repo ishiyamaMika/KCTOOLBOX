@@ -98,7 +98,8 @@ class KcResultDialog(QtWidgets.QDialog):
             return
 
         self.detail.clear()
-        self.detail.setPlainText(selected_items[0].detail_text)
+        if hasattr(selected_items[0], "detail_text"):
+            self.detail.setPlainText(selected_items[0].detail_text)
 
     def append_header_table(self, results):
 
