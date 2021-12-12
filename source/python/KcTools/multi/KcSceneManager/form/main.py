@@ -1724,7 +1724,7 @@ class KcSceneManager(QtWidgets.QWidget):
         user_check = self.ui.user_check.checkState() == QtCore.Qt.Checked
         
         for r in range(self.ui.shot_table.rowCount()):
-            item = self.ui.shot_table.item(r, self.shot_table_list.index("name"))
+            item = self.ui.shot_table.item(r, self.shot_table_list.index("user"))
             if user_check:
                 if self.is_current_user(item):
                     self.ui.shot_table.setRowHidden(r, False)
