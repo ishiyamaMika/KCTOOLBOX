@@ -64,13 +64,16 @@ class ChangeTime(Piece):
             
         elif self.piece_data["mode"] == "revert":
             header = "revert scene time"
-            detail = "revert time to: {}-{}({})".format(self.pass_data[_PIECE_NAME_]["loop_start"], 
-                                                        self.pass_data[_PIECE_NAME_]["loop_stop"], 
-                                                        self.pass_data[_PIECE_NAME_]["fps"])
+            if _PIECE_NAME_ in self.pass_data:
+                detail = "revert time to: {}-{}({})".format(self.pass_data[_PIECE_NAME_]["loop_start"], 
+                                                            self.pass_data[_PIECE_NAME_]["loop_stop"], 
+                                                            self.pass_data[_PIECE_NAME_]["fps"])
 
-            header = u"シーンのフレームを戻しました"
-            kc_transport_time.set_scene_time(**self.pass_data[_PIECE_NAME_])
-            self.logger.debug(detail)
+                header = u"シーンのフレームを戻しました"
+                kc_transport_time.set_scene_time(**self.pass_data[_PIECE_NAME_])
+                self.logger.debug(detail)
+            else:
+                header = u"シーンのフレームは変更されていませんでした"
 
         return flg, self.pass_data, header, detail
 
