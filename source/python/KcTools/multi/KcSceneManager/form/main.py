@@ -294,11 +294,6 @@ class RecordDialog(QtWidgets.QDialog):
 
             self.record.emit(data, self.path, relatives, self.cam_check.checkState()==QtCore.Qt.Checked)
             self.close()
-            if self.save_as_mode:
-                QtWidgets.QMessageBox.information(self, "info", u"保存しました", QtWidgets.QMessageBox.Ok)
-            else:
-                QtWidgets.QMessageBox.information(self, "info", u"変更しました", QtWidgets.QMessageBox.Ok)
-
 
 class KcSceneManager(QtWidgets.QWidget):
     NAME = "KcSceneManager"
@@ -677,6 +672,7 @@ class KcSceneManager(QtWidgets.QWidget):
             self.append_camera(data)
         self.update_record_from_dialog(data, path)
         self.update_relative_record_path(relative_items, path)
+        QtWidgets.QMessageBox.information(self, "info", u"変更しました", QtWidgets.QMessageBox.Ok)
 
     def append_camera(self, data):
 
@@ -713,6 +709,7 @@ class KcSceneManager(QtWidgets.QWidget):
                 return
         self.update_relative_record_path(relative_items, save_path, save_as=True)
         self.cmd.file_save(save_path)
+        QtWidgets.QMessageBox.information(self, "info", u"保存しました", QtWidgets.QMessageBox.Ok)
         if self.current_scene_item:
             self.reload(unicode(self.current_scene_item.text()))
         else:
