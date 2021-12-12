@@ -4,6 +4,7 @@ info:
 
 data: 
     directory: "X:/Project/tools/project/ZIM"
+    shot_directory: "X:/Project/tools/project/ZIM/3D"
     schema:
         shot:
             shot_name: ""

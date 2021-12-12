@@ -1236,7 +1236,7 @@ class KcSceneManager(QtWidgets.QWidget):
         # scenes = [u"all"] + scenes
 
         self.append_scene_table(scenes, selection_name)
-        self.create_tree(self.project.config["general"]["root_directory"])
+        self.create_tree(self.project.tool_config["shot_directory"])
 
     def edit_explorer_action_triggered(self):
         if not self.current_shot_item:
