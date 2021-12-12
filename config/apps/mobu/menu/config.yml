@@ -3,8 +3,9 @@ info:
 
 data:
     order:
-        - modeling
+        - shot
         - rigging
+        - modeling
         - animation
         - palette_tools
         - centrum
