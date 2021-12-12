@@ -1583,11 +1583,6 @@ class KcSceneManager(QtWidgets.QWidget):
             configs.sort()
             return configs
 
-        if name == u"all":
-            filter_ = False
-        else:
-            filter_ = name
-
         self.ui.shot_table.clearContents()
         self.ui.shot_table.setRowCount(0)
         shot_paths = []
@@ -1740,7 +1735,7 @@ class KcSceneManager(QtWidgets.QWidget):
 
                     
     def is_current_user(self, item):
-        if item.info_data.get("update_by") == self.user:
+        if unicode(item.text()) == self.user:
             return True
         return False
 
