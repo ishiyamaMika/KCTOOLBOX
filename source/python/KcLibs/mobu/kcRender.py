@@ -5,6 +5,15 @@ import sys
 
 from pyfbsdk import *
 
+
+
+mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+if mod not in sys.path:
+    sys.path.append(mod)
+
+import KcLibs.mobu.kc_model as kc_model    
+import KcLibs.mobu.kc_transport_time as kc_transport_time    
+
 class KcRender(object):
     def __init__(self):
         self.start = False
@@ -20,6 +29,7 @@ class KcRender(object):
         self.show_time_code = True
         self.height = False
         self.width = False
+        self.render_scale = 1
 
     def options(self, **kwargs):
         for k, v in kwargs.items():
@@ -29,13 +39,13 @@ class KcRender(object):
 
     def execute(self, cam, path, dialog=False):
         def _set_start_end_fps():
-            frames = taAnimSec_scene.get_transport_frames()
+            frames = kc_transport_time.get_scene_time()
             if not self.start:
-                self.start = frames[1]
+                self.start = frames["zoom_start"]
             if not self.end:
-                self.end = frames[2]
+                self.end = frames["zoom_stop"]
             if not self.fps:
-                self.fps = frames[-1]
+                self.fps = frames["fps"]
 
         def _set_viewing():
             if "model_only":
@@ -61,6 +71,23 @@ class KcRender(object):
             span = FBTimeSpan()
             span.Set(start, end)
             return span
+
+        def _change_resolution(cam, scale):
+            width = cam.ResolutionWidth
+            height = cam.ResolutionHeight
+            cam.ResolutionHeight = int(float(cam.ResolutionHeight) * float(scale))
+            cam.ResolutionWidth = int(float(cam.ResolutionWidth) * float(scale))
+
+            print "change cam to:", cam.ResolutionWidth, cam.ResolutionHeight
+            return width, height
+
+        def _revert_resolution(cam, width, height):
+            cam.ResolutionWidth = width
+            cam.ResolutionHeight = height
+            print "revert cam to:", width, height
+
+        if path == "":
+            return False
 
         _set_start_end_fps()
 
@@ -88,21 +115,29 @@ class KcRender(object):
         app = FBApplication()
 
         if isinstance(cam, (str, unicode)):
-            cam = taAnimSec_scene.find_model_by_name(cam)
+            cam = kc_model.find_model_by_name(cam)
             if not cam:
                 print ""
                 return False
 
-        app.SwitchViewerCamera(cam)
         
+        if self.render_scale != 1:
+            width, height = _change_resolution(cam, self.render_scale)
+
+        app.SwitchViewerCamera(cam)
         FBSystem().Scene.Evaluate()
 
         app.FileRender(grabber_options)
+        if self.render_scale != 1:
+            _revert_resolution(cam, width, height)
+
+        return True
 
 if __name__ == "__builtin__":
-    cam = ""
-    path = ""
+    cam = "cam_s01c006A:Merge_Camera"
+    path = "E:/works/client/keica/data/test.mov"
     render = KcRender()
+    render.render_scale = 0.5
     render.execute(cam, path)
 
 

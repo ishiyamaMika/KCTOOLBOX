@@ -5,6 +5,7 @@ import codecs
 import json
 import re
 import copy
+import glob
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 
@@ -23,26 +24,6 @@ from puzzle.Puzzle import Puzzle
 
 import logging
 from logging import getLogger, StreamHandler, FileHandler
-
-"""
-LOGGER = getLogger("kcToolBox")
-format = "%(asctime)-25s %(levelname)-10s %(module)-15s %(funcName)-25s line:%(lineno)-5s %(message)s"
-formatter = logging.Formatter(format)
-
-path = kc_env.get_log_directory("KcToolBox")
-if not os.path.exists(path):
-    os.makedirs(path)
-
-
-file_handler = FileHandler("{}/KcToolBox.log".format(path), mode="a")
-file_handler.type_str = "file1"
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-LOGGER.addHandler(file_handler)
-stream = logging.StreamHandler()
-stream.setFormatter(formatter)
-LOGGER.addHandler(stream)
-"""
 
 class KcProject(object):
     def __init__(self, logger=None):
@@ -103,12 +84,47 @@ class KcProject(object):
         self.tool_config_directory = kc_env.get_app_config(app, tool_name)
         self.tool_config = self.get_config(self.tool_config_directory)
 
-    def get_cameras(self):
-        piece_data = self.config["puzzle"]["get_cameras"]
+    def change_camera(self, namespace, start, end, fps):
+        data = {
+            "namespace": namespace,
+            "start": start,
+            "stop": end,
+            "fps": fps
+            }
 
+        piece_data = self.config["puzzle"]["change_camera"]
+        pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
+
+
+    def get_cameras(self, include_model=False):
+        piece_data = self.config["puzzle"]["get_cameras"]
+        piece_data["include_model"] = include_model
         pass_data, results = self.puzzle_play(piece_data, {}, {})
 
         return pass_data.get("cameras", [])
+
+    def get_latest_camera_path(self):
+        rig_path = self.config["asset"][kc_env.mode]["paths"]["camera"]["rig"]
+        camera_directory = self.path_generate(os.path.dirname(rig_path), {"<category>": "camera"})
+        print os.path.dirname(rig_path), camera_directory
+        if not camera_directory:
+            return False
+
+        paths = glob.glob("{}/{}".format(camera_directory, os.path.basename(rig_path).replace("<take>", "*").replace("<version>", "*")))
+        paths.sort()
+        if len(paths) == 0:
+            return
+
+        cam_path = paths[-1]
+        return cam_path
+
+    def get_asset(self, namespace):
+        assets = [l for l in self.get_assets() if l["namespace"] == namespace]
+
+        if len(assets) == 0:
+            return False
+
+        return assets[0]
 
     def get_assets(self):
         piece_data = self.config["puzzle"]["get_assets"]
@@ -130,7 +146,6 @@ class KcProject(object):
                 key = "<{}>".format(k)
                 if key in self.config["general"]["padding"]:
                     padding = "{{:0{}d}}".format(self.config["general"]["padding"][key])
-                    print "ooo::", padding
                     if isinstance(v, (int, float)):
                         fields_[key] = padding.format(int(v))
                     else:
@@ -138,12 +153,12 @@ class KcProject(object):
                 else:
                     fields_[key] = str(v)
             else:
-                fields_[key] = str(v)
-
+                fields_[k] = str(v)
+   
         fields_["<project>"] = self.name
+        fields_["<root_directory>"] = self.config["general"]["root_directory"]
 
         fields_.update(self.config["extra_fields"])
-
         return self.field_generator.generate(template, fields_, force=force)
 
     def path_split(self, template, path):
@@ -151,9 +166,10 @@ class KcProject(object):
 
     def puzzle_play(self, piece_data, data, pass_data={}, order=["primary", "main", "post"]):
         self.puzzle.order = order
-        self.puzzle.pass_data = {}
-        self.puzzle.pass_data.update(pass_data)
-        self.puzzle.pass_data["project"] = self
+        pass_data["project"] = self
+
+        self.puzzle.pass_data = {"project": self}
+
 
         results = self.puzzle.play(piece_data, data, pass_data)
         error = []
@@ -276,3 +292,9 @@ if __name__ in ["__main__", "__builtin__"]:
                u'update_by': u'amek'}
     template = "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
     print "________", x.path_generate(template, fields)
+
+
+    print "________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad")
+
+    print x.get_assets()
+    x.change_camera("TEST", 0, 20, 24)

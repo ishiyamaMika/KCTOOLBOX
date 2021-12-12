@@ -36,6 +36,7 @@ class StoryCreate(Piece):
         header = ""
         detail = ""
 
+
         asset_path = str(self.data["asset_path"])
 
         assets = self.pass_data["project"].get_assets()
@@ -46,21 +47,29 @@ class StoryCreate(Piece):
 
         if not exists:
             print os.path.exists(asset_path)
+            detail += u"assetを追加しました\n{}\n".format(asset_path)
             kc_file_io.file_merge(asset_path, str(self.data["namespace"]))
+        else:
+            detail += u"アセットはすでにシーンに存在します\n"
 
         plot_config_path = self.data["config"]["plot"]
         if not plot_config_path:
-            header = u"config path is not exists: {}".format(plot_config_path)
+            header = u"設定ファイルがありませんでした: {}".format(self.data["namespace"])
+            detail = u"path: {}".format(plot_config_path)
             self.logger.debug(header)
             return True, self.pass_data, header, detail
 
         info, models = self.pass_data["project"].sticky.read(plot_config_path)
         model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
-        kc_story.create_story_track(str(self.data["namespace"]), model_names)
+        track = kc_story.create_story_track(str(self.data["namespace"]), model_names)
+
+        kc_story.create_clip(track, str(self.data["export_path"]), offset=self.data["start"])
 
         if self.logger: self.logger.debug("update: {}".format(self.data["namespace"]))
 
-        return flg, self.pass_data, header, detail
+        detail += "\n" + unicode(self.data)
+
+        return flg, self.pass_data, u"storyのクリップを作成しました: {}".format(self.data["namespace"]), detail
 
 if __name__ == "__builtin__":
     piece_data = {"paint": {

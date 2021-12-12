@@ -156,22 +156,19 @@ def find_material_by_name(name):
     return False
 
 
-def select(model):
-    if isinstance(model, list):
-        models = []
-        for m in model:
-            obj = select(m)
-            if obj is not None:
-                models.append(obj)
-        return models
-    else:
+def select(models):
+    select_models = []
+    if not isinstance(models, list):
+        models = [models]
 
+    for model in models:
         obj = to_object(model)
         if obj:
             obj.Selected = True
-            return obj
-        else:
-            return None
+            select_models.append(obj)
+
+    return select_models
+
 
 def unselected_all():
     m_list = FBModelList()
@@ -187,5 +184,5 @@ if __name__ == "__builtin__":
     # FBGetSelectedModels(m_list)
     # create_custom_property(m_list[0], "TEST", "String", "testABC", False)
 
-    print get_material("meta_colorX")
+    print to_object(["eye_L_dmy", "eye_R_dmy"])
 

@@ -17,6 +17,7 @@ for mod in mods:
 from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
+import KcLibs.mobu.kc_transport_time as kc_transport_time
 
 _PIECE_NAME_ = "FileMasterSceneCreate"
 
@@ -42,6 +43,12 @@ class FileMasterSceneCreate(Piece):
             print "get asset from scene"
             print "check exists"
             print "if not exists.append sotai"
+
+        kc_transport_time.set_scene_time(self.data["start"], 
+                                         self.data["end"], 
+                                         self.data["start"], 
+                                         self.data["end"], 
+                                         self.data["fps"])
 
         return flg, self.pass_data, header, detail
 

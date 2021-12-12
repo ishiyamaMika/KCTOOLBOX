@@ -44,9 +44,9 @@ class GetCameras(Piece):
 
             name = each.Name
             if self.piece_data.get("include_model"):
-                cameras.append({"namespace": namespace, "name": name, "model": each, "category": "cam"})
+                cameras.append({"namespace": namespace, "name": name, "model": each, "category": "camera"})
             else:
-                cameras.append({"namespace": namespace, "name": name, "category": "cam"})
+                cameras.append({"namespace": namespace, "name": name, "category": "camera"})
 
         self.pass_data["cameras"] = cameras
         return flg, self.pass_data, header, detail

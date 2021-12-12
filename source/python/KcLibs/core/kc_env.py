@@ -18,6 +18,7 @@ if not mod in sys.path:
 try:
     import KcLibs.core.kc_sentry as kc_sentry
     kc_sentry.load()
+    print "load: sentry"
 except:
     pass
 
@@ -108,6 +109,10 @@ def get_log_directory(*args):
     return "{}/config/user/log/{}/{}".format(get_root_directory(), get_user(), joined)
 
 def get_info(**kwargs):
+    """
+    TODO: 
+        use save config
+    """
     info = {"update_by": get_user(), 
             "update_at": datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")}
 
@@ -128,20 +133,21 @@ def load_config(path, defaults={}):
         data.setdefault(k, v)
     return data
 
-def save_config(path, name, category, data):
+def save_config(path, name, category, data, **kwargs):
     info = {
-        "user": get_user(),
+        "update_by": get_user(),
         "update_at": datetime.datetime.now().strftime("%Y:%m:%d %H:%M:%S"),
         "name": name,
         "category": category
     }
+    info.update(kwargs)
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
     try:
         json.dump({"info": info, "data": data}, open(path, "w"), "utf8", indent=4)
-        return True
+        return True, info, data
     except:
-        return False
+        return False, info, data
 
 
 if __name__ in ["__builtin__", "__main__"]:

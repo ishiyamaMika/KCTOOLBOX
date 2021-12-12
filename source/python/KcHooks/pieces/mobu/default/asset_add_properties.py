@@ -33,15 +33,22 @@ class AssetAddProperties(Piece):
         flg = True
         header = ""
         detail = ""
+        category = self.data["properties"]["category"]
         if not "namespace" in self.data:
             print "namespace is not exists"
             return flg, self.pass_data, u"namespaceが設定されていません", detail
 
-        root_model_name = self.piece_data["parent_name"].replace("<namespace>", self.data["namespace"])
+        if category in self.piece_data["parent_name"]:
+            parent_name = self.piece_data["parent_name"][category]
+        else:
+            parent_name = self.piece_data["parent_name"]["default"]
 
-        model = kc_model.find_model_by_name(self.piece_data["parent_name"].split(":")[-1], ignore_namespace=True)
+
+        root_model_name = parent_name.replace("<namespace>", self.data["namespace"])
+        model = kc_model.find_model_by_name(parent_name.split(":")[-1], ignore_namespace=True)
 
         meta_model = kc_model.find_model_by_name("meta", ignore_namespace=True)
+
         meta_color = kc_model.find_material_by_name("meta_color")
 
         if not meta_model:
@@ -87,10 +94,15 @@ class AssetAddProperties(Piece):
         if take > 0:
             color = self.piece_data["color"].get(take, "random")
             if color == "random":
-                color = (random.randint(0, 255)/255.0, random.randint(0, 255)/255.0, random.randint(0, 255)/255.0)
+                color = [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
 
+            color = (color[0]/255.0, color[1]/255.0, color[2]/255.0)
+            print color
             prop = meta_color.PropertyList.Find("Diffuse")
-            prop.Data = FBColor(*color)
+            try:
+                prop.Data = FBColor(*color)
+            except:
+                print "set color: failed"
        
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         if "update_at" in property_list:
@@ -108,13 +120,13 @@ class AssetAddProperties(Piece):
 
 if __name__ == "__builtin__":
     data = {
-            "namespace": "CH_tsukikoQuad",
-            "properties": {"namespace": "CH_tsukikoQuad", 
-                           "asset_name": "tsukikoQuad",
-                           "variation": "TEST",
-                           "take": 2,
+            "namespace": "cam_s01c001",
+            "properties": {"namespace": "cam_s01c001", 
+                           "asset_name": "cam_s00c000",
+                           "variation": "",
+                           "take": 20,
                            "version": 1, 
-                           "category": "CH"},
+                           "category": "camera"},
             "meta": [
                      "namespace",
                      "asset_name",
@@ -126,7 +138,7 @@ if __name__ == "__builtin__":
                      "update_by"]   
             }
     piece_data = {
-            "parent_name": "root",
+            "parent_name": {"camera": "cam_root"},
             "meta_model_name": "<namespace>:meta",
             "color": {
                 1: (255, 0, 0),
@@ -141,4 +153,4 @@ if __name__ == "__builtin__":
             }
 
     x = AssetAddProperties(piece_data=piece_data, data=data)
-    x.execute()
+    print x.execute()

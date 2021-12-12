@@ -52,7 +52,7 @@ class GetAssets(Piece):
             meta_data["namespace"] = namespace
 
             assets.append(meta_data)
-            self.logger.debug("namespace: {}".format(namespace))
+            if self.logger: self.logger.debug("namespace: {}".format(namespace))
 
         self.pass_data["assets"] = assets
 

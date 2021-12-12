@@ -31,6 +31,9 @@ def file_open(file_path):
     except:
         return False
 
+def file_new():
+    FBApplication().FileNew()
+
 def get_file_path():
     return FBApplication().FBXFileName
 
@@ -52,6 +55,7 @@ def file_merge(file_path, namespace=None, padding=2):
     if FBApplication().FileAppend(file_path, False, options):
         if not namespace:
             return
+
         pattern = "(.*)_([0-9]*)$"
         namespaces = {}
         for b in before:
@@ -68,9 +72,7 @@ def file_merge(file_path, namespace=None, padding=2):
         a = set(before)
         b = set(after)
 
-        print ">>>??", a, b
         current = list(b - a)
-        print "33333", current
         if len(current) > 0:
             current = current[0]
 

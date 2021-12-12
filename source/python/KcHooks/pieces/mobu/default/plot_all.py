@@ -62,7 +62,8 @@ class PlotAll(Piece):
 
         print "select camera models"
         print "plot"
-        print len(model_names)
+        header = u"plotしました: {}".format(len(model_names))
+        detail = "plot:\n" + "\n".join(model_names)
         kc_key.plot_selected()
 
         return flg, self.pass_data, header, detail
@@ -76,7 +77,7 @@ if __name__ == "__builtin__":
             "start": 0,
             "end": 100,
             "assets": [{"namespace": "", "name": "", "category": "CH", "number": 1}, 
-                       {"namespace": "", "name": "", "category": "cam"}]
+                       {"namespace": "", "name": "", "category": "camera"}]
             }
 
     x = PlotAll(piece_data=piece_data, data=data)
