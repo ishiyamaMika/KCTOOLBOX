@@ -26,9 +26,6 @@ def generate_id():
 
 
 def eventMenu(control, event):
-    print event.Name
-    print event.Id
-    print _MENU_DIC_
     if event.Id not in _MENU_DIC_:  
         return
     script = _MENU_DIC_[event.Id]
@@ -61,14 +58,19 @@ def create_menu(menu_root):
     # if menu_manager.GetMenu("keica") is not None:
     #    return
 
-    menu_manager.InsertBefore(None, "Help", "keica")
+
     root = menu_manager.GetMenu("keica")
+    if not root:
+        menu_manager.InsertBefore(None, "Help", "keica")
+    root = menu_manager.GetMenu("keica")
+
+    root.category_name = "root"
 
     ls = os.listdir(menu_root)
     menus = {menu_root: root}
     config = _get_yml_config(menu_root)
     ls = _sort(config, ls)
-    for l in ls:
+    for i, l in enumerate(ls):
         directory = "{}/{}".format(menu_root.replace("\\", "/"), l)
         if l.endswith(".yml"):
             continue
@@ -76,9 +78,11 @@ def create_menu(menu_root):
             continue
 
         menu = FBGenericMenu()
-        root.InsertLast(l, 200, menu)
+        root.InsertLast(l, 200+i, menu)
         menu.OnMenuActivate.Add(eventMenu)
         menus[directory] = menu
+
+        menu.category_name = os.path.basename(directory)
 
         config = _get_yml_config(directory)
         for d, dl, fl in os.walk(directory):
@@ -97,9 +101,11 @@ def create_menu(menu_root):
 
                 if sub_menu_path not in menus:
                     sub_menu = FBGenericMenu()
+                    sub_menu.category_name = os.path.basename(sub_menu_path)
                     menus[parent].InsertLast(d_, 200, sub_menu)
                     menus[sub_menu_path] = sub_menu
                     sub_menu.OnMenuActivate.Add(eventMenu)
+
 
             p_menu = menus[d]
             config = _get_yml_config(d)
@@ -110,11 +116,11 @@ def create_menu(menu_root):
                     continue
                 if f.endswith(".yml"):
                     continue
+
                 path = u"{}/{}".format(d, f)
                 inc = generate_id()
                 p_menu.InsertLast(os.path.splitext(f)[0], inc)
                 _MENU_DIC_[inc] = f_path
-
 
 if __name__ == "__builtin__":
     create_menu("{}/config/apps/mobu/menu".format(kc_env.get_root_directory()))

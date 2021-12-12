@@ -9,7 +9,7 @@ from logging import getLogger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-print mod        
+
 if not mod in sys.path:
     sys.path.append(mod)
 
