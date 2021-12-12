@@ -706,6 +706,11 @@ class KcSceneManager(QtWidgets.QWidget):
         if cam_check:
             self.append_camera(data)
         save_path = self.update_record_from_dialog(data, path)
+
+        if os.path.exists(save_path):
+            mes = QtWidgets.QMessageBox.information(self, "info", u"ファイルが存在します。上書きしますか？", QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+            if mes == QtWidgets.QMessageBox.No:
+                return
         self.update_relative_record_path(relative_items, save_path, save_as=True)
         self.cmd.file_save(save_path)
         if self.current_scene_item:
