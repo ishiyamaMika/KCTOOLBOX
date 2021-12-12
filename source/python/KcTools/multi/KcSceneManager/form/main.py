@@ -1909,12 +1909,17 @@ class KcSceneManager(QtWidgets.QWidget):
                 self.ui.shot_table.setRowHidden(r, True)
 
         path = data.get("paths", {}).get(kc_env.mode, {}).get("edit", False)
+        shot_file_fields = self.project.path_split(self.project.config["shot"][kc_env.mode]["paths"]["edit"], path)
+
         """
         TODO:
             ハードコード
         """
         user_item = QtWidgets.QTableWidgetItem()
-        user_item.setText(info.get("path_name", info.get("user", info["update_by"])))
+        if "<user>" in shot_file_fields:
+            user_item.setText(shot_file_fields["<user>"])
+        else:
+            user_item.setText(info.get("path_name", info.get("user", info["update_by"])))
 
         user_item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
         
