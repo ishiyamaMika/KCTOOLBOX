@@ -113,6 +113,14 @@ class AssetExport(Piece):
         model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
 
         models = kc_model.select(model_names)
+        if self.data["category"] == "camera":
+            for model in models:
+                if isinstance(model, FBCamera):
+                    self.pass_data["@camera"] = model.LongName
+                    self.pass_data["@width"] = model.ResolutionWidth
+                    self.pass_data["@height"] = model.ResolutionHeight
+                    break
+
         if len(model_names) == len(models):
             self.logger.debug("models is all selected: {}".format(self.data["namespace"]))
             kc_file_io.file_save(str(self.data["export_path"]), selection=True)

@@ -296,5 +296,5 @@ if __name__ in ["__main__", "__builtin__"]:
 
     print "________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad")
 
-    print x.get_assets()
-    x.change_camera("TEST", 0, 20, 24)
+    print x.get_cameras()
+    # x.change_camera("TEST", 0, 20, 24)

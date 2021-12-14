@@ -17,6 +17,7 @@ for mod in mods:
 from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
+import KcLibs.mobu.kc_model as kc_model
 
 _PIECE_NAME_ = "CameraSetup"
 
@@ -33,6 +34,19 @@ class CameraSetup(Piece):
         flg = True
         header = ""
         detail = ""
+
+        if "camera" in self.data:
+            camera = kc_model.to_object(str(self.data["camera"]))
+            if camera:
+                camera.ResolutionWidth = self.data["width"]
+                camera.ResolutionHeight = self.data["height"]
+                header = u"カメラの解像度を設定しました: {}x{}".format(self.data["width"], self.data["height"])
+            else:
+                header = u"カメラがありませんでした: {}".format(self.data["camera"])
+
+        else:
+            header = u"カメラの解像度を設定できませんでした"
+
 
         print "select camera"
         print "set size"

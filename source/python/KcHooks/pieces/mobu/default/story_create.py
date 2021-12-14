@@ -39,11 +39,18 @@ class StoryCreate(Piece):
 
         asset_path = str(self.data["asset_path"])
 
-        assets = self.pass_data["project"].get_assets()
         exists = False
-        for asset in assets:
-            if self.data["namespace"] == asset["namespace"]:
-                exists = True
+        if self.data["category"] == "camera":
+          cameras = self.pass_data["project"].get_cameras()
+          for camera in cameras:
+              if self.data["namespace"] == camera["namespace"]:
+                  exists = True
+        else:
+          assets = self.pass_data["project"].get_assets()
+          for asset in assets:
+              if self.data["namespace"] == asset["namespace"]:
+                  exists = True
+
 
         if not exists:
             detail += u"assetを追加しました\n{}\n".format(asset_path)

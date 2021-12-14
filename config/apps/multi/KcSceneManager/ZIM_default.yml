@@ -142,9 +142,13 @@ data:
                       fps: "@fps"
 
             post_end:
-                #- name: cam_setup
-                #  piece: KcHooks.pieces.mobu.default.camera_setup
-                #  description: ""
+                - name: cam_setup
+                  piece: KcHooks.pieces.mobu.default.camera_setup
+                  description: ""
+                  paint:
+                      camera: "@camera"
+                      width: "@width"
+                      height: "@height"
 
                 - name: file_save
                   piece: KcHooks.pieces.mobu.default.file_save
