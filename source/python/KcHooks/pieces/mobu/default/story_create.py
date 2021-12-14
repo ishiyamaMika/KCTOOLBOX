@@ -51,6 +51,10 @@ class StoryCreate(Piece):
         else:
             detail += u"アセットはすでにシーンに存在します\n"
 
+        for each in FBSystem().Scene.Characters:
+            if each.Active:
+              each.Active = False
+
         plot_config_path = self.data["config"]["plot"]
         if not plot_config_path:
             header = u"設定ファイルがありませんでした: {}".format(self.data["namespace"])
@@ -83,20 +87,20 @@ if __name__ == "__builtin__":
            "asset_path": ""
             }
 
-    data = {u'asset_name': u'ABCDE',
-           u'category': u'LO',
-           u'config': {'export': 'E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/LO/ABCDE/MB/config/LO_ABCDE_asasad_export.json',
+    data = {u'asset_name': u'CH_tsukikoQuad',
+           u'category': u'CH',
+           u'config': {'export': 'E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/LO/ABCDE/MB/config/CH_tsukikoQuad_export.json',
                        'plot': 'E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/LO/ABCDE/MB/config/LO_ABCDE_asasad_plot.json'},
            'cut': u'001',
            'end': 0,
            'mobu_edit_export_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_LO_ABCDE_asasad_02.fbx',
-           'mobu_asset_path': 'E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/LO/ABCDE/MB/LO_ABCDE_asasad_sotai_t00.fbx',
-           u'namespace': u'LO_ABCDE_asasad_02',
+           'mobu_sotai_path': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/CH_tsukikoQuad_sotai_t01.fbx",
+           u'namespace': u'CH_tsukikoQuad',
            'scene': u'01',
            u'selection': True,
            'start': 0,
            u'take': 0.0,
-           u'true_namespace': u'LO_ABCDE_asasad',
+           u'true_namespace': u'CH_tsukikoQuad',
            u'type': u'both',
            u'update_at': u'2021/11/23 13:33:10',
            u'update_by': u'amek',
@@ -105,7 +109,7 @@ if __name__ == "__builtin__":
 
 
     from KcLibs.core.KcProject import *
-
+    FBApplication().FileNew()
     kc_project = KcProject()
     kc_project.set("ZIM", "default")
 

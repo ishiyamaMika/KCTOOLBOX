@@ -4,7 +4,7 @@ info:
 
 data: 
     directory: "X:/Project/tools/project/ZIM"
-    shot_directory: "X:/Project/tools/project/ZIM/3D"
+    shot_directory: "X:/Project/_942_ZIZ/3D"
     schema:
         shot:
             shot_name: ""
@@ -102,9 +102,9 @@ data:
                       fps: "@fps"
 
             main:
-                - name: koma save
-                  piece: KcHooks.pieces.mobu.default.get_koma
-                  description: save koma config
+                # - name: koma save
+                #   piece: KcHooks.pieces.mobu.default.get_koma
+                #   description: save koma config
 
                 - name: export asset
                   piece: KcHooks.pieces.mobu.default.asset_export
