@@ -63,6 +63,15 @@ data:
                     config: <asset_root>/<category>/MB/config/cam_s00c000_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
 
+        max:
+            paths:
+                default:
+                    edit: ""
+                    master: ""
+                    edit_movie: ""
+                    master_movie: ""
+
+
     shot: 
         header:
             "<scene>": "s"
@@ -80,23 +89,30 @@ data:
                 edit_movie: <root_directory>/3D/s<scene>/c<cut>/edit/mov_edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.mov
                 master_movie: <root_directory>/3D/s<scene>/c<cut>/movie_convert/MB/<project>_s<scene>c<cut>_MB.mov
 
+        max:
+            paths:
+                edit: ""
+                master: ""
+                edit_movie: ""
+                master_movie: ""
+
 
     puzzle:
         get_cameras:
             main:
                 - name: get cameras
-                  piece: KcHooks.pieces.mobu.default.get_cameras
+                  piece: KcHooks.pieces.<app>.default.get_cameras
                   description: get camera from scene
         change_camera:
             main:
                 - name: change camera
-                  piece: KcHooks.pieces.mobu.default.change_camera
+                  piece: KcHooks.pieces.<app>.default.change_camera
                   description: change camera to
 
         get_assets:
             main:
                 - name: get assets
-                  piece: KcHooks.pieces.mobu.default.get_assets
+                  piece: KcHooks.pieces.<app>.default.get_assets
                   description: get asset from scene
 
 

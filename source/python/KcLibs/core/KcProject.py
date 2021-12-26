@@ -96,7 +96,7 @@ class KcProject(object):
         if not hasattr(self.config, "puzzle"):
             return
 
-        piece_data = self.config["puzzle"]["change_camera"]
+        piece_data = self.config["puzzle"]["change_camera"].replace("<app>", kc_env.mode)
         pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
 
 
@@ -104,7 +104,8 @@ class KcProject(object):
         if not hasattr(self.config, "puzzle"):
             return []
 
-        piece_data = self.config["puzzle"]["get_cameras"]
+        piece_data = self.config["puzzle"]["get_cameras"].replace("<app>", kc_env.mode)
+
         piece_data["include_model"] = include_model
         pass_data, results = self.puzzle_play(piece_data, {}, {})
 
@@ -136,7 +137,8 @@ class KcProject(object):
     def get_assets(self):
         if not hasattr(self.config, "puzzle"):
             return []
-        piece_data = self.config["puzzle"]["get_assets"]
+
+        piece_data = self.config["puzzle"]["get_assets"].replace("<app>", kc_env.mode)
 
         pass_data, results = self.puzzle_play(piece_data, {"main": {"meta": self.config["asset"]["meta"]}}, {})
 

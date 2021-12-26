@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 import os
 import sys
 
@@ -11,5 +9,5 @@ import KcLibs.core.kc_env as kc_env
 kc_env.append_sys_paths()
 
 import KcTools.multi.KcSceneManager.form.main as scene_manager
-
+reload(scene_manager)
 scene_manager.start_app()

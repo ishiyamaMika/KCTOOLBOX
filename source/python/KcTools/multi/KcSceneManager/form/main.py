@@ -295,7 +295,7 @@ class RecordDialog(QtWidgets.QDialog):
             self.record.emit(data, self.path, relatives, self.cam_check.checkState()==QtCore.Qt.Checked)
             self.close()
 
-class KcSceneManager(QtWidgets.QWidget):
+class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
     VERSION = "1.0.1"
 
@@ -380,6 +380,7 @@ class KcSceneManager(QtWidgets.QWidget):
     def set_ui(self):
         ui_path = "{}/form/ui/main.ui".format(self.tool_directory)
         self.ui = kc_qt.load_ui(ui_path, self)
+        print self.ui
 
         if kc_env.mode == "win":
             layout = QtWidgets.QVBoxLayout()
@@ -926,6 +927,8 @@ class KcSceneManager(QtWidgets.QWidget):
             self.ui.master_check.clicked.disconnect(self.master_check_clicked)
 
             self.connected = False
+
+        print "connect:", self.connected
 
     def master_check_clicked(self):
         if self.sender().checkState() == QtCore.Qt.Checked:
@@ -2199,7 +2202,7 @@ class KcSceneManagerCmd(object):
 
 
 def start_app():
-    kc_qt.start_app(KcSceneManager, name="KcSceneManager", x=1200, y=500)
+    kc_qt.start_app(KcSceneManager, name="KcSceneManager", x=1200, y=500, root=kc_qt.get_root_window())
 
 if __name__ in ["__builtin__", "__main__"]:
     def test_ui():

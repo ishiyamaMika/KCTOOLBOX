@@ -32,7 +32,7 @@ except:
 if mode is None:
     try:
         import MaxPlus
-        mode = "3dsmax"
+        mode = "max"
     except:
         pass
 
