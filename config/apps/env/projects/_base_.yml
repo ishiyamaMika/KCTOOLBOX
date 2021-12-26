@@ -46,20 +46,20 @@ data:
             paths:
                 default:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx
-                    sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_sotai_t<take>.fbx
+                    sotai: <asset_root>/<category>/<asset_name>/MB/sotai/<category>_<asset_name>_sotai_t<take>.fbx
                     config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
 
                 LO:
                     rig: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_t<take>_<version>.fbx
-                    sotai: <asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
+                    sotai: <asset_root>/<category>/<asset_name>/MB/sotai/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
                     config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<variation>_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
                 camera:
                     rig: <asset_root>/<category>/MB/cam_t<take>_<version>.FBX
-                    sotai: <asset_root>/<category>/MB/cam_sotai_t<take>.FBX
+                    sotai: <asset_root>/<category>/MB/sotai/cam_sotai_t<take>.FBX
                     config: <asset_root>/<category>/MB/config/cam_s00c000_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
 

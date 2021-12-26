@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(QtWidgets.QWidget):
     NAME = "KcSceneManager"
-    VER = 1.0
+    VERSION = "1.0.1"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)

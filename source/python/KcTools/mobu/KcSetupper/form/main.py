@@ -48,7 +48,7 @@ class CompleterLineEdit(QtWidgets.QLineEdit):
 
 class KcSetupper(QtWidgets.QWidget):
     NAME = "KcSetupper"
-    VER = 1.2
+    VERSION = "1.2.1"
 
     def __init__(self, parent=None):
         super(KcSetupper, self).__init__(parent)
@@ -309,7 +309,9 @@ class KcSetupper(QtWidgets.QWidget):
 
         match = re.match(".*_t([0-9]*).*", f)
         if match:
-            take = int(match.groups()[0])
+            take_ = match.groups()[0]
+            if take_.isdigit():
+                take = int(take_)
             version = 1
 
         match = re.match(".*_t([0-9]*)_([0-9]*).*", f)

@@ -34,6 +34,8 @@ class KcProject(object):
         self.puzzle = Puzzle(logger=self.logger)
         self.field_generator = FieldValueGenerator()
         self.sticky = StickyConfig()
+        self.config = {}
+        self.tool_config = {}
         self.project_variations = self.get_project_variations()
 
     def get_project_variations(self):
@@ -91,12 +93,17 @@ class KcProject(object):
             "stop": end,
             "fps": fps
             }
+        if not hasattr(self.config, "puzzle"):
+            return
 
         piece_data = self.config["puzzle"]["change_camera"]
         pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
 
 
     def get_cameras(self, include_model=False):
+        if not hasattr(self.config, "puzzle"):
+            return []
+
         piece_data = self.config["puzzle"]["get_cameras"]
         piece_data["include_model"] = include_model
         pass_data, results = self.puzzle_play(piece_data, {}, {})
@@ -106,7 +113,7 @@ class KcProject(object):
     def get_latest_camera_path(self):
         rig_path = self.config["asset"][kc_env.mode]["paths"]["camera"]["rig"]
         camera_directory = self.path_generate(os.path.dirname(rig_path), {"<category>": "camera"})
-        print os.path.dirname(rig_path), camera_directory
+
         if not camera_directory:
             return False
 
@@ -127,6 +134,8 @@ class KcProject(object):
         return assets[0]
 
     def get_assets(self):
+        if not hasattr(self.config, "puzzle"):
+            return []
         piece_data = self.config["puzzle"]["get_assets"]
 
         pass_data, results = self.puzzle_play(piece_data, {"main": {"meta": self.config["asset"]["meta"]}}, {})
@@ -136,7 +145,6 @@ class KcProject(object):
     def path_generate(self, template, fields, force=False):
         fields_ = {} #copy.deepcopy(fields)
         for k, v in fields.items():
-            print k, v
             if isinstance(v, list):
                 continue
             if isinstance(v, dict):
