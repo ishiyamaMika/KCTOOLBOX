@@ -33,9 +33,16 @@ class ChangeTime(Piece):
             self.pass_data[_PIECE_NAME_] = kc_transport_time.get_scene_time()
             
             if self.piece_data["fps"] != self.data["fps"]:
-                value = self.piece_data["fps"] / self.data["fps"]
-                start = self.data["start"] * value
-                end = self.data["end"] * value
+                if self.piece_data["fps"] > self.data["fps"]:
+                    value = self.piece_data["fps"] / self.data["fps"]
+                    start = self.data["start"] * value
+                    end = self.data["end"] * value + (value-1)
+                else:
+                    value = self.data["fps"] / self.piece_data["fps"]
+                    print value
+                    start = self.data["start"] / value
+                    end = self.data["end"] / value
+
                 fps = self.piece_data["fps"]
             else:
                 start = self.data["start"]
@@ -48,19 +55,20 @@ class ChangeTime(Piece):
                                              zoom_stop=end, 
                                              fps=fps)
 
-            detail = "change time to: {}-{}({}) > {}-{}({})".format(self.data["start"],
-                                                                    self.data["end"],
-                                                                    self.data["fps"],
-                                                                    start, 
-                                                                    end, 
-                                                                    fps)
+            new_time = kc_transport_time.get_scene_time()
 
+            detail = "change time to: {}-{}({}) -> {}-{}({})".format(self.data["start"],
+                                                                     self.data["end"],
+                                                                     self.data["fps"],
+                                                                     new_time["loop_start"], 
+                                                                     new_time["loop_stop"], 
+                                                                     new_time["fps"])
             self.pass_data["@start"] = start
             self.pass_data["@end"] = end
             self.pass_data["@fps"] = fps
 
             header = u"シーンのフレームを変更しました"
-            self.logger.debug(detail)
+            if self.logger: self.logger.debug(detail)
             
         elif self.piece_data["mode"] == "revert":
             header = "revert scene time"
@@ -71,7 +79,7 @@ class ChangeTime(Piece):
 
                 header = u"シーンのフレームを戻しました"
                 kc_transport_time.set_scene_time(**self.pass_data[_PIECE_NAME_])
-                self.logger.debug(detail)
+                if self.logger: self.logger.debug(detail)
             else:
                 header = u"シーンのフレームは変更されていませんでした"
 
@@ -85,7 +93,7 @@ if __name__ == "__builtin__":
     
     data ={u'cut': u'005',
            'start': 0,
-           'end': 10,
+           'end': 8,
            'fps': 8,
            'movie_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c005/edit/mov_edit/ZIM_s01c005_anim_t01_02_amek.fbx',
            'path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c005/edit/ZIM_s01c005_anim_t01_02_amek_ANIM.fbx',
