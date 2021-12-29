@@ -93,17 +93,12 @@ class KcProject(object):
             "stop": end,
             "fps": fps
             }
-        if not hasattr(self.config, "puzzle"):
-            return
 
         piece_data = self.config["puzzle"]["change_camera"]
         pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
 
 
     def get_cameras(self, include_model=False):
-        if not hasattr(self.config, "puzzle"):
-            return []
-
         piece_data = self.config["puzzle"]["get_cameras"]
         piece_data["include_model"] = include_model
         pass_data, results = self.puzzle_play(piece_data, {}, {})
@@ -134,8 +129,6 @@ class KcProject(object):
         return assets[0]
 
     def get_assets(self):
-        if not hasattr(self.config, "puzzle"):
-            return []
         piece_data = self.config["puzzle"]["get_assets"]
 
         pass_data, results = self.puzzle_play(piece_data, {"main": {"meta": self.config["asset"]["meta"]}}, {})
