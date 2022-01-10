@@ -39,7 +39,6 @@ class ChangeTime(Piece):
                     end = self.data["end"] * value + (value-1)
                 else:
                     value = self.data["fps"] / self.piece_data["fps"]
-                    print value
                     start = self.data["start"] / value
                     end = self.data["end"] / value
 

@@ -40,9 +40,6 @@ class FileMasterSceneCreate(Piece):
 
         else:
             kc_file_io.file_open(self.data["master_path"])
-            print "get asset from scene"
-            print "check exists"
-            print "if not exists.append sotai"
 
         kc_transport_time.set_scene_time(self.data["start"], 
                                          self.data["end"], 

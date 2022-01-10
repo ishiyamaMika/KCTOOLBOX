@@ -96,7 +96,7 @@ class AssetExport(Piece):
         info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
         model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
 
-        models = kc_model.to_object(model_names)
+        models = kc_model.to_object(model_names) or []
 
         if len(model_names) != len(models):
             diff = list(set(model_names) | set([l.LongName for l in models]))

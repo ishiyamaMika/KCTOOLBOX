@@ -70,7 +70,8 @@ class GetKoma(Piece):
             all_ = {}
             for m in model:
                 dic = self.get_all_keys(m)
-                all_[m.LongName] = dic[m.LongName]
+                if dic is not None:
+                    all_[m.LongName] = dic[m.LongName]
             return all_
         else:
             all_keys = {}
@@ -81,10 +82,23 @@ class GetKoma(Piece):
             b = all_keys["Rotation"].keys()
             c = all_keys["Scaling"].keys()
             mix = a + b + c
+            mix = list(set(mix))
             mix.sort()
-            if len(mix) == 0:
-                return {model.LongName: {"min": None, "max": None, "list": []}}
+            if len(mix) in [0, 1]:
+                return None
+                # return {model.LongName: {"min": None, "max": None, "list": []}}
+            """
+            print "type:", type(a), type(b), type(c)
+            print "T:", a
+            print "R:", b
+            print "S:", c
+            print "A:", mix
+            print "len:", len(mix), len(mix)
+            """
 
+            """
+            TRSすべてをマージして移動したフレームの取得
+            """
             min_ = mix[0]
             max_ = mix[-1]
             keyframe_set = {}
@@ -97,7 +111,7 @@ class GetKoma(Piece):
                     if i in all_keys[trs]:
                         keys[trs] = all_keys[trs][i]
                     else:
-                        keys[trs] = []
+                        continue
                 keyframe_set["list"].append(keys)
 
             return {model.LongName: keyframe_set}
@@ -115,10 +129,13 @@ class GetKoma(Piece):
 
         model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
 
-        models = kc_model.select(model_names)
+        models = kc_model.to_object(model_names)
         keys = self.get_all_keys(models)
 
-        koma_path = "{}.json".format(self.data["mobu_edit_export_path"])
+        d, f = os.path.split(self.data["path"])
+        f, ext = os.path.splitext(f)
+
+        koma_path = "{}/{}_koma.json".format(d, f)
 
         if not os.path.exists(os.path.dirname(koma_path)):
             os.makedirs(os.path.dirname(koma_path))
@@ -142,15 +159,16 @@ if __name__ == "__builtin__":
            'config': {'export': False, 'plot': False},
            'cut': u'001',
            'end': 0,
-           'mobu_edit_export_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
-            u'config': {'export': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json",
-                            'plot': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json"},
+           'mobu_edit_export_path': u'X:/Project/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
+            u'config': {'export': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json",
+                            'plot': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json"},
            'mobu_sotai_path': False,
            u'namespace': u'CH_tsukikoQuad',
            'scene': u'01',
            u'selection': True,
            'start': 0,
            u'take': 2.0,
+           u"path": "E:/works/client/keica/data/junkscript/test.json",
            u'true_namespace': u'CH_tsukikoQuad',
            u'type': u'both',
            u'update_at': u'2021/11/18 01:17:16',

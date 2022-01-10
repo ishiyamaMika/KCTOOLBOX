@@ -56,6 +56,7 @@ def create_story_track(name, models, cam=False):
 def create_clip(track, path, **kwargs):
     def _is_same(a, b):
         return os.path.normpath(a).lower() == os.path.normpath(b).lower()
+
     clip = False
     for clip_ in track.Clips:
         if _is_same(clip_.PropertyList.Find("ClipAnimationPath").Data, path):

@@ -380,8 +380,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
     def set_ui(self):
         ui_path = "{}/form/ui/main.ui".format(self.tool_directory)
         self.ui = kc_qt.load_ui(ui_path, self)
-        print self.ui
-
         if kc_env.mode == "win":
             layout = QtWidgets.QVBoxLayout()
             layout.addWidget(self.ui)
@@ -830,7 +828,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             return 
 
         item = selected_items[0]
-        if item.row_data["type"] == "config":
+        if item.row_data["type"] in ["config", "both"]:
             self.delete_from_config_action.setVisible(True)
         else:
             self.delete_from_config_action.setVisible(False)
@@ -850,14 +848,21 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         info, data = self.project.sticky.read(item.config_path)
         config_assets = data.get("assets", [])
 
+        pop_index = []
+
         for row in rows:
             item_ = self.ui.asset_table.item(row, self.asset_table_list.index("name"))
             namespace = unicode(item_.text())
 
-            for i, asset in enumerate(config_assets[::-1]):
+            for i, asset in enumerate(config_assets):
                 if namespace == asset["namespace"]:
-                    poped = config_assets.pop(i)
+                    pop_index.append(i)
                     self.ui.asset_table.setRowHidden(row, True)
+
+        pop_index = list(set(pop_index))
+        pop_index.sort(reverse=True)
+        for i in pop_index:
+            config_assets.pop(i)
 
         self.current_shot_item.row_data = data
 
@@ -905,6 +910,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             self.ui.shot_table.itemDoubleClicked.connect(self.shot_table_item_double_clicked)
             self.ui.master_check.clicked.connect(self.master_check_clicked)
 
+
             self.connected = True
 
         elif not flg and self.connected:
@@ -926,6 +932,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             self.ui.master_check.clicked.disconnect(self.master_check_clicked)
 
+
             self.connected = False
 
         print "connect:", self.connected
@@ -934,9 +941,11 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         if self.sender().checkState() == QtCore.Qt.Checked:
             self.ui.create_master_btn.setText(u"convert")
             self.ui.render_btn.setText(u"master render")
+            self.ui.render_btn.setVisible(False)
         else:
             self.ui.create_master_btn.setText(u"create master")
             self.ui.render_btn.setText(u"edit render")
+            self.ui.render_btn.setVisible(True)
 
 
     def shot_table_item_double_clicked(self, item):
@@ -1405,10 +1414,205 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             value = 0.25
         return value
     
-    def create_master_btn_clicked(self):
+
+    def convert_execute(self):
         items = [l for l in self.get_shot_table_active_item_data()]
         render_scale = self.get_render_scale()
         results_all = []
+        now_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        for item in items:
+            errors = []
+            data = {"primary": {}, "main": [], "common": {}}
+
+            data["primary"]["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], item["fields"])
+
+            if not data["primary"]["path"]:
+                continue
+
+            data["primary"]["start"] = item["frame"]["start"]
+            data["primary"]["end"] = item["frame"]["end"]
+            data["primary"]["fps"] = item["frame"].get("fps", 24)
+
+            for asset in item.get("assets", []):
+                if not asset.get("selection") and asset["category"] != "camera":
+                    continue
+
+                asset = copy.deepcopy(asset)
+                asset["scene"] = item["fields"]["scene"]
+                asset["cut"] = item["fields"]["cut"]
+                asset["start"] = item["frame"]["start"]
+                asset["end"] = item["frame"]["end"]
+
+                if asset["category"] in self.project.config["asset"][kc_env.mode]["paths"]:
+                    template = self.project.config["asset"][kc_env.mode]["paths"][asset["category"]]
+                    max_template = self.project.config["asset"]["max"]["paths"][asset["category"]]
+                else:
+                    template = self.project.config["asset"][kc_env.mode]["paths"]["default"]
+                    max_template = self.project.config["asset"]["max"]["paths"]["default"]
+
+                if not "config" in template:
+                    continue
+
+                asset["config"] = {"plot": self.project.path_generate(template["config"].replace("<config_type>", "plot"), asset), 
+                                   "export": self.project.path_generate(template["config"].replace("<config_type>", "export"), asset)} 
+
+                asset["mobu_master_export_path"] = self.project.path_generate(template["master_export"], asset)
+                
+                if asset["category"] == "camera":
+                    camera_path = self.project.get_latest_camera_path("max")
+                    asset["max_asset_path"] = camera_path
+                else:
+                    asset["version"] = "*"
+                    asset["max_asset_path"] = self.project.path_generate(max_template["rig"], asset)
+
+                if not asset["max_asset_path"]:
+                    errors.append([False, {}, "", u"[error] maxのパスを生成できません: {}".format(asset["namespace"]), max_template["rig"] + "\n" + unicode(asset)])
+                else:
+                    paths = glob.glob(asset["max_asset_path"])
+                    paths.sort()
+
+                    if len(paths) == 0:
+                        errors.append([False, {}, "", u"[error] max pathがありません: {}".format(asset["namespace"]), asset["max_asset_path"]])
+
+                    else:
+                        asset["max_asset_path"] = paths[-1]
+
+                    data["primary"].setdefault("assets", []).append(asset)
+                    data["main"].append(asset)
+
+            post_primary = {}
+            post_primary["path"] = self.project.path_generate(self.project.config["shot"]["max"]["paths"]["master"], item["fields"])
+            post_primary["assets"] = item.get("assets", [])
+
+            post_main = copy.deepcopy(data["main"])
+
+            post_end = {}
+            post_end["path"] = post_primary["path"]
+            post_end["shot_name"] = item["shot_name"]
+            post_end["start"] = item["frame"]["start"]
+            post_end["end"] = item["frame"]["end"]
+            post_end["fps"] = item["frame"]["fps"]
+            post_end["render_scale"] = render_scale
+            post_end["movie_path"] = self.project.path_generate(self.project.config["shot"]["max"]["paths"]["master_movie"], item["fields"])
+
+            camera_namespace = self.project.path_generate(self.project.config["asset"]["namespaces"]["camera"], item["fields"])
+
+            post_end["camera"] = "{}:{}".format(camera_namespace, self.project.config["shot"]["camera_name"])
+
+            orders = self.project.tool_config["puzzle"]["orders"]
+
+            data["post_primary"] = post_primary
+            data["post_main"] = post_main
+            data["post_end"] = post_end
+            if len(errors) > 0:
+                results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
+                results_all.extend(errors)
+                results_all.append([-2, {}, "-", "-", u"処理停止しました"])                
+                continue
+
+            """
+            pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export_varidate"], 
+                                                          data, 
+                                                          {}, 
+                                                          orders.get("mobu_edit_export_varidate", orders["default"]))
+            errors_ = []
+            for result in results:
+                if result[3].startswith("[error]"):
+                    errors_.append(result[3])
+                elif not result[0]:
+                    errors_.append(result[2])
+                elif result == "puzzle process stopped":
+                    errors_.append(u"[error] 処理が予期せぬエラーで中止しました。")
+
+            if len(errors_) > 0:
+                errors.append(item["shot_name"])
+                errors.extend(errors_)
+                results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
+                results_all.extend(results)
+                results_all.append([-2, {}, "-", "-", u"処理停止しました"])
+
+            if len(errors) > 0:
+                continue
+            """
+
+            pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_master_export"], 
+                                     data, 
+                                     {}, 
+                                     orders.get("mobu_master_export", orders["default"]))
+            
+            results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
+            results_all.extend(results)
+
+            data_directory = kc_env.get_log_directory("multi", "KcSceneManager", "puzzle")
+            data_path = "{}/{}_data.json".format(data_directory, now_time)
+            piece_path = "{}/{}_piece.json".format(data_directory, now_time)
+            pass_data_path = "{}/{}_pass_data.json".format(data_directory, now_time)
+            if not os.path.exists(data_directory):
+                os.makedirs(data_directory)
+
+            files = [l for l in os.listdir(data_directory) if l.split("_")[0] != now_time.split("_")[0]]
+            for f in files:
+                try:
+                    os.remove("{}/{}".format(data_directory, f))
+                except:
+                    pass
+
+            data_ = {"data": data, "info": {}}
+            json.dump(data_, open(data_path, "w"), "utf8", indent=4)
+            try:
+                del pass_data["project"]
+                pass_data["project_info"] = {"name": self.project.name, "variation": self.project.variation}
+            except:
+                pass
+
+            pass_data_ = {"data": pass_data, "info": {}}
+            json.dump(pass_data_, open(pass_data_path, "w"), "utf8", indent=4)
+
+            piece_data = {"data": self.project.tool_config["puzzle"], "info": {}}
+            json.dump(piece_data, open(piece_path, "w"), "utf8", indent=4)
+
+            convert_app_data = {}
+            convert_app_data["data_path"] = data_path
+            convert_app_data["piece_path"] = piece_path
+            convert_app_data["pass_path"] = pass_data_path
+            convert_app_data["log_directory"] = kc_env.get_log_directory("KcSceneManager", "puzzle")
+            convert_app_data["message_output"] = kc_env.get_log_directory("KcSceneManager", "message")
+            convert_app_data["result"] = "{}/result.json".format(kc_env.get_log_directory("KcSceneManager", "puzzle"))
+            convert_app_data["log_name"] = self.NAME
+            orders = self.project.tool_config["puzzle"]["orders"]
+            if "convert" in orders:
+                convert_app_data["order"] = orders["convert"]
+            results_all.append([-1, {}, u"max処理", u"max処理", ""])
+            pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["convert"], 
+                                     {"main": convert_app_data}, 
+                                     {}
+                                     )
+            if os.path.exists(convert_app_data["result"]):
+                js = json.load(open(convert_app_data["result"], "r"), "utf8")
+                results_all.extend(js["data"]["result"])
+            
+            results_all.append([-2, {}, "-", "-", u"処理しました"])
+    
+
+        self.cmd.file_new()
+        x = KcResultDialog(self)
+        x.set_ui()
+        x.append_header_table(results_all)
+        x.resize(1200, 600)
+        x.exec_()
+
+    def create_master_btn_clicked(self):
+        if self.ui.master_check.checkState() == QtCore.Qt.Checked:
+            self.convert_execute()
+        else:
+            self.create_master_execute()
+
+    def create_master_execute(self):
+        items = [l for l in self.get_shot_table_active_item_data()]
+        render_scale = self.get_render_scale()
+        results_all = []
+        
         for item in items:
             errors = []
             data = {"primary": {}, "main": [], "common": {}}
@@ -1462,6 +1666,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             post_primary = {}
             post_primary["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], item["fields"])
+            post_primary["assets"] = item.get("assets", [])
 
             post_main = copy.deepcopy(data["main"])
 
@@ -1485,6 +1690,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 results_all.extend(errors)
                 results_all.append([-2, {}, "-", "-", u"処理停止しました"])                
                 continue
+
+            json.dump(data, open("E:/TEST02.json", "w"), "utf8", indent=4)
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export_varidate"], 
                                                           data, 
@@ -1518,18 +1725,14 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
             results_all.extend(results)
             results_all.append([-2, {}, "-", "-", u"処理しました"])
+
+
         self.cmd.file_new()
         x = KcResultDialog(self)
         x.set_ui()
         x.append_header_table(results_all)
         x.resize(1200, 600)
         x.exec_()
-        """
-        if len(errors) > 0:
-            # QtWidgets.QMessageBox.warning(self, "info", u"errorがありました\n{}".format("\n".join(errors)), QtWidgets.QMessageBox.Cancel)
-        else:
-            QtWidgets.QMessageBox.information(self, "info", u"実行しました", QtWidgets.QMessageBox.Ok)
-        """
 
 
     def get_shot_table_active_item_data(self):
@@ -1966,7 +2169,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             item.setText(data["namespace"])
             item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
 
-
             if not self.current_shot_item.is_file_opened:
                 item.setForeground(QtGui.QColor(120, 120, 120))    
 
@@ -2002,6 +2204,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 break
 
         if not rem:
+            self.sender().row_data["selection"] = self.sender().is_active
             assets.append(self.sender().row_data)
             info = self.asset_table_state["both"]
             item.setForeground(info["color"])
