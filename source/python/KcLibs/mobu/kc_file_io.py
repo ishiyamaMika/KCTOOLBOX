@@ -104,5 +104,7 @@ if __name__ == "__builtin__":
     FBApplication().FileNew()
     namespace = "CH_tsukikoQuad"
     f = "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/CH_tsukikoQuad_t02_01.fbx"
-    for i in range(2):
-        file_merge(f, namespace)
+    f = "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/CH_tsukikoQuad_t06_01.fbx"
+    # for i in range(2):
+    namespace = "CH_tsukikoQuad_03"
+    file_merge(f, namespace)

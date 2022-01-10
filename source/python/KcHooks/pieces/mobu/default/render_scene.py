@@ -95,8 +95,6 @@ if __name__ == "__builtin__":
            "render_fps": 24,
            u'version': u'02'}
 
-
-
     x = RenderScene(piece_data=piece_data, data=data)
     x.execute()
 

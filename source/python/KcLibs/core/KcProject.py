@@ -94,19 +94,31 @@ class KcProject(object):
             "fps": fps
             }
 
-        piece_data = self.config["puzzle"]["change_camera"]
+        piece_data = self.config["puzzle"]["change_camera"].replace("<app>", kc_env.mode)
         pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
 
 
     def get_cameras(self, include_model=False):
-        piece_data = self.config["puzzle"]["get_cameras"]
+
+        if not "puzzle" in self.config:
+            return []
+        print 
+
+        print self.config["puzzle"]["get_cameras"]
+
+        piece_data = copy.deepcopy(self.config["puzzle"]["get_cameras"])
+
+        for piece_data_ in piece_data["main"]:
+            for each in piece_data["main"]:
+                each["piece"] = each["piece"].replace("<app>", kc_env.mode)
+
         piece_data["include_model"] = include_model
         pass_data, results = self.puzzle_play(piece_data, {}, {})
 
         return pass_data.get("cameras", [])
 
-    def get_latest_camera_path(self):
-        rig_path = self.config["asset"][kc_env.mode]["paths"]["camera"]["rig"]
+    def get_latest_camera_path(self, mode="mobu"):
+        rig_path = self.config["asset"][mode]["paths"]["camera"]["rig"]
         camera_directory = self.path_generate(os.path.dirname(rig_path), {"<category>": "camera"})
 
         if not camera_directory:
@@ -129,7 +141,15 @@ class KcProject(object):
         return assets[0]
 
     def get_assets(self):
-        piece_data = self.config["puzzle"]["get_assets"]
+
+        if not "puzzle" in self.config:
+            return []
+
+        piece_data = copy.deepcopy(self.config["puzzle"]["get_assets"])
+        for piece_data_ in piece_data["main"]:
+            for each in piece_data["main"]:
+                each["piece"] = each["piece"].replace("<app>", kc_env.mode)
+
 
         pass_data, results = self.puzzle_play(piece_data, {"main": {"meta": self.config["asset"]["meta"]}}, {})
 
@@ -209,6 +229,8 @@ if __name__ in ["__main__", "__builtin__"]:
     print 
     print 
     print 
+
+
     config_assets =  [
             {
                 "category": "ch", 
