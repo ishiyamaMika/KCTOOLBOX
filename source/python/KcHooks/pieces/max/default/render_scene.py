@@ -43,6 +43,7 @@ class RenderScene(Piece):
                                         end=self.data["end"],
                                         fps=self.data["fps"], 
                                         filename=self.data["movie_path"],
+                                        outputAvi=True,
                                         percentSize=self.piece_data["scale_percent"])
             if os.path.exists(self.data["movie_path"]):
                 header = "max scene preview successed"
@@ -50,7 +51,6 @@ class RenderScene(Piece):
             else:
                 header = "max scene preview failed"
                 detail = "camera: {camera}\nstart: {start}\nend: {end}\nfps: {fps}\npath: {movie_path}".format(**self.data)
-        flg = False
         
         return flg, self.pass_data, header, detail
 
