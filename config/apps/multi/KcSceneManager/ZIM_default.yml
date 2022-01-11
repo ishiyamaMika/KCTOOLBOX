@@ -301,15 +301,6 @@ data:
                       start: "@start"
                       end: "@end"
 
-                - name: render scene
-                  piece: KcHooks.pieces.max.default.render_scene
-                  description: render scene
-                  scale_percent: 50
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
-
                 - name: save file
                   piece: KcHooks.pieces.max.default.file_save
                   description: save max file
@@ -320,6 +311,21 @@ data:
                       fps: "@fps"
                       start: "@start"
                       end: "@end"
+
+                - name: open
+                  piece: KcHooks.pieces.max.default.file_open
+                  description: open save file
+
+                - name: render scene
+                  piece: KcHooks.pieces.max.default.render_scene
+                  description: render scene
+                  scale_percent: 50
+                  paint:
+                      start: "@start"
+                      end: "@end"
+                      fps: "@fps"
+
+
 
         mobu_edit_render:
             primary:
