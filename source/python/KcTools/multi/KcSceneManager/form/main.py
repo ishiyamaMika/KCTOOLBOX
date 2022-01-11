@@ -1691,8 +1691,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 results_all.append([-2, {}, "-", "-", u"処理停止しました"])                
                 continue
 
-            json.dump(data, open("E:/TEST02.json", "w"), "utf8", indent=4)
-
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export_varidate"], 
                                                           data, 
                                                           {}, 
