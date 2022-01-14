@@ -51,12 +51,27 @@ class StoryCreate(Piece):
               if self.data["namespace"] == asset["namespace"]:
                   exists = True
 
+        current_constraints = [l for l in FBSystem().Scene.Constraints]
 
         if not exists:
             detail += u"assetを追加しました\n{}\n".format(asset_path)
             kc_file_io.file_merge(asset_path, str(self.data["namespace"]))
         else:
             detail += u"アセットはすでにシーンに存在します\n"
+        
+        now_constraints = [l for l in FBSystem().Scene.Constraints]
+
+        # 追加されたコンストレインのチェックを外す
+        for const in now_constraints:
+            if not const in current_constraints:
+                if const.ClassName() in ["FBStoryTrack", "FBCharacter"]:
+                    continue
+            
+                if "CharacterSolver" in const.ClassName():
+                    continue
+                
+                const.Active = False
+                self.logger.debug("constraint off: {}".format(const.LongName))
 
         for each in FBSystem().Scene.Characters:
             if each.Active:
