@@ -42,9 +42,24 @@ def file_merge(path="", namespace=None, base_layer_name=None):
 
         return True
     return False
-               
-    
-def file_import(path, suppress_prompts=True):
+   
+def file_import(path, param=[{"name": "Mode", "value": "#exmerge"}]):
+    def _fbx_import_settings(params):
+        cmd = ""
+        for param in params:
+            cmd += 'FBXImporterSetParam "{}" {}\n'.format(param["name"], param["value"])
+        return MaxPlus.Core.EvalMAXScript(cmd)
+
+    if param:
+        
+        if not _fbx_import_settings(param):
+            error = "import setting failed:"
+            for l in param:
+                error += "{} --- {}".format(l["name"], l["value"])
+            print error
+
+        # return MaxPlus.Core.EvalMAXScript('{}\nimportFile "{}" #noPrompt'.format(cmd, path))
+    # else:
     return MaxPlus.Core.EvalMAXScript('importFile "{}" #noPrompt'.format(path))
     # return pymxs.runtime.importFile(path, quiet=True)
 
@@ -83,10 +98,10 @@ if __name__ == "__main__":
     file_save(path2)
     """
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad.max"
-    print file_merge(path)
+    # print file_merge(path)
 
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad_02.max"
-    print file_merge(path)
+    # print file_merge(path)
     export_cam_path = r"X:\Project\_942_ZIZ\3D\s99\c999\3D\import\ZIM_s99c999_cam_s99c999.fbx"
-    print os.path.exists(export_cam_path)
-    # print file_import(export_cam_path)
+    # print os.path.exists(export_cam_path)
+    print file_import(export_cam_path, param=[{"name": "Mode", "value": "#exmerge"}])

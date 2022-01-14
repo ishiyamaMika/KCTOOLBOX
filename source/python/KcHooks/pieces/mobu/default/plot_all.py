@@ -34,6 +34,13 @@ class PlotAll(Piece):
         self.name = _PIECE_NAME_
 
     def execute(self):
+        def _ignore(model_name):
+            ignores = ["_ctrlSpace_", "_jtSpace_"]
+            for ignore in ignores:
+                if ignore in model_name:
+                    return False
+            return True
+
         flg = True
         header = ""
         detail = ""
@@ -54,6 +61,8 @@ class PlotAll(Piece):
             
             info, data = self.pass_data["project"].sticky.read(config)
             for d in data:
+                if not _ignore(d):
+                    continue
                 model_names.append("{}:{}".format(asset["namespace"], d["name"]))
 
         kc_model.select(model_names)

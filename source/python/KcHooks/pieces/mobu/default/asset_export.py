@@ -105,12 +105,19 @@ class AssetExport(Piece):
         return True, self.pass_data, u"設定ファイルとシーンのモデル数は一致しています: {}".format(self.data["namespace"]), ""
 
     def main(self):
+        def _ignore(model_name):
+            ignores = ["_ctrlSpace_", "_jtSpace_"]
+            for ignore in ignores:
+                if ignore in model_name:
+                    return False
+            return True
+
         kc_model.unselected_all()
         flg = True
 
         info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
 
-        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
+        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if _ignore(l["name"])]
 
         models = kc_model.select(model_names)
         if self.data["category"] == "camera":

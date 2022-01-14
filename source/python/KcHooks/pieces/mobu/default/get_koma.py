@@ -120,14 +120,19 @@ class GetKoma(Piece):
         flg = True
         header = ""
         detail = ""
-
+        def _ignore(model_name):
+            ignores = ["_ctrlSpace_", "_jtSpace_"]
+            for ignore in ignores:
+                if ignore in model_name:
+                    return False
+            return True
 
         kc_model.unselected_all()
         flg = True
 
         info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
 
-        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
+        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if _ignore(l)]
 
         models = kc_model.to_object(model_names)
         keys = self.get_all_keys(models)
