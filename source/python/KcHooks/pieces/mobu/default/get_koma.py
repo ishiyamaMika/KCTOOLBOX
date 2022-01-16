@@ -33,6 +33,8 @@ class GetKoma(Piece):
     def get_all_keys(self, model):
         def _get_trs_key(model, trs="Translation"):
             all_keys = {}
+            if isinstance(model, bool):
+                return {}
 
             trs_object = getattr(model, trs)
             if not trs_object.GetAnimationNode():
