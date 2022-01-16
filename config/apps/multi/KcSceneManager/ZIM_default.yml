@@ -136,7 +136,8 @@ data:
 
                 - name: export asset
                   piece: KcHooks.pieces.mobu.default.asset_export
-                  description: export asset
+                  description: export 
+                  key_name: plot
                   paint:
                       export_path: mobu_edit_export_path
                       start: "@start"
@@ -167,6 +168,7 @@ data:
                 - name: story clip create
                   piece: KcHooks.pieces.mobu.default.story_create
                   description: create story clip
+                  key_name: plot
                   paint:
                       export_path: mobu_edit_export_path
                       asset_path: mobu_sotai_path
@@ -220,10 +222,10 @@ data:
                       fps: "@fps"
 
                 - name: remove koma
-                  piece: KcHooks.pieces.win.removeFiles
+                  piece: KcHooks.pieces.win.remove_files
                   description: remove koma files
-                  patterns: 
-                      - root: convert_path
+                  pattern: 
+                      - root: mobu_master_export_path
                         target: ../import/*_koma.json
 
             main:

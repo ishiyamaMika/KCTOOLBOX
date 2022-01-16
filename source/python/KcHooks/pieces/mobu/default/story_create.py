@@ -61,6 +61,7 @@ class StoryCreate(Piece):
         
         now_constraints = [l for l in FBSystem().Scene.Constraints]
 
+        """
         # 追加されたコンストレインのチェックを外す
         for const in now_constraints:
             if not const in current_constraints:
@@ -72,6 +73,7 @@ class StoryCreate(Piece):
                 
                 const.Active = False
                 self.logger.debug("constraint off: {}".format(const.LongName))
+        """
 
         for each in FBSystem().Scene.Characters:
             if each.Active:

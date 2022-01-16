@@ -173,9 +173,11 @@ class AssetExport(Piece):
     def main(self):
         kc_model.unselected_all()
         flg = True
+        key_name = "export"
+        if "key_name" in self.piece_data:
+            key_name = self.piece_data["key_name"]
 
-        info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
-
+        info, models = self.pass_data["project"].sticky.read(self.data["config"][key_name])
         model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if self.ignore_models(l["name"])]
 
         models = kc_model.select(model_names)
@@ -197,7 +199,7 @@ class AssetExport(Piece):
             self.logger.warning("this model is not selected: {}: {}".format(self.data["namespace"], " ".join(list(model_names_-models_))))
 
         header = u"ファイルをエクスポートしました: {}".format(self.data["namespace"])
-        detail = u"path: \n{}".format(self.data["export_path"])
+        detail = u"path: \n{}\nexport key name: {}".format(self.data["export_path"], key_name)
 
         return flg, self.pass_data, header, detail
 
