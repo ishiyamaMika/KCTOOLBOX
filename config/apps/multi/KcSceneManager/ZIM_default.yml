@@ -224,7 +224,7 @@ data:
                 - name: remove koma
                   piece: KcHooks.pieces.win.remove_files
                   description: remove koma files
-                  pattern: 
+                  patterns: 
                       - root: mobu_master_export_path
                         target: ../import/*_koma.json
 
