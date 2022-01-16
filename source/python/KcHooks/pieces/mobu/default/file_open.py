@@ -41,22 +41,22 @@ class FileOpen(Piece):
             FBApplication().FileNew()
             if self.logger: 
                 self.logger.debug("file new")
-
-        current_path = file_io.get_file_path()
-
-        if os.path.normpath(current_path).lower() == os.path.normpath(self.data["path"]).lower() and not self.piece_data.get("force", False):
-            self.logger.debug("file was already opened: {}".format(self.data["path"]))
-            return flg, self.pass_data, u"開いているファイルが同じです: {}".format(os.path.basename(self.data["path"])), "file name:\n{}".format(self.data["path"])
-
-        if file_io.file_open(self.data["path"]):
-            if self.logger: 
-                self.logger.debug("file open: {}".format(self.data["path"]))
-                file_path = self.data["path"]
-
         else:
-            if self.logger: 
-                self.logger.debug("file open failed: {}".format(self.data["path"]))
-            flg = False
+            current_path = file_io.get_file_path()
+
+            if os.path.normpath(current_path).lower() == os.path.normpath(self.data["path"]).lower() and not self.piece_data.get("force", False):
+                self.logger.debug("file was already opened: {}".format(self.data["path"]))
+                return flg, self.pass_data, u"開いているファイルが同じです: {}".format(os.path.basename(self.data["path"])), "file name:\n{}".format(self.data["path"])
+
+            if file_io.file_open(self.data["path"]):
+                if self.logger: 
+                    self.logger.debug("file open: {}".format(self.data["path"]))
+                    file_path = self.data["path"]
+
+            else:
+                if self.logger: 
+                    self.logger.debug("file open failed: {}".format(self.data["path"]))
+                flg = False
         
         if "start" in self.data and "end" in self.data and "fps" in self.data:
             self.logger.debug("{} {} {}".format(self.data["start"], self.data["end"], self.data["fps"]))
@@ -66,7 +66,10 @@ class FileOpen(Piece):
                                              zoom_stop=self.data["end"], 
                                              fps=self.data["fps"])
 
-        return flg, self.pass_data, u"ファイルを開きました: {}".format(os.path.basename(self.data["path"])), "file name:\n{}".format(file_path)
+        if self.piece_data.get("new"):
+            return flg, self.pass_data, u"新規ファイルで開始しました:", ""
+        else:
+            return flg, self.pass_data, u"ファイルを開きました: {}".format(os.path.basename(self.data["path"])), "file name:\n{}".format(file_path)
 
 if __name__ == "__builtin__":
 

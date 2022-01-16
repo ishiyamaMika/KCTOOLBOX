@@ -100,10 +100,19 @@ data:
 
         mobu_edit_export:
             primary:
+                - name: archive
+                  piece: KcHooks.pieces.win.archive_file
+                  description: archive edit file
+
                 - name: open_file
                   piece: KcHooks.pieces.mobu.default.file_open
                   description: open file
                   force: true
+
+                - name: plot_all
+                  piece: KcHooks.pieces.mobu.default.plot_all
+                  description: plot all
+                  interpolate: Stepped
 
                 - name: change scene time
                   piece: KcHooks.pieces.mobu.default.change_time
@@ -111,13 +120,14 @@ data:
                   fps: 24
                   mode: change
 
-                - name: plot_all
-                  piece: KcHooks.pieces.mobu.default.plot_all
-                  description: plot all
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+                # - name: plot_all
+                #   piece: KcHooks.pieces.mobu.default.plot_all
+                #   description: plot all
+                #   paint:
+                #       start: "@start"
+                #       end: "@end"
+                #       fps: "@fps"
+
 
             main:
                 # - name: koma save
@@ -209,6 +219,13 @@ data:
                       end: "@end"
                       fps: "@fps"
 
+                - name: remove koma
+                  piece: KcHooks.pieces.win.removeFiles
+                  description: remove koma files
+                  patterns: 
+                      - root: convert_path
+                        target: ../import/*_koma.json
+
             main:
                 - name: koma save
                   piece: KcHooks.pieces.mobu.default.get_koma
@@ -239,6 +256,24 @@ data:
                   description: through pieces from command line 
                   keys: max_import
                   app_environ: PT_DISPATCHER_MAX
+
+
+        mobu_master_export_varidate:
+            primary:
+                - name: open_file
+                  piece: KcHooks.pieces.mobu.default.file_open
+                  description: open file
+
+            main:
+                - name: export asset
+                  piece: KcHooks.pieces.mobu.default.asset_export
+                  description: export asset
+                  mode: master_varidate
+                  # filters: 
+                  #     - category: ["CH", "BG", "PR", "LO"]
+                  paint:
+                      export_path: mobu_master_export_path
+
 
         max_import:
             primary:
@@ -300,6 +335,10 @@ data:
                       fps: "@fps"
                       start: "@start"
                       end: "@end"
+
+                - name: archive
+                  piece: KcHooks.pieces.win.archive_file
+                  description: archive edit file
 
                 - name: save file
                   piece: KcHooks.pieces.max.default.file_save

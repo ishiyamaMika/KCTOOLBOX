@@ -1458,32 +1458,35 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                                    "export": self.project.path_generate(template["config"].replace("<config_type>", "export"), asset)} 
 
                 asset["mobu_master_export_path"] = self.project.path_generate(template["master_export"], asset)
-                
+                asset["max_asset_path"] = False
+
                 if asset["category"] == "camera":
                     camera_path = self.project.get_latest_camera_path("max")
                     asset["max_asset_path"] = camera_path
                 else:
-                    asset["version"] = "*"
-                    asset["max_asset_path"] = self.project.path_generate(max_template["rig"], asset)
+                    asset["version"] = "*"    
+                    max_asset_directory = self.project.path_generate(os.path.dirname(max_template["rig"]), asset)
+                    if os.path.exists(max_asset_directory):
+                        files = []
+                        for l in os.listdir(max_asset_directory):
+                            name_fields = self.project.field_generator.get_field_value(os.path.basename(max_template["rig"]), l)
+                            if "<take>" in name_fields:
+                                files.append("{}/{}".format(max_asset_directory, l))
+                            
+                        if len(files) > 0:
+                            files.sort()
+                            asset["max_asset_path"] = files[-1]
 
                 if not asset["max_asset_path"]:
                     errors.append([False, {}, "", u"[error] maxのパスを生成できません: {}".format(asset["namespace"]), max_template["rig"] + "\n" + unicode(asset)])
                 else:
-                    paths = glob.glob(asset["max_asset_path"])
-                    paths.sort()
-
-                    if len(paths) == 0:
-                        errors.append([False, {}, "", u"[error] max pathがありません: {}".format(asset["namespace"]), asset["max_asset_path"]])
-
-                    else:
-                        asset["max_asset_path"] = paths[-1]
-
                     data["primary"].setdefault("assets", []).append(asset)
                     data["main"].append(asset)
 
             post_primary = {}
             post_primary["path"] = self.project.path_generate(self.project.config["shot"]["max"]["paths"]["master"], item["fields"])
             post_primary["assets"] = item.get("assets", [])
+            data["primary"]["convert_path"] = post_primary["path"]
 
             post_main = copy.deepcopy(data["main"])
 
@@ -1511,11 +1514,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 results_all.append([-2, {}, "-", "-", u"処理停止しました"])                
                 continue
 
-            """
-            pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export_varidate"], 
+            pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_master_export_varidate"], 
                                                           data, 
                                                           {}, 
-                                                          orders.get("mobu_edit_export_varidate", orders["default"]))
+                                                          orders.get("mobu_master_export_varidate", orders["default"]))
             errors_ = []
             for result in results:
                 if result[3].startswith("[error]"):
@@ -1534,7 +1536,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             if len(errors) > 0:
                 continue
-            """
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_master_export"], 
                                      data, 
@@ -1667,6 +1668,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             post_primary = {}
             post_primary["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], item["fields"])
             post_primary["assets"] = item.get("assets", [])
+            
 
             post_main = copy.deepcopy(data["main"])
 

@@ -15,9 +15,9 @@ from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
 import KcLibs.max.kc_file_io as kc_file_io
-# import KcLibs.mobu.kc_transport_time as kc_transport_time
+import KcLibs.max.kc_transport_time as kc_transport_time
+import KcLibs.max.kc_render as kc_render
 
-reload(kc_file_io)
 _PIECE_NAME_ = "SetRenderSetting"
 
 class SetRenderSetting(Piece):
@@ -40,14 +40,16 @@ class SetRenderSetting(Piece):
         modified_keys = []
         self.details.append("pattern: {}".format("{}/import/*_koma.json".format(directory)))
         for f in glob.glob("{}/import/*_koma.json".format(directory)):
-            self.details.append(f)
             if "_cam_" in os.path.basename(f):
                 continue
+            
+            self.details.append(f)
             js = json.load(open(f), "utf8")
             try:
                 info, data = js["info"], js["data"]
             except:
                 continue
+            self.details.append(info["category"])
             if info["category"] != "koma data":
                 continue
 
@@ -60,12 +62,12 @@ class SetRenderSetting(Piece):
                             if v2["changed"]:
                                 if v2["frame"] not in modified_keys:
                                     modified_keys.append(v2["frame"])
+                                    print node, v2["frame"]
 
         modified = list(set(modified_keys))
         modified.sort()
-
-        lst = list()
         lsts = []
+        lst = list()
         for i, number in enumerate(modified):
             if i == 0:
                 lst.append(number)
@@ -78,9 +80,8 @@ class SetRenderSetting(Piece):
                 lsts.append(lst)
                 lst = list()
                 lst.append(number)
-
+        lsts.append(lst)
         results = ",".join([_cast(l) for l in lsts])
-
         return results
 
     def execute(self):
@@ -88,12 +89,22 @@ class SetRenderSetting(Piece):
         header = ""
         detail = ""
 
-        pymxs.runtime.rendStart = self.data["start"]
-        pymxs.runtime.rendEnd = self.data["end"]
-        pymxs.runtime.renderWidth = self.data["width"]
-        pymxs.runtime.renderHeight = self.data["height"]
-        result = self.get_frames(os.path.dirname(self.data["path"]))
-        pymxs.runtime.rendPickupFrames = result
+        kc_transport_time.set_scene_time(self.data["start"], self.data["end"], self.data["fps"])
+        options = {}
+        result = ""
+        if "path" in self.data:
+            result = self.get_frames(os.path.dirname(self.data["path"]))
+            if self.logger: 
+                self.logger.debug("render frames: {}".format(result))
+            else:
+                print result
+            options["render_frames"] = result
+
+        kc_render.setup(self.data["start"], 
+                        self.data["end"], 
+                        self.data["width"], 
+                        self.data["height"], 
+                        **options)
 
         header = "update render settings"
         detail = "start: {}\nend: {}\nwidth: {}\nheight: {}\nframes: {}\nkoma files: {}".format(self.data["start"], 
@@ -107,7 +118,10 @@ class SetRenderSetting(Piece):
 if __name__ == "__main__":
 
     piece_data = {}
-    data = {"start": 12, "end": 50, "width": 720, "height": 360}
 
+
+    path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/master/ZIM_s99c999_anim.max"
+    data = {"start": 12, "end": 50, "fps": 24, "width": 720, "height": 360, "path": path}
     x = SetRenderSetting(piece_data=piece_data, data=data)
-    x.execute()
+    import pprint
+    pprint.pprint(x.execute())

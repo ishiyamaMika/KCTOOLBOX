@@ -3,6 +3,7 @@
 import os
 import sys
 import json
+import re
 
 from pyfbsdk import *
 
@@ -39,16 +40,14 @@ class AssetExport(Piece):
         flg = True
         header = ""
         detail = ""
-        print "AssetExport---"
-
         if self.piece_data.get("mode") == "varidate":
             return self.varidate()
+        elif self.piece_data.get("mode") == "master_varidate":
+            return self.master_varidate()
         else:
             return self.main()
 
     def varidate(self):
-        import re
-
         export_path = self.data["export_path"]
         if not export_path:
             return True, self.pass_data, u"[error] エクスポートパスを作成できませんでした: {} > {}".format(self.data["namespace"], export_path), ""
@@ -90,7 +89,7 @@ class AssetExport(Piece):
         if len(take_versions) == 0:
             return True, self.pass_data, u"[error] アセットファイルが存在しません: {}".format(self.data["namespace"]), ""
         
-        if asset_meta["take"] < take_versions[-1][0]:
+        if asset_meta["take"] != take_versions[-1][0]:
             return True, self.pass_data, u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(self.data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]), ""
 
         info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
@@ -104,20 +103,80 @@ class AssetExport(Piece):
 
         return True, self.pass_data, u"設定ファイルとシーンのモデル数は一致しています: {}".format(self.data["namespace"]), ""
 
-    def main(self):
-        def _ignore(model_name):
-            ignores = ["_ctrlSpace_", "_jtSpace_"]
-            for ignore in ignores:
-                if ignore in model_name:
-                    return False
-            return True
+    def master_varidate(self):
+        export_path = self.data["export_path"]
+        if not export_path:
+            return True, self.pass_data, u"[error] エクスポートパスを作成できませんでした: {} > {}".format(self.data["namespace"], export_path), ""
 
+        if not self.data["config"]["export"]:
+            return True, self.pass_data, u"[error] 設定ファイルパスを作成できませんでした: {}".format(self.data["namespace"]), ""
+
+        if not os.path.exists(self.data["config"]["export"]):
+            return True, self.pass_data, u"[error] 設定ファイルパスが存在しませんでした: {}".format(self.data["namespace"]), ""
+
+        asset_directory = os.path.dirname(self.data["max_asset_path"])
+        paths = self.pass_data["project"].config["asset"]["max"]["paths"]
+        asset_meta = self.pass_data["project"].get_asset(self.data["namespace"])
+
+        if not asset_meta:
+            return True, self.pass_data, u"[error] metaモデルがアセットに設定されていません: {}".format(self.data["namespace"]), ""
+
+        take_versions = []
+        print "::::", asset_directory
+        for each in os.listdir(asset_directory):
+            if not each.lower().endswith(".max"):
+                continue
+
+            asset_path = "{}/{}".format(asset_directory, each)
+            print asset_path
+
+            if self.data["category"] in paths:
+                template = paths[self.data["category"]]["rig"]
+            else:
+                template = paths["default"]["rig"]
+            
+            print template
+
+            fields = self.pass_data["project"].path_split(template, asset_path)
+            if "<take>" in fields:
+                try:
+                    take_versions.append([int(fields["<take>"]), int(fields["<version>"])])
+                except:
+                    continue
+        
+        take_versions.sort()
+
+        if len(take_versions) == 0:
+            return True, self.pass_data, u"[error] アセットファイルが存在しません: {}".format(self.data["namespace"]), ""
+
+        if asset_meta["take"] != take_versions[-1][0]:
+            return True, self.pass_data, u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(self.data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]), ""
+
+        info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
+        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if self.ignore_models(l["name"])]
+
+        models = kc_model.to_object(model_names) or []
+
+        if len(model_names) != len(models):
+            diff = list(set(model_names) | set([l.LongName for l in models if self.ignore_models(l["name"])]))
+            return True, self.pass_data, u"[error] 設定ファイルとシーンのモデルの数が違います: {} ({})".format(self.data["namespace"], len(diff)), u"以下のmodelがありません\n{}".format("\n".join(diff))
+
+        return True, self.pass_data, u"設定ファイルとシーンのモデル数は一致しています: {}".format(self.data["namespace"]), ""
+
+    def ignore_models(self, model_name):
+        ignores = ["_ctrlSpace_", "_jtSpace_"]
+        for ignore in ignores:
+            if ignore in model_name:
+                return False
+        return True
+
+    def main(self):
         kc_model.unselected_all()
         flg = True
 
         info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
 
-        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if _ignore(l["name"])]
+        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if self.ignore_models(l["name"])]
 
         models = kc_model.select(model_names)
         if self.data["category"] == "camera":
@@ -144,31 +203,65 @@ class AssetExport(Piece):
 
 if __name__ == "__builtin__":
     x = KcProject()
-    x.set("ZIM", "home")
-    piece_data = {'path': "E:/works/client/keica/data/assets", 
-                  "mode": "varidate", 
-                  "paint": 
-                    {
-                        "export_path": "mobu_edit_export_path"}
-                    }
+    x.set("ZIM", "default")
+    def edit_varidate():
+        piece_data = {'path': "E:/works/client/keica/data/assets", 
+                    "mode": "varidate", 
+                    "paint": 
+                        {
+                            "export_path": "mobu_edit_export_path"}
+                        }
 
-    data = {u'category': u'CH',
-           'config': {'export': False, 'plot': False},
-           'cut': u'001',
-           'end': 0,
-           'mobu_edit_export_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
-            u'config': {'export': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json",
-                            'plot': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json"},
-           'mobu_sotai_path': False,
-           u'namespace': u'CH_tsukikoQuad',
-           'scene': u'01',
-           u'selection': True,
-           'start': 0,
-           u'take': 2.0,
-           u'true_namespace': u'CH_tsukikoQuad',
-           u'type': u'both',
-           u'update_at': u'2021/11/18 01:17:16',
-           u'update_by': u'amek'}
+        data = {u'category': u'CH',
+            'config': {'export': False, 'plot': False},
+            'cut': u'001',
+            'end': 0,
+            'mobu_edit_export_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
+                u'config': {'export': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json",
+                                'plot': "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json"},
+            'mobu_sotai_path': False,
+            u'namespace': u'CH_tsukikoQuad',
+            'scene': u'01',
+            u'selection': True,
+            'start': 0,
+            u'take': 2.0,
+            u'true_namespace': u'CH_tsukikoQuad',
+            u'type': u'both',
+            u'update_at': u'2021/11/18 01:17:16',
+            u'update_by': u'amek'}
+        
+        return piece_data, data
+    
+    def master_varidate():
+        piece_data = {'description': 'export asset',
+                      'mode': 'master_varidate',
+                      'name': 'export asset',
+                      'paint': {'export_path': 'mobu_master_export_path'},
+                      'piece': 'KcHooks.pieces.mobu.default.asset_export'}
+        
+        data = {u'asset_name': u'tsukikoQuad',
+                u'category': u'CH',
+                'config': {'export': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json',
+                            'plot': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json'},
+                'cut': u'999',
+                'end': 60,
+                'max_asset_path': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad\\CH_tsukikoQuad_rig_t06_01.max',
+                'mobu_master_export_path': u'X:/Project/_942_ZIZ/3D/s99/c999/3D/master/import/ZIM_s99c999_anim_CH_tsukikoQuad_03.fbx',
+                u'namespace': u'CH_tsukikoQuad_03',
+                'scene': u'99',
+                u'selection': True,
+                'start': 0,
+                u'take': 6.0,
+                u'true_namespace': u'CH_tsukikoQuad',
+                u'type': u'both',
+                u'update_at': u'2022/01/07 17:21:03',
+                u'update_by': u'Naoki.ito',
+                u'variation': u'',
+                u'version': '*'}
 
-    x = AssetExport(piece_data=piece_data, data=data, pass_data={"project": x})
-    print x.execute()
+        return piece_data, data        
+    
+    piece_data, data = master_varidate()
+    y = AssetExport(piece_data=piece_data, data=data, pass_data={"project": x})
+    print y.execute()
+    print 111

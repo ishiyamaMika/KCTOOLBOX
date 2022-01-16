@@ -686,6 +686,33 @@ def scale_keys(curve, scale=1.0, invert=False):
     FBSystem().Scene.Evaluate()
 
 
+def change_key_to_stepped(model):
+    def _change_to_stepped(anim_node):
+        for i in range(len(anim_node.Nodes)):
+            for key in anim_node.Nodes[i].FCurve.Keys:
+                key.Interpolation = FBInterpolation.kFBInterpolationConstant
+                key.LeftDerivative = 0
+                key.RightDerivative = 0
+                key.TangentClampMode = FBTangentClampMode.kFBTangentClampModeNone
+                key.TangentConstantMode = FBTangentConstantMode.kFBTangentConstantModeNormal
+
+    if isinstance(model, list):
+        for m in model:
+            change_key_to_stepped(m)
+    else:
+        for attr in dir(model):
+            try:
+                is_exists = hasattr(getattr(model, attr), "GetAnimationNode")
+            except:
+                continue
+            if is_exists:
+                try:
+                    anim_node = getattr(getattr(model, attr), "GetAnimationNode")()
+                except:
+                    continue
+
+                if anim_node:
+                    _change_to_stepped(anim_node)
 
 
 if __name__ == "__builtin__":
@@ -694,6 +721,9 @@ if __name__ == "__builtin__":
     #y = FBFindModelByName("dst")    
     #copy_local_animation(model, y, [True, True, False])
     #plot_selected(30.0)
-    plot_selected()
+
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    change_key_to_stepped([l for l in m_list])
     print "DONE"
 

@@ -21,7 +21,7 @@ import KcLibs.core.kc_env as kc_env
 from KcLibs.core.KcProject import KcProject
 import KcLibs.mobu.kc_key as kc_key
 import KcLibs.mobu.kc_model as kc_model
-
+reload(kc_key)
 _PIECE_NAME_ = "PlotAll"
 
 class PlotAll(Piece):
@@ -44,10 +44,13 @@ class PlotAll(Piece):
         flg = True
         header = ""
         detail = ""
-
+        
+        """
         start = self.data["start"]
         end = self.data["end"]
         fps = self.pass_data["project"].config["general"]["fps"]
+        """
+        
         model_names = []
         for asset in self.data.get("assets", []):
             if not "config" in asset:
@@ -72,6 +75,13 @@ class PlotAll(Piece):
         header = u"plotしました: {}".format(len(model_names))
         detail = "plot:\n" + "\n".join(model_names)
         kc_key.plot_selected()
+
+        if "interpolate" in self.piece_data:
+            m_list = FBModelList()
+            FBGetSelectedModels(m_list)
+            kc_key.change_key_to_stepped([l for l in m_list])
+            if self.logger:
+                self.logger.debug("change key to stepped")
 
         return flg, self.pass_data, header, detail
 
