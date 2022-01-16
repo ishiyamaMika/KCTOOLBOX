@@ -164,7 +164,7 @@ class AssetExport(Piece):
         return True, self.pass_data, u"設定ファイルとシーンのモデル数は一致しています: {}".format(self.data["namespace"]), ""
 
     def ignore_models(self, model_name):
-        ignores = ["_ctrlSpace_", "_jtSpace_"]
+        ignores = ["_ctrlSpace", "_jtSpace"]
         for ignore in ignores:
             if ignore in model_name:
                 return False

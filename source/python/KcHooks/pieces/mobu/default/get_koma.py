@@ -123,7 +123,7 @@ class GetKoma(Piece):
         header = ""
         detail = ""
         def _ignore(model_name):
-            ignores = ["_ctrlSpace_", "_jtSpace_"]
+            ignores = ["_ctrlSpace", "_jtSpace"]
             for ignore in ignores:
                 if ignore in model_name:
                     return False
