@@ -35,8 +35,10 @@ class RenderScene(Piece):
         else:
             if not os.path.exists(os.path.dirname(self.data["movie_path"])):
                 os.makedirs(os.path.dirname(self.data["movie_path"]))
-
+            pymxs.runtime.viewport.setLayout(pymxs.runtime.Name("layout_1")) 
+            pymxs.runtime.ForceCompleteRedraw()
             pymxs.runtime.viewport.setCamera(camera)
+            pymxs.runtime.ForceCompleteRedraw()
             pymxs.runtime.viewport.SetRenderLevel(pymxs.runtime.Name("flat"))
             pymxs.runtime.ForceCompleteRedraw()
             pymxs.runtime.CreatePreview(start=self.data["start"], 
