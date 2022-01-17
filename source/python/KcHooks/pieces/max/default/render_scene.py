@@ -37,6 +37,7 @@ class RenderScene(Piece):
                 os.makedirs(os.path.dirname(self.data["movie_path"]))
 
             pymxs.runtime.viewport.setCamera(camera)
+            pymxs.runtime.viewport.SetRenderLevel(pymxs.runtime.Name("flat"))
             pymxs.runtime.ForceCompleteRedraw()
             pymxs.runtime.CreatePreview(start=self.data["start"], 
                                         end=self.data["end"],
