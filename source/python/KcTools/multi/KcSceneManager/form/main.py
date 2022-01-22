@@ -1656,7 +1656,15 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                     asset["mobu_sotai_path"] = cam_path
 
                 else:
+                    asset["take"] = "*"
                     asset["mobu_sotai_path"] = self.project.path_generate(template["sotai"], asset)
+                    """
+                        TODO:
+                            ハードコード
+                    """
+                    sotai_paths = glob.glob(asset["mobu_sotai_path"])
+                    sotai_paths.sort()
+                    asset["mobu_sotai_path"] = sotai_paths[-1]
                 if not asset["mobu_sotai_path"]:
                     errors.append([False, {}, "", u"[error] sotaiのパスを生成できません: {}".format(asset["namespace"]), template["sotai"] + "\n" + unicode(asset)])
                 elif not os.path.exists(asset["mobu_sotai_path"]):
