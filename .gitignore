@@ -2,3 +2,6 @@ sample/
 *.pyc
 bin/
 *.bak
+source/actionScripts/KcTools/aftereffects/Types-for-Adobe-master/
+source/actionScripts/KcTools/aftereffects/jsconfig.json
+source/actionScripts/KcTools/aftereffects/.vscode/

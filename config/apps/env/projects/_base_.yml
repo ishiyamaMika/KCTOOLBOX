@@ -49,7 +49,7 @@ data:
                     sotai: <asset_root>/<category>/<asset_name>/MB/sotai/<category>_<asset_name>_sotai_t<take>.fbx
                     config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
-                    master_export: "<root_directory>/3D/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+                    master_export: "<root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
 
                 LO:
@@ -57,14 +57,14 @@ data:
                     sotai: <asset_root>/<category>/<asset_name>/MB/sotai/<category>_<asset_name>_<variation>_sotai_t<take>.fbx
                     config: <asset_root>/<category>/<asset_name>/MB/config/<category>_<asset_name>_<variation>_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
-                    master_export: "<root_directory>/3D/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+                    master_export: "<root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
 
                 camera:
                     rig: <asset_root>/<category>/MB/cam_t<take>_<version>.FBX
                     sotai: <asset_root>/<category>/MB/sotai/cam_sotai_t<take>.FBX
                     config: <asset_root>/<category>/MB/config/cam_s00c000_<config_type>.json
                     edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
-                    master_export: "<root_directory>/3D/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_<namespace>.fbx"
+                    master_export: "<root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_<namespace>.fbx"
 
         max:
             paths:
@@ -96,9 +96,9 @@ data:
         max:
             paths:
                 edit: <root_directory>/3D/s<scene>/c<cut>/3D/edit/<project>_s<scene>c<cut>_edit_t<take>_<version>_<user>_<progress>.max
-                master: <root_directory>/3D/s<scene>/c<cut>/3D/master/<project>_s<scene>c<cut>_anim.max
-                edit_movie: <root_directory>/3D/s<scene>/c<cut>/3D/edit/mov_edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.mov
-                master_movie: <root_directory>/3D/s<scene>/c<cut>/movie_convert/max/<project>_s<scene>c<cut>_MB.avi
+                master: <root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/<project>_s<scene>c<cut>_anim.max
+                edit_movie: <root_directory>/3D/s<scene>/c<cut>/3D/edit/mov_edit/<project>_s<scene>c<cut>_anim_t<take>_<version>_<user>.avi
+                master_movie: <root_directory>/3D/s<scene>/c<cut>/movie_convert/max/<project>_s<scene>c<cut>_max.avi
 
 
     puzzle:

@@ -32,7 +32,9 @@ class SetRenderSetting(Piece):
 
     def get_frames(self, directory):
         def _cast(numbers):
-            if len(numbers) == 1:
+            if len(numbers) == 0:
+                return False
+            elif len(numbers) == 1:
                 return str(numbers[0])
             else:
                 return "{}-{}".format(numbers[0], numbers[-1])
@@ -52,7 +54,7 @@ class SetRenderSetting(Piece):
             self.details.append(info["category"])
             if info["category"] != "koma data":
                 continue
-
+            remap_frames = []
             for node, keys in data["modified"].items():
                 for trs in keys["list"]:
                     for k, v in trs.items():
@@ -62,7 +64,16 @@ class SetRenderSetting(Piece):
                             if v2["changed"]:
                                 if v2["frame"] not in modified_keys:
                                     modified_keys.append(v2["frame"])
-                                    print node, v2["frame"]
+                
+                remap_frames.extend(keys["change_frames"])
+            
+            remap_path = "{}.txt".format(f)
+            remap_frames = list(set(remap_frames))
+            remap_frames.sort()
+            with open(remap_path, "w") as f:
+                f.write("\n".join(["{}@{}".format(i, l) for (i, l) in enumerate(remap_frames)]))
+                if self.logger:
+                    self.logger.debug("remap path create: {}".format(remap_path))
 
         modified = list(set(modified_keys))
         modified.sort()
@@ -81,7 +92,7 @@ class SetRenderSetting(Piece):
                 lst = list()
                 lst.append(number)
         lsts.append(lst)
-        results = ",".join([_cast(l) for l in lsts])
+        results = ",".join([_cast(l) for l in lsts if len(l) > 0])
         return results
 
     def execute(self):

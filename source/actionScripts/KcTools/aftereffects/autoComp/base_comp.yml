@@ -1,0 +1,252 @@
+order:
+    - LineA_Thin
+    - LineA
+    - line
+    - "color{1}"
+    - irisLine_Thin
+    - irisLine
+    - eyelashLine_Thin
+    - eyelashLine
+    - lightingMask    
+    - faceMask
+    - hiMask
+    - hiColor
+    - shadeMask
+    - shade
+    - "color{0}"
+
+settings:
+    LineA_Thin:
+        common: 
+            enabled: true
+
+    LineA:
+        common: 
+            enabled: true
+
+    color{1}: 
+        common:
+            enabled: false
+
+        Aoi*:
+            effects: 
+                - name: リニアカラーキー
+                  properties: 
+                    - name: キーカラー
+                      value: [1, 1, 1]
+
+                    - name: マッチングの許容度
+                      value: 0
+
+                    - name: マッチングの柔軟度
+                      value: 0
+
+        Lily*:
+            effects: 
+                - name: リニアカラーキー
+                  properties: 
+                    - name: キーカラー
+                      value: [1, 1, 1]
+
+                    - name: マッチングの許容度
+                      value: 0
+
+                    - name: マッチングの柔軟度
+                      value: 0
+
+        Ray*:
+            effects: 
+                - name: リニアカラーキー
+                  properties: 
+                    - name: キーカラー
+                      value: [1, 1, 1]
+
+                    - name: マッチングの許容度
+                      value: 0
+
+                    - name: マッチングの柔軟度
+                      value: 0
+    irisLine_Thin:
+        common:
+            enabled: true
+            mat_type: alpha
+
+    irisLine:
+        common:
+            enabled: true
+            mat_type: alpha
+
+    eyelashLine_Thin:
+        common: 
+            enabled: true
+            mat_type: alpha
+
+    eyelashLine:
+        common: 
+            enabled: true
+            mat_type: alpha
+
+    lightingMask:
+        common: 
+            enabled: false
+
+        Rollei*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.5411
+
+                    - name: 白入力レベル
+                      value: 0.5411
+
+                    - name: ガンマ
+                      value: 1.14
+
+                    - name: 黒出力レベル
+                      value: 0
+
+                    - name: 白出力レベル
+                      value: 1
+
+    hiMask:
+        common: 
+            enabled: false
+
+        Aoi*:
+            effects: 
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.6549
+
+                    - name: 白入力レベル
+                      value: 0.6549
+
+        Lily*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.0
+
+                    - name: 白入力レベル
+                      value: 0.0
+
+                    - name: ガンマ
+                      value: 1.0
+
+                    - name: 黒出力レベル
+                      value: 0.0
+
+                    - name: 白出力レベル
+                      value: 1.0
+
+        Ray*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.5137
+
+                    - name: 白入力レベル
+                      value: 0.5137
+
+                    - name: ガンマ
+                      value: 1.0
+
+                    - name: 黒出力レベル
+                      value: 0
+
+                    - name: 白出力レベル
+                      value: 1
+
+    hiColor:
+        common: 
+            enabled: true        
+            mat_type: luma
+
+    shadeMask:
+        common: 
+            enabled: false
+
+        Aoi*:            
+            effects: 
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.6549
+
+                    - name: 白入力レベル
+                      value: 0.6549
+
+        Leica*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.5568
+
+                    - name: 白入力レベル
+                      value: 0.5568
+
+                    - name: ガンマ
+                      value: 1.0
+
+                    - name: 黒出力レベル
+                      value: 0
+
+                    - name: 白出力レベル
+                      value: 1
+
+        Lily*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.5019
+
+                    - name: 白入力レベル
+                      value: 0.5019
+
+                    - name: ガンマ
+                      value: 1.0
+
+                    - name: 黒出力レベル
+                      value: 0
+
+                    - name: 白出力レベル
+                      value: 1
+
+        Ray*:
+            effects:
+                - name: レベル
+                  properties: 
+                    - name: 黒入力レベル
+                      value: 0.5137
+
+                    - name: 白入力レベル
+                      value: 0.5137
+
+                    - name: ガンマ
+                      value: 1.0
+
+                    - name: 黒出力レベル
+                      value: 0
+
+                    - name: 白出力レベル
+                      value: 1
+    faceMask:
+        common: 
+            enabled: false        
+
+    shade:
+        common: 
+            enabled: true        
+            mat_type: luma_inverted
+
+    color{0}: 
+        common: 
+            enabled: true        
+
+

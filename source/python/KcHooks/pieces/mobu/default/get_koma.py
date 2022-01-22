@@ -34,11 +34,12 @@ class GetKoma(Piece):
         def _get_trs_key(model, trs="Translation"):
             all_keys = {}
             if isinstance(model, bool):
-                return {}
+                return {}, []
 
             trs_object = getattr(model, trs)
             if not trs_object.GetAnimationNode():
-                return {}
+                return {}, []
+            modified_list = []
             for i in range(3):
                 each_keys = []
                 anim_node = trs_object.GetAnimationNode().Nodes[i]
@@ -64,9 +65,16 @@ class GetKoma(Piece):
                     else:
                         keyframe["changed"] = temp_key["value"] != keyframe["value"]
 
+                    if keyframe["changed"]:
+                        modified_list.append(frame)
+
                     all_keys[frame][i] = keyframe
                     temp_key = keyframe
-            return all_keys
+
+            modified_list = list(set(modified_list))
+            print modified_list
+                
+            return all_keys, modified_list
 
         if isinstance(model, (list, FBModelList)):
             all_ = {}
@@ -77,8 +85,10 @@ class GetKoma(Piece):
             return all_
         else:
             all_keys = {}
+            modified = []
             for trs in ["Translation", "Rotation", "Scaling"]:
-                all_keys[trs] = _get_trs_key(model, trs)
+                all_keys[trs], modified_list = _get_trs_key(model, trs)
+                modified.extend(modified_list)
 
             a = all_keys["Translation"].keys()
             b = all_keys["Rotation"].keys()
@@ -116,6 +126,9 @@ class GetKoma(Piece):
                         continue
                 keyframe_set["list"].append(keys)
 
+            modified = list(set(modified))
+            modified.sort()
+            keyframe_set["change_frames"] = modified
             return {model.LongName: keyframe_set}
 
     def execute(self):
@@ -184,6 +197,7 @@ if __name__ == "__builtin__":
     piece_data = {}
 
     x = GetKoma(piece_data=piece_data, data=data, pass_data=pass_data)
-    x.execute()
-
-    print x.pass_data
+    # x.execute()
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    x.get_all_keys(m_list[0])
