@@ -12,7 +12,7 @@ data:
                 widget: QComboBox
                 items: 
                     - CH
-                    - PR
+                    - PP
                     - LO
                     - VC
                     - BG

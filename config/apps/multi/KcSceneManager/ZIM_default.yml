@@ -184,6 +184,10 @@ data:
                       camera: "@camera"
                       width: "@width"
                       height: "@height"
+                
+                - name: setup scene
+                  piece: KcHooks.pieces.mobu.default.scene_setup
+                  description: ""
 
                 - name: file_save
                   piece: KcHooks.pieces.mobu.default.file_save
@@ -193,6 +197,7 @@ data:
                       start: "@start"
                       end: "@end"
                       fps: "@fps"
+                
                 - name: render_scene
                   piece: KcHooks.pieces.mobu.default.render_scene
                   description: ""
