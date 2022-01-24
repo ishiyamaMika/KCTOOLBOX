@@ -186,7 +186,7 @@ data:
                       height: "@height"
                 
                 - name: setup scene
-                  piece: KcHooks.pieces.mobu.default.scene_setup
+                  piece: KcHooks.pieces.mobu.default.setup_scene
                   description: ""
 
                 - name: file_save
