@@ -37,10 +37,13 @@ class CameraSetup(Piece):
 
         if "camera" in self.data:
             camera = kc_model.to_object(str(self.data["camera"]))
+
             if camera:
                 camera.ResolutionWidth = self.data["width"]
                 camera.ResolutionHeight = self.data["height"]
                 header = u"カメラの解像度を設定しました: {}x{}".format(self.data["width"], self.data["height"])
+                camera.PropertyList.Find("ApertureMode").Data = 1
+                camera.FilmAspectRatio = float(self.data["width"])/self.data["height"]
             else:
                 header = u"カメラがありませんでした: {}".format(self.data["camera"])
 
@@ -58,10 +61,11 @@ if __name__ == "__builtin__":
     piece_data = {}
 
     data = {
-           "namespace": "camera name",
+           "namespace": "test",
            "width": 1920,
-           "height": 1080
+           "height": 1080,
+           "camera": "cam_s00c000:Merge_Camera"
             }
 
     x = CameraSetup(piece_data=piece_data, data=data)
-    x.execute()
+    print x.execute()
