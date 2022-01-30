@@ -35,20 +35,26 @@ class CameraSetup(Piece):
         header = ""
         detail = ""
 
+
+
         if "camera" in self.data:
             camera = kc_model.to_object(str(self.data["camera"]))
 
             if camera:
                 camera.ResolutionWidth = self.data["width"]
                 camera.ResolutionHeight = self.data["height"]
-                header = u"カメラの解像度を設定しました: {}x{}".format(self.data["width"], self.data["height"])
-                # camera.PropertyList.Find("ApertureMode").Data = 1
-                # camera.FilmAspectRatio = float(self.data["width"])/self.data["height"]
+                header = u"カメラの解像度を設定しました: {}x{}".format(self.data["width"], 
+                                                                    self.data["height"])
+
+                # camera.ApertureMode = FBCameraApertureMode.kFBApertureHorizontal
+                camera.FilmAspectRatio = float(self.data["width"])/self.data["height"]
+                FBSystem().Scene.Evaluate()
             else:
                 header = u"カメラがありませんでした: {}".format(self.data["camera"])
 
         else:
             header = u"カメラの解像度を設定できませんでした"
+            detail = self.data
 
 
         print "select camera"

@@ -379,11 +379,12 @@ data:
                   piece: KcHooks.pieces.mobu.default.file_open
                   description: ""
 
-                - name: change scene time
-                  piece: KcHooks.pieces.mobu.default.change_time
-                  description: "change scene time. result set to pass_data"
-                  fps: 24
-                  mode: change
+                # - name: change scene time
+                #   piece: KcHooks.pieces.mobu.default.change_time
+                #   description: "change scene time. result set to pass_data"
+                #   fps: 24
+                #   mode: change
+                
 
                 - name: render
                   piece: KcHooks.pieces.mobu.default.render_scene
