@@ -30,7 +30,8 @@ class RenderScene(Piece):
 
 
     def png_to_movie(self, src_path, dst_path, fps):
-        cmd = '{} -i "{}" -vcodec libx264 -pix_fmt yuv420p -q 0 -framerate {} "{}"'.format(self.ffmpeg, src_path, fps, dst_path)
+        # cmd = '{} -i "{}" -vcodec libx264 -pix_fmt yuv420p -q 0 -framerate {} "{}"'.format(self.ffmpeg, src_path, fps, dst_path)
+        cmd = '{} -i "{}" -q 0 -framerate {} "{}"'.format(self.ffmpeg, src_path, fps, dst_path)
         cmd = cmd.replace("/", "\\")
         if self.logger:
             self.logger.debug("output_path: {}".format(dst_path))
@@ -92,10 +93,10 @@ class RenderScene(Piece):
             if os.path.exists(self.data["movie_path"]):
                 header = "max scene preview successed"
                 detail = "camera: {camera}\nstart: {start}\nend: {end}\nfps: {fps}\npath: {movie_path}".format(**self.data)
-                try:
-                    shutil.rmtree("{}/temp".format(d))
-                except:
-                    pass
+                # try:
+                #     shutil.rmtree("{}/temp".format(d))
+                # except:
+                #     pass
             else:
                 header = "max scene preview failed"
                 detail = "camera: {camera}\nstart: {start}\nend: {end}\nfps: {fps}\npath: {movie_path}".format(**self.data)
