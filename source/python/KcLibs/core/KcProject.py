@@ -6,6 +6,7 @@ import json
 import re
 import copy
 import glob
+import traceback
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 
@@ -72,7 +73,9 @@ class KcProject(object):
         config_data = {}
         for f in files:
             override_info, override_data = self.sticky.read(f)
-            config_data = self.sticky.values_override(config_data, override_data, use_field_value=False)
+            config_data = self.sticky.values_override(config_data, 
+                                                      override_data, 
+                                                      use_field_value=False)
 
         extra_fields = {"<{}>".format(k): v for (k, v) in config_data.get("extra_fields", {}).items()}
         extra_fields_ = {}
@@ -189,7 +192,7 @@ class KcProject(object):
         self.puzzle.order = order
         pass_data["project"] = self
 
-        self.puzzle.pass_data = {"project": self}
+        self.puzzle.pass_data = pass_data
 
 
         results = self.puzzle.play(piece_data, data, pass_data)
@@ -199,7 +202,10 @@ class KcProject(object):
                 error.append("\n".join(result[1:]))
 
         if len(error) > 0:
-            self.logger.error(u"\n".join(error))
+            try:
+                self.logger.error(u"\n".join(error))
+            except:
+                self.logger.error(traceback.format_exc())
         return self.puzzle.pass_data, results
 
 

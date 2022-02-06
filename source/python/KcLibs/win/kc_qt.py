@@ -8,7 +8,6 @@ import importlib
 import subprocess
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-print mod
 
 if mod not in sys.path:
     sys.path.append(mod)
@@ -36,6 +35,42 @@ else:
     ROOT_WIDGET = QtWidgets.QWidget
 
 
+class ConnectSignals(list):
+    def __init__(self):
+        self.connected = False
+    
+    def on(self):
+        self._change(True)
+
+    def off(self):
+        self._change(False)
+    
+    def add(self, signal, function):
+        self.append({"object": signal, "function": function})
+    
+    def _change(self, flg):
+        if flg == self.connected:
+            return
+
+        for signal in self:
+            if flg:
+                signal["object"].connect(signal["function"])
+            else:
+                signal["object"].disconnect(signal["function"])
+        
+        self.connected = flg
+
+def context_menu(widget, actions, function):
+    menu = QtWidgets.QMenu()
+    for action in actions:
+        action_ = QtWidgets.QAction(action["name"], menu)
+        action_.triggered.connect(action["function"])
+
+        menu.addAction(action_)
+
+    widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+    widget.customContextMenuRequested.connect(function)
+    return menu
 
 def load_ui(ui_file, tool_instance=None):
     if kc_env.mode == "max":
@@ -58,8 +93,6 @@ def load_ui(ui_file, tool_instance=None):
         rel_path, ext = os.path.splitext(rel_path)
         rel_path = rel_path.replace("\\", "/")
         import_path = ".".join(rel_path.replace(".py", "").split("/"))
-
-        print "................", import_path
 
         ui_module = importlib.import_module(import_path)
         form = ui_module.Ui_Form()
@@ -116,8 +149,6 @@ def get_root_window():
                 result = widget
                 break
 
-
-
     return result
 
 
@@ -142,7 +173,6 @@ if __name__ in ["__main__", "__builtin__"]:
             ui_path = "{}/source/python/KcTools/mobu/KcSetup/form/ui/main.ui".format(os.environ["KEICA_TOOL_PATH"])
             ui_path = "F:/works/keica/KcToolBox/source/python/KcTools/multi/KcSceneManager/form/ui/main.ui"
             self.ui = load_ui(ui_path, self)
-            print dir(self.ui)
             self.show()
 
     start_app(TestWindow, root=get_root_window())
