@@ -1,0 +1,1 @@
+%KEICA_TOOL_PATH%\bin\Python27\python.exe %KEICA_TOOL_PATH%\source\python\KcTools\win\KcCopySequence\form\main.py

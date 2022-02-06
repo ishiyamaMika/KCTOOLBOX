@@ -1,0 +1,27 @@
+info: 
+    name: KcCopySequence
+
+data: 
+    puzzle:
+        orders:
+            default:
+                - primary
+                - main
+                - post
+
+            copySequence: 
+                - main
+
+
+        copySequence:
+            main:
+                - name: archive
+                  piece: KcHooks.pieces.win.archive_file
+                  description: archive edit file
+                  is_directory: true
+                  paint: 
+                      path: source_directory
+            
+                - name: copy and rename files
+                  piece: KcHooks.pieces.win.renumber_files
+                  description: copy sequence
