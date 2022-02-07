@@ -94,8 +94,6 @@ class StoryCreate(Piece):
 
         if self.logger: self.logger.debug("update: {}".format(self.data["namespace"]))
 
-        detail += "\n" + unicode(self.data)
-
         return flg, self.pass_data, u"storyのクリップを作成しました: {}".format(self.data["namespace"]), detail
 
 if __name__ == "__builtin__":

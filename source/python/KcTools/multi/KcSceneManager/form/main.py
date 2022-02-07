@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -1111,7 +1111,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             return False
         if not self.project:
             return
-
+        
         if index == 0:
             return
         elif index == 1:
@@ -1123,7 +1123,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 self.ui.category_check_layout.takeAt(i)
 
             scene_Assets = self.project.get_assets()
-            self.get_category_assets()
+            try:
+                self.get_category_assets()
+            except:
+                return
             self.ui.exist_asset_table.clearContents()
             self.ui.exist_asset_table.setRowCount(0)
 

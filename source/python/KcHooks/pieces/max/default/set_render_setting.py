@@ -38,13 +38,12 @@ class SetRenderSetting(Piece):
                 return str(numbers[0])
             else:
                 return "{}-{}".format(numbers[0], numbers[-1])
-
         modified_keys = []
         self.details.append("pattern: {}".format("{}/import/*_koma.json".format(directory)))
         for f in glob.glob("{}/import/*_koma.json".format(directory)):
             if "_cam_" in os.path.basename(f):
                 continue
-            
+
             self.details.append(f)
             js = json.load(open(f), "utf8")
             try:
@@ -54,46 +53,34 @@ class SetRenderSetting(Piece):
             self.details.append(info["category"])
             if info["category"] != "koma data":
                 continue
-            remap_frames = []
-            for node, keys in data["modified"].items():
-                for trs in keys["list"]:
-                    for k, v in trs.items():
-                        for v2 in v:
-                            if v2 is None:
-                                continue
-                            if v2["changed"]:
-                                if v2["frame"] not in modified_keys:
-                                    modified_keys.append(v2["frame"])
-                
-                remap_frames.extend(keys["change_frames"])
-            
-            remap_path = "{}.txt".format(f)
-            remap_frames = list(set(remap_frames))
-            remap_frames.sort()
-            with open(remap_path, "w") as f:
-                f.write("\n".join(["{}@{}".format(i, l) for (i, l) in enumerate(remap_frames)]))
-                if self.logger:
-                    self.logger.debug("remap path create: {}".format(remap_path))
 
-        modified = list(set(modified_keys))
-        modified.sort()
+            modified_keys.extend(data["modified"])
+
+        modified_keys = list(set(modified_keys))
+        modified_keys.sort()
+
         lsts = []
         lst = list()
-        for i, number in enumerate(modified):
+        for i, number in enumerate(modified_keys):
             if i == 0:
                 lst.append(number)
                 continue
-
-            before = modified[i-1]
-            if number - 1 == before:
+        
+            before = modified_keys[i-1]
+            if number -1 == before:
                 lst.append(number)
             else:
                 lsts.append(lst)
                 lst = list()
                 lst.append(number)
+            
         lsts.append(lst)
-        results = ",".join([_cast(l) for l in lsts if len(l) > 0])
-        return results
+
+        print lsts
+
+        render_frames = ",".join([_cast(l) for l in lsts if len(l) > 0])
+
+        return render_frames
 
     def execute(self):
         flg = True
@@ -104,12 +91,13 @@ class SetRenderSetting(Piece):
         options = {}
         result = ""
         if "path" in self.data:
-            result = self.get_frames(os.path.dirname(self.data["path"]))
+            render_frames = self.get_frames(os.path.dirname(self.data["path"]))
             if self.logger: 
-                self.logger.debug("render frames: {}".format(result))
+                self.logger.debug("render frames: {}".format(render_frames))
             else:
                 print result
-            options["render_frames"] = result
+
+            options["render_frames"] = render_frames
 
         kc_render.setup(self.data["start"], 
                         self.data["end"], 
@@ -129,9 +117,9 @@ class SetRenderSetting(Piece):
 if __name__ == "__main__":
 
     piece_data = {}
+    print 111
 
-
-    path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/master/ZIM_s99c999_anim.max"
+    path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/master/ZIM_s99c500_anim.max"
     data = {"start": 12, "end": 50, "fps": 24, "width": 720, "height": 360, "path": path}
     x = SetRenderSetting(piece_data=piece_data, data=data)
     import pprint

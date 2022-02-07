@@ -10,8 +10,10 @@ mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
     sys.path.append(mod)
 
-from puzzle.Piece import Piece
 import KcLibs.core.kc_env as kc_env
+kc_env.append_sys_paths()
+
+from puzzle.Piece import Piece
 import KcLibs.mobu.kc_model as kc_model
 _PIECE_NAME_ = "GetKoma"
 
@@ -31,105 +33,82 @@ class GetKoma(Piece):
             return fb_time.GetFrame(True)   
 
     def get_all_keys(self, model):
-        def _get_trs_key(model, trs="Translation"):
+        def _get_each_keys(anim_node, i):
+            if anim_node is None:
+                return [], {}
             all_keys = {}
-            if isinstance(model, bool):
-                return {}, []
-
-            trs_object = getattr(model, trs)
-            if not trs_object.GetAnimationNode():
-                return {}, []
+            temp_key = None
             modified_list = []
-            for i in range(3):
-                each_keys = []
-                anim_node = trs_object.GetAnimationNode().Nodes[i]
-                if anim_node is None:
-                    #all_keys.append(each_keys)
-                    continue
+            for ii, k in enumerate(anim_node.Keys):
+                frame = self.get_frame(k.Time)
+                all_keys.setdefault(frame, {})
+                keyframe = {}
+                # keyframe["type"] = "{}{}".format(trs[0], ["x", "y", "z"][i])
+                # keyframe["axis"] = i
+                keyframe["frame"] = k.Time.GetFrame()
+                # keyframe["frame"] = get_frame(k.Time)
+                keyframe["value"] = k.Value
+                if "e-" in str(keyframe):
+                    keyframe["value"] = 0
+                keyframe["value"] = round(keyframe["value"], 4)
+                if ii == 0:
+                    keyframe["changed"] = True
+                else:
+                    keyframe["changed"] = temp_key["value"] != keyframe["value"]
 
-                temp_key = None
-                for ii, k in enumerate(anim_node.FCurve.Keys):
-                    frame = self.get_frame(k.Time)
-                    all_keys.setdefault(frame, [None, None, None])
-                    keyframe = {}
-                    keyframe["type"] = "{}{}".format(trs[0], ["x", "y", "z"][i])
-                    keyframe["axis"] = i
-                    keyframe["frame"] = k.Time.GetFrame()
-                    # keyframe["frame"] = get_frame(k.Time)
-                    keyframe["value"] = k.Value
-                    if "e-" in str(keyframe):
-                        keyframe["value"] = 0
-                    keyframe["value"] = round(keyframe["value"], 4)
-                    if ii == 0:
-                        keyframe["changed"] = True
-                    else:
-                        keyframe["changed"] = temp_key["value"] != keyframe["value"]
+                if keyframe["changed"]:
+                    modified_list.append(frame)
 
-                    if keyframe["changed"]:
-                        modified_list.append(frame)
+                all_keys[frame][i] = keyframe
+                temp_key = keyframe
 
-                    all_keys[frame][i] = keyframe
-                    temp_key = keyframe
-
-            modified_list = list(set(modified_list))
-            print modified_list
-                
-            return all_keys, modified_list
+            return modified_list, all_keys            
 
         if isinstance(model, (list, FBModelList)):
-            all_ = {}
+            results = []
             for m in model:
-                dic = self.get_all_keys(m)
-                if dic is not None:
-                    all_[m.LongName] = dic[m.LongName]
-            return all_
+                results.extend(self.get_all_keys(m))
+
+            return results
+
         else:
             all_keys = {}
             modified = []
-            for trs in ["Translation", "Rotation", "Scaling"]:
-                all_keys[trs], modified_list = _get_trs_key(model, trs)
-                modified.extend(modified_list)
+            for each in model.PropertyList:
+                if each.IsAnimatable() and each.IsAnimated():
+                    if not each.GetAnimationNode():
+                        continue
+                
+                    if each.GetAnimationNode().FCurve is not None:
+                        # print each.Name
+                        all_keys[each.Name], modified_list_ = _get_each_keys(each.GetAnimationNode().FCurve, each.Name)
+                        modified.extend(modified_list_)                    
+                        # print "*****", modified_list_
 
-            a = all_keys["Translation"].keys()
-            b = all_keys["Rotation"].keys()
-            c = all_keys["Scaling"].keys()
-            mix = a + b + c
-            mix = list(set(mix))
-            mix.sort()
+                    elif len(each.GetAnimationNode().Nodes) > 0:
+                        for i in range(len(each.GetAnimationNode().Nodes)):
+                            anim_node = each.GetAnimationNode().Nodes[i].FCurve
+                            name = "{}_{}".format(each.Name, i)
+                            all_keys.setdefault(name, [])
+                            all_keys[name], modified_list_ = _get_each_keys(anim_node, name)
+                      
+                        modified.extend(modified_list_)
+            mix = []
+            for ls in all_keys.values():
+                if len(ls) == 0:
+                    continue
+
+                mix.extend(ls)
+            
             if len(mix) in [0, 1]:
-                return None
-                # return {model.LongName: {"min": None, "max": None, "list": []}}
-            """
-            print "type:", type(a), type(b), type(c)
-            print "T:", a
-            print "R:", b
-            print "S:", c
-            print "A:", mix
-            print "len:", len(mix), len(mix)
-            """
+                return []
 
             """
             TRSすべてをマージして移動したフレームの取得
             """
-            min_ = mix[0]
-            max_ = mix[-1]
-            keyframe_set = {}
-            keyframe_set["min"] = min_
-            keyframe_set["max"] = max_
-            keyframe_set["list"] = []
-            for i in range(min_, max_+1):
-                keys = {}
-                for trs in ["Translation", "Rotation", "Scaling"]:
-                    if i in all_keys[trs]:
-                        keys[trs] = all_keys[trs][i]
-                    else:
-                        continue
-                keyframe_set["list"].append(keys)
-
-            modified = list(set(modified))
-            modified.sort()
-            keyframe_set["change_frames"] = modified
-            return {model.LongName: keyframe_set}
+            x = list(set(mix))
+            x.sort()
+            return mix
 
     def execute(self):
         flg = True
@@ -151,7 +130,8 @@ class GetKoma(Piece):
 
         models = kc_model.to_object(model_names)
         keys = self.get_all_keys(models)
-
+        keys = list(set(keys))
+        keys.sort()
         d, f = os.path.split(self.data["path"])
         f, ext = os.path.splitext(f)
 
@@ -163,8 +143,10 @@ class GetKoma(Piece):
         kc_env.save_config(koma_path, "KcSceneManager", "koma data", {"modified": keys})
 
         header = u"コマファイルをエクスポートしました: {}".format(self.data["namespace"])
-        detail = u"path: \n{}".format(koma_path)
-
+        detail = u"path: \n{}\n\n".format(koma_path)
+        detail += u", ".join([unicode(l) for l in keys])
+        detail += u"\n".join(model_names)
+        detail += u"\n"
 
         return flg, self.pass_data, header, detail
 
@@ -180,8 +162,8 @@ if __name__ == "__builtin__":
            'cut': u'001',
            'end': 0,
            'mobu_edit_export_path': u'X:/Project/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
-            u'config': {'export': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json",
-                            'plot': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json"},
+            u'config': {'export': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/usaoSS/MB/config/CH_usaoSS_export.json",
+                        'plot': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/usaoSS/MB/config/CH_usaoSS_plot.json"},
            'mobu_sotai_path': False,
            u'namespace': u'CH_tsukikoQuad',
            'scene': u'01',
@@ -189,7 +171,7 @@ if __name__ == "__builtin__":
            'start': 0,
            u'take': 2.0,
            u"path": "E:/works/client/keica/data/junkscript/test.json",
-           u'true_namespace': u'CH_tsukikoQuad',
+           u'true_namespace': u'CH_usaoSS',
            u'type': u'both',
            u'update_at': u'2021/11/18 01:17:16',
            u'update_by': u'amek'}
@@ -200,4 +182,6 @@ if __name__ == "__builtin__":
     # x.execute()
     m_list = FBModelList()
     FBGetSelectedModels(m_list)
-    x.get_all_keys(m_list[0])
+    keys = list(set(x.get_all_keys(m_list)))
+    keys.sort()
+    print keys
