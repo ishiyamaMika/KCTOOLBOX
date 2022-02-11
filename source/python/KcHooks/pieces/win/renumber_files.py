@@ -55,6 +55,8 @@ class RenumberFiles(Piece):
         files.sort()
         successed = []
         error = []
+        mode = self.piece_data.get("mode", "move")
+
         for i, f in enumerate(files):
             source_path = "{}/{}".format(self.data["source_directory"], f)
             if os.path.isdir(source_path):
@@ -70,21 +72,35 @@ class RenumberFiles(Piece):
                 renumber.append("{}@{}".format(frame, int(number)))
                 destination_path = "{}/{}".format(self.data["destination_directory"], new_f)
                 if signal:
-                    signal.emit(u"start: {} > {}".format(f, new_f))
-                try:
-                    shutil.copy2(source_path, destination_path)
+                    signal.emit(u"{} start: {} > {}".format(mode, f, new_f))
+                
+                if mode == "copy":
+                    try:
+                        shutil.copy2(source_path, destination_path)
+                        success_flg = True
+                    except:
+                        success_flg = False
+                else:
+                    try:
+                        shutil.move(source_path, destination_path)
+                        success_flg = True
+                    except:
+                        success_flg = False
+                
+                if success_flg:
                     successed.append(u"src: {}\ndst: {}\n".format(f, new_f))
                     if self.logger:
-                        self.logger.debug("copy successed: {} > {}".format(f, new_f))
+                        self.logger.debug("{} successed: {} > {}".format(mode, f, new_f))
                     if signal:
-                        signal.emit(u"successed: {} > {}".format(source_path, destination_path))                        
-                except:
+                        signal.emit(u"{} successed: {} > {}".format(mode, source_path, destination_path))                        
+                else:
                     error.append(u"src: {}\ndst: {}\n".format(f, new_f))
                     if self.logger:
-                        self.logger.debug("copy failed: {} > {}".format(f, new_f))
+                        self.logger.debug("{} failed: {} > {}".format(mode, f, new_f))
                         flg = False
                     if signal:
-                        signal.emit(u"failed: {} > {}".format(f, new_f))                                                
+                        signal.emit(u"{} failed: {} > {}".format(mode, f, new_f))                                                
+
                 frame += 1
 
         if flg:
