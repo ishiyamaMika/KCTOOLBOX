@@ -13,7 +13,6 @@ import os
 def comp_property_list(function):
     @wraps(function)
     def _deco(*args, **kwargs):
-        print "comp_property_list--start"
         a = _get_property_list_data()
         res = function(*args, **kwargs)
         _comp_property(a, _get_property_list_data(False))
@@ -600,25 +599,6 @@ def copy_local_scaling(src, dst, delete_base=False):
 #        dst.Translation.GetAnimationNode().Nodes[i].FCurve.Keys = curve
 #EditBegin   
 
-def copy_to_other_take(src, src_take, dst_take, offset_frame, trs=[True, True, True]):
-    t_util.select_take(src_take)
-    if src.Translation.GetAnimationNode() is None:
-        return
-
-    mx = max_len(src.Translation.GetAnimationNode())
-    xyz_keys = trs_key_infos(src)
-    t_util.select_take(dst_take)
-
-    src.Translation.SetAnimated(True)
-    for i in range(mx):
-        if len(xyz_keys[0]) > i:
-            src.Translation.GetAnimationNode().Nodes[xyz_keys[0][i].xyz].FCurve.KeyAdd(xyz_keys[0][i].fb_time.__add__(FBTime(offset_frame)), xyz_keys[0][i].value)
-        if len(xyz_keys[1]) > i:
-            src.Translation.GetAnimationNode().Nodes[xyz_keys[1][i].xyz].FCurve.KeyAdd(xyz_keys[1][i].fb_time.__add__(FBTime(offset_frame)), xyz_keys[1][i].value)
-        if len(xyz_keys[2]) > i:
-            src.Translation.GetAnimationNode().Nodes[xyz_keys[2][i].xyz].FCurve.KeyAdd(xyz_keys[2][i].fb_time.__add__(FBTime(offset_frame)), xyz_keys[2][i].value)
-
-
 _KEY_ATTRS_ = ["TangentMode", "TangentClampMode", "TangentConstantMode", "TangentBreak", "Continuity", "Bias", "Interpolation", 
                "RightBezierTangent", "RightDerivative", "LeftBezierTangent", "LeftDerivative", "LeftTangentWeight", 
                "MarkedForManipulation", "RightTangentWeight",  
@@ -685,35 +665,49 @@ def scale_keys(curve, scale=1.0, invert=False):
 
     FBSystem().Scene.Evaluate()
 
-
 def change_key_to_stepped(model):
-    def _change_to_stepped(anim_node):
-        for i in range(len(anim_node.Nodes)):
-            for key in anim_node.Nodes[i].FCurve.Keys:
-                key.Interpolation = FBInterpolation.kFBInterpolationConstant
-                key.LeftDerivative = 0
-                key.RightDerivative = 0
-                key.TangentClampMode = FBTangentClampMode.kFBTangentClampModeNone
-                key.TangentConstantMode = FBTangentConstantMode.kFBTangentConstantModeNormal
+    def _change_to_stepped(anim_curve):
+        for key in anim_curve.Keys:
+            key.Interpolation = FBInterpolation.kFBInterpolationConstant
+            key.LeftDerivative = 0
+            key.RightDerivative = 0
+            key.TangentClampMode = FBTangentClampMode.kFBTangentClampModeNone
+            key.TangentConstantMode = FBTangentConstantMode.kFBTangentConstantModeNormal
 
     if isinstance(model, list):
+        names = []
         for m in model:
-            change_key_to_stepped(m)
+            names.extend(change_key_to_stepped(m))
+        return names
     else:
-        for attr in dir(model):
-            try:
-                is_exists = hasattr(getattr(model, attr), "GetAnimationNode")
-            except:
-                continue
-            if is_exists:
-                try:
-                    anim_node = getattr(getattr(model, attr), "GetAnimationNode")()
-                except:
+        anim_curves = []
+        curve_names = []
+        for each in model.PropertyList:
+            if each.IsAnimatable() and each.IsAnimated():
+                if not each.GetAnimationNode():
                     continue
+            
+                if each.GetAnimationNode().FCurve is not None:
+                    anim_curves.append(each.GetAnimationNode().FCurve)
+                    curve_name = "{}.{}.{}".format(model.LongName, 
+                                                   each.Name, 
+                                                   each.GetAnimationNode().Name)
 
-                if anim_node:
-                    _change_to_stepped(anim_node)
+                    curve_names.append(curve_name)
+                
+                elif len(each.GetAnimationNode().Nodes) > 0:
+                    for i in range(len(each.GetAnimationNode().Nodes)):
+                        anim_curves.append(each.GetAnimationNode().Nodes[i].FCurve)
+                        curve_name = "{}.{}.{}".format(model.LongName, 
+                                                       each.Name, 
+                                                       each.GetAnimationNode().Nodes[i].Name)
 
+                        curve_names.append(curve_name)
+        
+        for anim_curve in anim_curves:
+            _change_to_stepped(anim_curve)
+        
+        return curve_names
 
 if __name__ == "__builtin__":
     from pyfbsdk import*
@@ -724,6 +718,6 @@ if __name__ == "__builtin__":
 
     m_list = FBModelList()
     FBGetSelectedModels(m_list)
-    change_key_to_stepped([l for l in m_list])
+    print change_key_to_stepped([l for l in m_list])
     print "DONE"
 

@@ -57,6 +57,8 @@ class PlotAll(Piece):
             if not "config" in asset:
                 continue
             config = asset["config"].get("plot")
+            if self.logger:
+                self.logger.debug("config path: {}".format(config))
             if not config:
                 continue
 
@@ -80,7 +82,9 @@ class PlotAll(Piece):
         if "interpolate" in self.piece_data:
             m_list = FBModelList()
             FBGetSelectedModels(m_list)
-            kc_key.change_key_to_stepped([l for l in m_list])
+            stepped = kc_key.change_key_to_stepped([l for l in m_list])
+            detail += u"\n\nstepped:\n"
+            detail += u"\n".join(stepped)
             if self.logger:
                 self.logger.debug("change key to stepped")
 
