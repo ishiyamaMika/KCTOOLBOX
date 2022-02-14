@@ -97,6 +97,8 @@ if __name__ == "__main__":
     path2 = r"E:\works\client\keica\data\junkscript\testABC.max"
     file_save(path2)
     """
+    
+    """
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad.max"
     # print file_merge(path)
 
@@ -105,3 +107,7 @@ if __name__ == "__main__":
     export_cam_path = r"X:\Project\_942_ZIZ\3D\s99\c999\3D\import\ZIM_s99c999_cam_s99c999.fbx"
     # print os.path.exists(export_cam_path)
     print file_import(export_cam_path, param=[{"name": "Mode", "value": "#exmerge"}])
+    """
+    
+    path = r"X:\Project\_942_ZIZ\2020_ikimono_movie\_work\14_partC_Japan\26_animation\_3D_assets\CH\usagizakiSS\CH_usagizakiSS_rig_t01_02.max"
+    file_merge(path)

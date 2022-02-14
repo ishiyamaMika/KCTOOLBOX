@@ -31,7 +31,7 @@ class ImportAsset(Piece):
     def execute(self):
         flg = True
         header = ""
-        detail = ""
+        detail = "import file: \n{}".format(self.data["import_path"])
 
         # kc_file_io.file_open(self.data["asset_path"])
 
