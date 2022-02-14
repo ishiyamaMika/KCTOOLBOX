@@ -4,9 +4,9 @@ import os
 
 from pyfbsdk import *
 
-mod_path = "%s/python" % os.environ["CENTRUM_PATH"]
-if not mod_path in sys.path:
-    sys.path.append(mod_path)
+mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+if mod not in sys.path:
+    sys.path.append(mod)
 
 
 import KcLibs.mobu.kc_model as kc_model
