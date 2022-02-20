@@ -54,7 +54,7 @@ class AchiveFile(Piece):
                 d, f = os.path.split(path)
                 f, ext = os.path.splitext(f)
                 archive_path = "{}/archives".format(d)
-                fs = [f]
+                fs = [os.path.basename(path)]
 
             if not os.path.exists(archive_path):
                 os.makedirs(archive_path)
@@ -71,6 +71,7 @@ class AchiveFile(Piece):
                 else:
                     source_path = self.data["path"]
                     destination_path = "{}/{}_{}{}".format(archive_path, file_time, f_, ext)
+                    print destination_path, f, ext, fs
                 source_f = os.path.basename(source_path)
                 
                 source_f_name = os.path.basename(source_path)
@@ -112,13 +113,13 @@ class AchiveFile(Piece):
 
         return flg, self.pass_data, header, detail
 
-if __name__ == "__main__":
+if __name__ in ["__main__", "__builtin__"]:
 
     def is_file():
         piece_data = {}
         path = "F:/works/keica/junk/test_.py"
         data = {"path": path, "max": 10}
-
+        print 234
         x = AchiveFile(piece_data=piece_data, data=data)
         x.execute()
 
@@ -134,5 +135,5 @@ if __name__ == "__main__":
 
         print x.pass_data
     
-    is_directory()
+    is_file()
 

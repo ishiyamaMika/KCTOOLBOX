@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "1.0.2"
+    VERSION = "1.1.3"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -325,8 +325,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                                 "fps": {"width": 45, "view": "fps"}, 
                                 "user": {"width": 100}}
 
-        self.asset_table_list = ["check", "name"]
-        self.asset_table_dict = {"check": {"width": 20, "view": ""}}
+        self.asset_table_list = ["check", "name", "group"]
+        self.asset_table_dict = {"check": {"width": 20, "view": ""}, 
+                                 "name": {"width": 180}, 
+                                 "group": {"view": "group"}}
 
         self.record_table_list = ["name"]
         self.record_table_dict = {}
@@ -461,10 +463,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         self.shot_table_menu.addSeparator().setText("config")
         delete_action = QtWidgets.QAction(u"設定削除", self)
 
-
         self.shot_table_menu.addAction(add_shot_action)
         config_explorer_action.triggered.connect(self.config_explorer_action_triggered)
-
 
         self.shot_table_menu.addAction(update_shot_frames_action)
         update_shot_frames_action.triggered.connect(self.update_shot_frames_action_triggered)
@@ -478,6 +478,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         self.shot_table_menu.addAction(delete_action)
 
         delete_action.triggered.connect(self.delete_action_triggered)
+
+
 
         self.ui.project_combo.addItems(self.project.project_variations.keys())
         project = unicode(self.ui.project_combo.currentText())
@@ -512,7 +514,57 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         self.ui.splitter.setSizes([100, 350, 200])
         self.ui.directory_splitter.setSizes([100, 400])
 
+        self.asset_menu.addSeparator().setText("comp")
+        comp_groups_action = QtWidgets.QAction(u"アセットをgroup化", self)
+
+        select_model_action = QtWidgets.QAction(u"シーンのmodelを選択", self)
+        select_from_scene_action = QtWidgets.QAction(u"シーンから行を選択", self)
+
+        self.asset_menu.addAction(comp_groups_action)
+        comp_groups_action.triggered.connect(self.comp_groups_action_triggered)
+
+        self.asset_menu.addAction(select_model_action)
+        self.asset_menu.addAction(select_from_scene_action)
+
+        select_model_action.triggered.connect(self.select_model_action_triggered)
+        select_from_scene_action.triggered.connect(self.select_from_scene_action_triggered)
+
         self.ui.render_scale_combo.addItems(["1/2", "1", "1/4"])
+    
+    def select_model_action_triggered(self):
+        namespaces = [each.text() for each in self.ui.asset_table.selectedItems() \
+                      if each.column() == self.asset_table_list.index("name")]
+
+        kc_model.select_geo_from_namespaces(namespaces)
+
+    def select_from_scene_action_triggered(self):
+        namespaces = kc_model.get_selected_namespaces()
+        for r in range(self.ui.asset_table.rowCount()):
+            item = self.ui.asset_table.item(r, self.asset_table_list.index("name"))
+            for c in range(self.ui.asset_table.columnCount()):
+                item_ = self.ui.asset_table.item(r, c)
+                if item_:
+                    item_.setSelected(item.text() in namespaces)
+
+    def comp_groups_action_triggered(self):
+        if not self.current_shot_item:
+            return
+        
+        rows = [l.row() for l in self.ui.asset_table.selectedItems() if hasattr(l, "row")]
+        
+        text, ok = QtWidgets.QInputDialog.getText(self, "info", u"group name")
+        if not ok:
+            return
+        
+        for row in rows:
+            group_item = self.ui.asset_table.item(row, self.asset_table_list.index("group"))
+            group_item.setText(text)
+
+            key_item = self.ui.asset_table.item(row, self.asset_table_list.index("name"))
+            key_item.row_data.setdefault("comp", {})
+            key_item.row_data["comp"]["group_name"] = unicode(text)
+
+        kc_env.save_config(self.current_shot_item.config_path, self.NAME, "shot_config", self.current_shot_item.row_data)
 
 
     def asset_config_plot_triggered(self):
@@ -1437,6 +1489,9 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             data["primary"]["end"] = item["frame"]["end"]
             data["primary"]["fps"] = item["frame"].get("fps", 24)
 
+            assets_by_groups = {}
+            cam_asset = False
+            no_group_error = []
             for asset in item.get("assets", []):
                 if not asset.get("selection") and asset["category"] != "camera":
                     continue
@@ -1446,6 +1501,13 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 asset["cut"] = item["fields"]["cut"]
                 asset["start"] = item["frame"]["start"]
                 asset["end"] = item["frame"]["end"]
+
+                if "comp" in asset:
+                    if "group_name" in asset["comp"]:
+                        assets_by_groups.setdefault(asset["comp"]["group_name"], []).append(asset)
+                else:
+                    if asset["category"] != "camera":
+                        no_group_error.append(asset["namespace"])
 
                 if asset["category"] in self.project.config["asset"][kc_env.mode]["paths"]:
                     template = self.project.config["asset"][kc_env.mode]["paths"][asset["category"]]
@@ -1466,6 +1528,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 if asset["category"] == "camera":
                     camera_path = self.project.get_latest_camera_path("max")
                     asset["max_asset_path"] = camera_path
+                    cam_asset = asset
                 else:
                     asset["version"] = "*"    
                     max_asset_directory = self.project.path_generate(os.path.dirname(max_template["rig"]), asset)
@@ -1485,6 +1548,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 else:
                     data["primary"].setdefault("assets", []).append(asset)
                     data["main"].append(asset)
+
+            if len(no_group_error) > 0:
+                QtWidgets.QMessageBox.warning(self, "info", u"assetがgroup化されていません\n{}".format(u"\n".join(no_group_error)), QtWidgets.QMessageBox.Cancel)
+                return
 
             post_primary = {}
             post_primary["path"] = self.project.path_generate(self.project.config["shot"]["max"]["paths"]["master"], item["fields"])
@@ -1508,9 +1575,31 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             orders = self.project.tool_config["puzzle"]["orders"]
 
+            post_end["groups"] = assets_by_groups.keys()
+
             data["post_primary"] = post_primary
             data["post_main"] = post_main
             data["post_end"] = post_end
+            data["separate_main"] = []
+            for k, v in assets_by_groups.items():
+                post_end_ = copy.deepcopy(data["post_end"])
+                post_end_["name"] = k
+                post_end_["assets"] = v
+                d, f = os.path.split(post_end_["path"])
+                f, ext = os.path.splitext(f)
+                post_end_["path"] = "{}/{}_{}{}".format(d, f, k, ext)
+                post_end_["filters"] = [each["namespace"] for each in v]
+                d, f = os.path.split(post_end_["movie_path"])
+                print(post_end_["movie_path"])
+                f, ext = os.path.splitext(f)
+                post_end_["movie_path"] = "{}/{}_{}{}" .format(d, f, k, ext)
+
+
+                if cam_asset:
+                    post_end_["assets"].append(cam_asset)
+
+                data["separate_main"].append(post_end_)
+
             if len(errors) > 0:
                 results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
                 results_all.extend(errors)
@@ -1545,6 +1634,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                                      {}, 
                                      orders.get("mobu_master_export", orders["default"]))
             
+
             results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
             results_all.extend(results)
 
@@ -2180,15 +2270,27 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             item.setText(data["namespace"])
             item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
 
+            
+            group_item = QtWidgets.QTableWidgetItem()
+            if "comp" in data:
+                if "group_name" in data["comp"]:
+                    group_item.setText(data["comp"]["group_name"])
+            
+            self.ui.asset_table.setItem(r, self.asset_table_list.index("group"), group_item)
+            group_item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
+            group_item.setTextAlignment(QtCore.Qt.AlignCenter)
+
             if not self.current_shot_item.is_file_opened:
                 item.setForeground(QtGui.QColor(120, 120, 120))    
+                group_item.setForeground(QtGui.QColor(120, 120, 120))    
 
             else:
                 info = self.asset_table_state[data["type"]]
                 item.setForeground(info["color"])
                 item.setToolTip(info["tooltip"])
-                # check.is_active = info["state"]
 
+                group_item.setForeground(info["color"])
+                # check.is_active = info["state"]
             # self.set_icon(check)
             item.row_data = data
 
@@ -2413,7 +2515,7 @@ class KcSceneManagerCmd(object):
         js = json.load(open(path, "r"), "utf8")
         data = [str("{}:{}".format(l["namespace"], l["name"])) for l in js["data"]]
         kc_model.select(data)
-
+    
 
 def start_app():
     kc_qt.start_app(KcSceneManager, name="KcSceneManager", x=1200, y=500, root=kc_qt.get_root_window())

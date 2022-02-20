@@ -177,6 +177,38 @@ def unselected_all():
         m.Selected = False
 
 
+def select_geo_from_namespaces(namespaces):
+    for model in FBSystem().Scene.RootModel.Children:
+        print model.Name
+        m_list = FBModelList()
+        FBGetSelectedModels(m_list, model, False)
+        for m in m_list:
+            print m.LongName
+            if not ":" in m.LongName:
+                continue
+        
+            namespace = ":".join(m.LongName.split(":")[:-1])
+            print m.LongName
+            print namespace
+            if not namespace in namespaces:
+                continue
+        
+            if m.ClassName() != "FBModel":
+                continue
+        
+            m.Selected = True
+
+def get_selected_namespaces():
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    namespaces = []
+    for m in m_list:
+        namespace = ":".join(m.LongName.split(":")[:-1])
+        namespaces.append(namespace)
+    
+    return namespaces
+
+
 if __name__ == "__builtin__":
     print "-------------------------"
     print
@@ -184,5 +216,6 @@ if __name__ == "__builtin__":
     # FBGetSelectedModels(m_list)
     # create_custom_property(m_list[0], "TEST", "String", "testABC", False)
 
-    print to_object(["eye_L_dmy", "eye_R_dmy"])
+    # print to_object(["eye_L_dmy", "eye_R_dmy"])
 
+    select_geo_from_namespaces(["CH_usaoSS", "PP_grassOhishiba_10"])

@@ -30,7 +30,7 @@ class SetRenderSetting(Piece):
         self.name = _PIECE_NAME_
         self.details = []
 
-    def get_frames(self, directory):
+    def get_frames(self, directory, filters=None):
         def _cast(numbers):
             if len(numbers) == 0:
                 return False
@@ -43,6 +43,19 @@ class SetRenderSetting(Piece):
         for f in glob.glob("{}/import/*_koma.json".format(directory)):
             if "_cam_" in os.path.basename(f):
                 continue
+            
+            if filters is not None:
+                check = os.path.basename(f).replace("_koma.json", "")
+                flg = False
+                for each in filters:
+                    if each in check:
+                        flg = True
+                        break
+                
+                if self.logger:
+                    self.logger.debug("filter {}: {}".format(flg, check))
+                if not flg:
+                    continue
 
             self.details.append(f)
             js = json.load(open(f), "utf8")
@@ -76,8 +89,6 @@ class SetRenderSetting(Piece):
             
         lsts.append(lst)
 
-        print lsts
-
         render_frames = ",".join([_cast(l) for l in lsts if len(l) > 0])
 
         return render_frames
@@ -91,7 +102,7 @@ class SetRenderSetting(Piece):
         options = {}
         result = ""
         if "path" in self.data:
-            render_frames = self.get_frames(os.path.dirname(self.data["path"]))
+            render_frames = self.get_frames(os.path.dirname(self.data["path"]), self.data.get("filters", None))
             if self.logger: 
                 self.logger.debug("render frames: {}".format(render_frames))
             else:

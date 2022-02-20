@@ -102,12 +102,8 @@ class KcProject(object):
 
 
     def get_cameras(self, include_model=False):
-
         if not "puzzle" in self.config:
             return []
-        print 
-
-        print self.config["puzzle"]["get_cameras"]
 
         piece_data = copy.deepcopy(self.config["puzzle"]["get_cameras"])
 

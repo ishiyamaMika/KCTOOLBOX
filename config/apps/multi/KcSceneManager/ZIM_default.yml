@@ -1,401 +1,451 @@
-info: 
-    name: tool
-    parent: ../_base_.yml
+info:
+  name: tool
+  parent: ../_base_.yml
 
-data: 
-    directory: "X:/Project/tools/project/ZIM"
-    shot_directory: "X:/Project/_942_ZIZ/3D"
-    schema:
-        shot:
-            shot_name: ""
-            paths: 
-                mobu: 
-                    edit: ""
-                    master: ""
-                max:
-                    edit: ""
-                    master: ""
+data:
+  directory: "X:/Project/tools/project/ZIM"
+  shot_directory: "X:/Project/_942_ZIZ/3D"
+  schema:
+    shot:
+      shot_name: ""
+      paths:
+        mobu:
+          edit: ""
+          master: ""
+        max:
+          edit: ""
+          master: ""
 
-            fields:
-              scene: 0
-              cut: 0
-              take: 0
-              version: 0
-              progress: anim
-              project: ""
-              project_variation: ""
+      fields:
+        scene: 0
+        cut: 0
+        take: 0
+        version: 0
+        progress: anim
+        project: ""
+        project_variation: ""
 
-            frame:
-              start: 0
-              end: 0
-              fps: 0
+      frame:
+        start: 0
+        end: 0
+        fps: 0
 
-            assets: []
+      assets: []
 
-    default_shot_name:
-        "<project>": "ZIM"
-        "<scene>": "01"
-        "<cut>": "001"
-        "<take>": "01"
-        "<version>": "01"
+  default_shot_name:
+    "<project>": "ZIM"
+    "<scene>": "01"
+    "<cut>": "001"
+    "<take>": "01"
+    "<version>": "01"
 
+  puzzle:
+    orders:
+      default:
+        - primary
+        - main
+        - post
 
-    puzzle:
-        orders:
-            default: 
-                - primary
-                - main
-                - post
+      mobu_edit_export:
+        - primary
+        - main
+        - post_primary
+        - post_main
+        - post_end
 
-            mobu_edit_export: 
-                - primary
-                - main
-                - post_primary
-                - post_main
-                - post_end
+      mobu_master_export:
+        - primary
+        - main
+        - post_main
+        - post
 
-            mobu_master_export:
-                - primary
-                - main
-                - post_main
-                - post
+      max_import:
+        - main
+        - post_primary
+        - post_main
+        - post_end
+        - separate_main
 
-            max_import:
-                - main
-                - post_primary
-                - post_main
-                - post_end
+      convert:
+        - main
+        - post_primary
+        - post_main
+        - post_end
+        - separate_main
 
-            convert:
-                - main
-                - post_primary
-                - post_main
-                - post_end
+    mobu_edit_export_varidate:
+      primary:
+        - name: open_file
+          piece: KcHooks.pieces.mobu.default.file_open
+          description: open file
 
-        mobu_edit_export_varidate:
-            primary:
-                - name: open_file
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  description: open file
+      main:
+        - name: export asset
+          piece: KcHooks.pieces.mobu.default.asset_export
+          description: export asset
+          mode: varidate
+          # filters:
+          #     - category: ["CH", "BG", "PR", "LO"]
+          paint:
+            export_path: mobu_edit_export_path
 
-            main:
-                - name: export asset
-                  piece: KcHooks.pieces.mobu.default.asset_export
-                  description: export asset
-                  mode: varidate
-                  # filters: 
-                  #     - category: ["CH", "BG", "PR", "LO"]
-                  paint:
-                      export_path: mobu_edit_export_path
+        #- name: export camera
+        #  piece: KcHooks.pieces.mobu.default.camera_export
+        #  description: export camera
+        #  mode: varidate
+        #  filters:
+        #      - category: [cam]
 
-                #- name: export camera
-                #  piece: KcHooks.pieces.mobu.default.camera_export
-                #  description: export camera
-                #  mode: varidate
-                #  filters:
-                #      - category: [cam]
+        #  paint:
+        #      export_path: mobu_edit_export_path
 
-                #  paint:
-                #      export_path: mobu_edit_export_path
+    mobu_edit_export:
+      primary:
+        - name: archive
+          piece: KcHooks.pieces.win.archive_file
+          description: archive edit file
 
-        mobu_edit_export:
-            primary:
-                - name: archive
-                  piece: KcHooks.pieces.win.archive_file
-                  description: archive edit file
+        - name: open_file
+          piece: KcHooks.pieces.mobu.default.file_open
+          description: open file
+          force: true
 
-                - name: open_file
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  description: open file
-                  force: true
+        - name: plot_all
+          piece: KcHooks.pieces.mobu.default.plot_all
+          description: plot all
+          interpolate: Stepped
 
-                - name: plot_all
-                  piece: KcHooks.pieces.mobu.default.plot_all
-                  description: plot all
-                  interpolate: Stepped
+        - name: change scene time
+          piece: KcHooks.pieces.mobu.default.change_time
+          description: "change scene time. result set to pass_data"
+          fps: 24
+          mode: change
 
-                - name: change scene time
-                  piece: KcHooks.pieces.mobu.default.change_time
-                  description: "change scene time. result set to pass_data"
-                  fps: 24
-                  mode: change
+        # - name: plot_all
+        #   piece: KcHooks.pieces.mobu.default.plot_all
+        #   description: plot all
+        #   paint:
+        #       start: "@start"
+        #       end: "@end"
+        #       fps: "@fps"
 
-                # - name: plot_all
-                #   piece: KcHooks.pieces.mobu.default.plot_all
-                #   description: plot all
-                #   paint:
-                #       start: "@start"
-                #       end: "@end"
-                #       fps: "@fps"
+      main:
+        # - name: koma save
+        #   piece: KcHooks.pieces.mobu.default.get_koma
+        #   description: save koma config
 
+        - name: export asset
+          piece: KcHooks.pieces.mobu.default.asset_export
+          description: export
+          key_name: plot
+          paint:
+            export_path: mobu_edit_export_path
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-            main:
-                # - name: koma save
-                #   piece: KcHooks.pieces.mobu.default.get_koma
-                #   description: save koma config
+        # - name: export camera
+        #   piece: KcHooks.pieces.mobu.default.camera_export
+        #   description: export camera
+        #   paint:
+        #       export_path: mobu_edit_export_path
 
-                - name: export asset
-                  piece: KcHooks.pieces.mobu.default.asset_export
-                  description: export 
-                  key_name: plot
-                  paint:
-                      export_path: mobu_edit_export_path
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+      post_primary:
+        - name: create
+          piece: KcHooks.pieces.mobu.default.file_open
+          new: true
+          description: ""
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-                # - name: export camera
-                #   piece: KcHooks.pieces.mobu.default.camera_export
-                #   description: export camera
-                #   paint:
-                #       export_path: mobu_edit_export_path
+        - name: adject assets
+          piece: KcHooks.pieces.mobu.default.adjust_scene_assets
+          description: check assets and adject them. delete if not exists in asset list
 
-            post_primary:
-                - name: create
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  new: true
-                  description: ""
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+      post_main:
+        - name: story clip create
+          piece: KcHooks.pieces.mobu.default.story_create
+          description: create story clip
+          key_name: plot
+          paint:
+            export_path: mobu_edit_export_path
+            asset_path: mobu_sotai_path
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-                - name: adject assets
-                  piece: KcHooks.pieces.mobu.default.adjust_scene_assets
-                  description: check assets and adject them. delete if not exists in asset list
+      post_end:
+        - name: cam_setup
+          piece: KcHooks.pieces.mobu.default.camera_setup
+          description: ""
+          paint:
+            camera: "@camera"
+            width: "@width"
+            height: "@height"
 
-            post_main:
-                - name: story clip create
-                  piece: KcHooks.pieces.mobu.default.story_create
-                  description: create story clip
-                  key_name: plot
-                  paint:
-                      export_path: mobu_edit_export_path
-                      asset_path: mobu_sotai_path
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+        - name: setup scene
+          piece: KcHooks.pieces.mobu.default.setup_scene
+          description: ""
 
-            post_end:
-                - name: cam_setup
-                  piece: KcHooks.pieces.mobu.default.camera_setup
-                  description: ""
-                  paint:
-                      camera: "@camera"
-                      width: "@width"
-                      height: "@height"
-                
-                - name: setup scene
-                  piece: KcHooks.pieces.mobu.default.setup_scene
-                  description: ""
+        - name: file_save
+          piece: KcHooks.pieces.mobu.default.file_save
+          description: ""
+          paint:
+            path: mobu_master_path
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-                - name: file_save
-                  piece: KcHooks.pieces.mobu.default.file_save
-                  description: ""
-                  paint: 
-                      path: mobu_master_path
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
-                
-                - name: render_scene
-                  piece: KcHooks.pieces.mobu.default.render_scene
-                  description: ""
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+        - name: render_scene
+          piece: KcHooks.pieces.mobu.default.render_scene
+          description: ""
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-        mobu_master_export:
-            primary:
-                - name: open
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  description: ""
+    mobu_master_export:
+      primary:
+        - name: open
+          piece: KcHooks.pieces.mobu.default.file_open
+          description: ""
 
-                - name: change scene time
-                  piece: KcHooks.pieces.mobu.default.change_time
-                  description: "change scene time. result set to pass_data"
-                  fps: 24
-                  mode: change
+        - name: change scene time
+          piece: KcHooks.pieces.mobu.default.change_time
+          description: "change scene time. result set to pass_data"
+          fps: 24
+          mode: change
 
-                - name: plot_all
-                  piece: KcHooks.pieces.mobu.default.plot_all
-                  description: plot all
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+        - name: plot_all
+          piece: KcHooks.pieces.mobu.default.plot_all
+          description: plot all
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-                - name: remove koma
-                  piece: KcHooks.pieces.win.remove_files
-                  description: remove koma files
-                  patterns: 
-                      - root: mobu_master_export_path
-                        target: ../import/*_koma.json
+        - name: remove koma
+          piece: KcHooks.pieces.win.remove_files
+          description: remove koma files
+          patterns:
+            - root: mobu_master_export_path
+              target: ../import/*_koma.json
 
-            main:
-                - name: koma save
-                  piece: KcHooks.pieces.mobu.default.get_koma
-                  description: save koma config
-                  paint:
-                      path: mobu_master_export_path
+      main:
+        - name: koma save
+          piece: KcHooks.pieces.mobu.default.get_koma
+          description: save koma config
+          paint:
+            path: mobu_master_export_path
 
-                - name: export asset
-                  piece: KcHooks.pieces.mobu.default.asset_export
-                  description: export asset
-                  paint:
-                      export_path: mobu_master_export_path
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+        - name: export asset
+          piece: KcHooks.pieces.mobu.default.asset_export
+          description: export asset
+          paint:
+            export_path: mobu_master_export_path
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-            post_main:
-                - name: 
-                  piece: KcHooks.pieces.mobu.default.rename_namespace
-                  description: remove namespace numbers
-                  paint:
-                      path: mobu_master_export_path
+      post_main:
+        - name:
+          piece: KcHooks.pieces.mobu.default.rename_namespace
+          description: remove namespace numbers
+          paint:
+            path: mobu_master_export_path
 
-        convert:
-            main:
-                - name: execute command line
-                  piece: KcHooks.pieces.win.execute_command
-                  description: through pieces from command line 
-                  keys: max_import
-                  app_environ: PT_DISPATCHER_MAX
+    convert:
+      main:
+        - name: execute command line
+          piece: KcHooks.pieces.win.execute_command
+          description: through pieces from command line
+          keys: max_import
+          app_environ: PT_DISPATCHER_MAX
 
+    mobu_master_export_varidate:
+      primary:
+        - name: open_file
+          piece: KcHooks.pieces.mobu.default.file_open
+          description: open file
 
-        mobu_master_export_varidate:
-            primary:
-                - name: open_file
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  description: open file
+      main:
+        - name: export asset
+          piece: KcHooks.pieces.mobu.default.asset_export
+          description: export asset
+          mode: master_varidate
+          # filters:
+          #     - category: ["CH", "BG", "PR", "LO"]
+          paint:
+            export_path: mobu_master_export_path
 
-            main:
-                - name: export asset
-                  piece: KcHooks.pieces.mobu.default.asset_export
-                  description: export asset
-                  mode: master_varidate
-                  # filters: 
-                  #     - category: ["CH", "BG", "PR", "LO"]
-                  paint:
-                      export_path: mobu_master_export_path
+    max_import:
+      primary:
+        - name: convert project to object
+          piece: KcHooks.pieces.win.convert_project
+          description: convert str to object
+      main:
+        - name: open
+          piece: KcHooks.pieces.max.default.file_open
+          description: open each assets
+          paint:
+            path: max_asset_path
 
+        - name: import camera
+          piece: KcHooks.pieces.max.default.import_camera
+          description: ""
+          filter:
+            category: camera
 
-        max_import:
-            primary:
-                - name: convert project to object
-                  piece: KcHooks.pieces.win.convert_project
-                  description: convert str to object
-            main:
-                - name: open
-                  piece: KcHooks.pieces.max.default.file_open
-                  description: open each assets
-                  paint: 
-                      path: max_asset_path
+          paint:
+            asset_path: max_asset_path
+            import_path: mobu_master_export_path
 
-                - name: import camera
-                  piece: KcHooks.pieces.max.default.import_camera
-                  description: ""
-                  filter:
-                      category: camera
+        - name: import asset
+          piece: KcHooks.pieces.max.default.import_asset
+          description: ""
+          paint:
+            asset_path: max_asset_path
+            import_path: mobu_master_export_path
 
-                  paint:
-                      asset_path: max_asset_path
-                      import_path: mobu_master_export_path
+        - name: save asset
+          piece: KcHooks.pieces.max.default.file_save
+          replace_ext: [".fbx", ".max"]
+          description: ""
+          paint:
+            save_path: mobu_master_export_path
 
-                - name: import asset
-                  piece: KcHooks.pieces.max.default.import_asset
-                  description: ""
-                  paint:
-                      asset_path: max_asset_path
-                      import_path: mobu_master_export_path
+      post_primary:
+        - name: open base file
+          piece: KcHooks.pieces.max.default.create_base_scene
+          description: import base file
+          base_path: "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/camera/base.max"
 
-                - name: save asset
-                  piece: KcHooks.pieces.max.default.file_save
-                  replace_ext: [".fbx", ".max"]
-                  description: ""
-                  paint: 
-                      save_path: mobu_master_export_path
+      post_main:
+        - name: merge asset
+          replace_ext: [".fbx", ".max"]
+          piece: KcHooks.pieces.max.default.file_merge
+          description: "merge asset files"
+          paint:
+            path: mobu_master_export_path
 
-            post_primary:
-                - name: open base file
-                  piece: KcHooks.pieces.max.default.create_base_scene
-                  description: import base file
-                  base_path: "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/camera/base.max"
+      post_end:
+        - name: setup render setting
+          piece: KcHooks.pieces.max.default.set_render_setting
+          description: set render setting
+          paint:
+            width: "@width"
+            height: "@height"
+            fps: "@fps"
+            start: "@start"
+            end: "@end"
 
-            post_main:
-                - name: merge asset
-                  replace_ext: [".fbx", ".max"]
-                  piece: KcHooks.pieces.max.default.file_merge
-                  description: "merge asset files"
-                  paint:
-                      path: mobu_master_export_path
+        - name: archive
+          piece: KcHooks.pieces.win.archive_file
+          description: archive edit file
 
-            post_end:
-                - name: setup render setting
-                  piece: KcHooks.pieces.max.default.set_render_setting
-                  description: set render setting
-                  paint:
-                      width: "@width"
-                      height: "@height"
-                      fps: "@fps"
-                      start: "@start"
-                      end: "@end"
+        - name: save file
+          piece: KcHooks.pieces.max.default.file_save
+          description: save max file
+          paint:
+            save_path: path
+            width: "@width"
+            height: "@height"
+            fps: "@fps"
+            start: "@start"
+            end: "@end"
 
-                - name: archive
-                  piece: KcHooks.pieces.win.archive_file
-                  description: archive edit file
+        - name: open
+          piece: KcHooks.pieces.max.default.file_open
+          description: open save file
 
-                - name: save file
-                  piece: KcHooks.pieces.max.default.file_save
-                  description: save max file
-                  paint:
-                      save_path: path
-                      width: "@width"
-                      height: "@height"
-                      fps: "@fps"
-                      start: "@start"
-                      end: "@end"
+        - name: render scene
+          piece: KcHooks.pieces.max.default.render_scene
+          description: render scene
+          scale_percent: 50
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
-                - name: open
-                  piece: KcHooks.pieces.max.default.file_open
-                  description: open save file
+        - name: create directories
+          piece: KcHooks.pieces.win.projects.ZIM.create_directories
+          description: hard code & crete from pass_data <create_directories> keys
 
-                - name: render scene
-                  piece: KcHooks.pieces.max.default.render_scene
-                  description: render scene
-                  scale_percent: 50
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+      separate_main:
+        - name: open base file
+          piece: KcHooks.pieces.max.default.create_base_scene
+          description: import base file
+          base_path: "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/camera/base.max"
 
+        - name: merge assets
+          replace_ext: [".fbx", ".max"]
+          piece: KcHooks.pieces.max.default.file_merges
+          description: "merge asset files"
+          paint:
+            path: mobu_master_export_path
 
+        - name: setup render setting
+          piece: KcHooks.pieces.max.default.set_render_setting
+          description: set render setting
+          paint:
+            width: "@width"
+            height: "@height"
+            fps: "@fps"
+            start: "@start"
+            end: "@end"
 
-        mobu_edit_render:
-            primary:
-                - name: open
-                  piece: KcHooks.pieces.mobu.default.file_open
-                  description: ""
+        - name: archive
+          piece: KcHooks.pieces.win.archive_file
+          description: archive edit file
 
-                # - name: change scene time
-                #   piece: KcHooks.pieces.mobu.default.change_time
-                #   description: "change scene time. result set to pass_data"
-                #   fps: 24
-                #   mode: change
-                
+        - name: save file
+          piece: KcHooks.pieces.max.default.file_save
+          description: save max file
+          paint:
+            save_path: path
+            width: "@width"
+            height: "@height"
+            fps: "@fps"
+            start: "@start"
+            end: "@end"
 
-                - name: render
-                  piece: KcHooks.pieces.mobu.default.render_scene
-                  description: "render scene"
-                  paint:
-                      start: "@start"
-                      end: "@end"
-                      fps: "@fps"
+        - name: open
+          piece: KcHooks.pieces.max.default.file_open
+          description: open save file
 
-            finally:
-                - name: revert scene time
-                  piece: KcHooks.pieces.mobu.default.change_time
-                  description: "revert scene time"
-                  mode: revert
+        - name: render scene
+          piece: KcHooks.pieces.max.default.render_scene
+          description: render scene
+          scale_percent: 50
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
+
+    mobu_edit_render:
+      primary:
+        - name: open
+          piece: KcHooks.pieces.mobu.default.file_open
+          description: ""
+
+        # - name: change scene time
+        #   piece: KcHooks.pieces.mobu.default.change_time
+        #   description: "change scene time. result set to pass_data"
+        #   fps: 24
+        #   mode: change
+
+        - name: render
+          piece: KcHooks.pieces.mobu.default.render_scene
+          description: "render scene"
+          paint:
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
+
+      finally:
+        - name: revert scene time
+          piece: KcHooks.pieces.mobu.default.change_time
+          description: "revert scene time"
+          mode: revert
