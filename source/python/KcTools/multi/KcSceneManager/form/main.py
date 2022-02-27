@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "1.1.3"
+    VERSION = "1.1.4"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -2395,11 +2395,15 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         if _file[0] in ["."]:
             return
 
+        if "/master" in path or "/Master" in path or "_old" in path or "movie_convert" in path or "mov_edit" in path:
+            return
+
         if os.path.basename(path) in self.ignore:
             return
 
         if not os.path.exists(path):
             pass 
+    
         
         elif os.path.isdir(path):
             if path.endswith(".fbm") or path.endswith(".bck"):

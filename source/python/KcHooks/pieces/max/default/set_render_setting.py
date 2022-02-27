@@ -90,7 +90,7 @@ class SetRenderSetting(Piece):
         lsts.append(lst)
 
         render_frames = ",".join([_cast(l) for l in lsts if len(l) > 0])
-
+        self.details.append(render_frames)
         return render_frames
 
     def execute(self):
