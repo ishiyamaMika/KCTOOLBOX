@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "1.1.4"
+    VERSION = "1.2.5"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -310,6 +310,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         self.project_name = ""
         self.variation_name = ""
         self.cmd = KcSceneManagerCmd()
+
+        self.reload_tree_flag = False
 
         self.connected = False
 
@@ -1049,6 +1051,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
 
     def reload_btn_clicked(self):
+        self.reload_tree_flag = False
         self.project_name = unicode(self.ui.project_combo.currentText())
         self.variation_name = unicode(self.ui.variation_combo.currentText())
         selected_items = self.ui.scene_table.selectedItems()
@@ -1167,6 +1170,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         if index == 0:
             return
         elif index == 1:
+            if not self.reload_tree_flag:
+                self.create_tree(self.project.tool_config["shot_directory"])
             self.reload_directory_tree()
         else:
             states = self.get_exist_asset_table_categories_state()
@@ -1301,7 +1306,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         # scenes = [u"all"] + scenes
 
         self.append_scene_table(scenes, selection_name)
-        self.create_tree(self.project.tool_config["shot_directory"])
+        
 
     def edit_explorer_action_triggered(self):
         if not self.current_shot_item:
@@ -2375,6 +2380,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
         for f in os.listdir(self.root):
             self.walk_tree(self.root, "%s/%s" % (self.root, f), lst, widget_list, deep=_max_count, parent=c_item, pattern=pattern)
+
+        self.reload_tree_flag = True
 
     def walk_tree(self, root, path, lst, widget_list, deep=-1, parent=False, pattern=False):
         """
