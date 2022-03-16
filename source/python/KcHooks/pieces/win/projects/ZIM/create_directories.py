@@ -40,8 +40,6 @@ class CreateDirectories(Piece):
         for group in self.data["groups"]:
             directories.append("aep/render/{}".format(group))
 
-
-
         for each in directories:
             directory = "{}/{}".format(cut_root, each)
             if not os.path.lexists(directory):

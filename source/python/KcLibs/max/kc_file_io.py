@@ -110,4 +110,7 @@ if __name__ == "__main__":
     """
     
     path = r"X:\Project\_942_ZIZ\2020_ikimono_movie\_work\14_partC_Japan\26_animation\_3D_assets\CH\usagizakiSS\CH_usagizakiSS_rig_t01_02.max"
-    file_merge(path)
+    # file_merge(path)
+    path = "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/rps/CH_usagizakiSS_RenderElements.rps"
+
+    rps_import(path)

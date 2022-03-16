@@ -297,7 +297,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "1.2.5"
+    VERSION = "1.3.6"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -417,7 +417,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         self.tree_menu.addAction(add_shot_action)
 
         open_file_action.triggered.connect(self.open_file_action_triggered)
-
+        self.ui.split_check.setVisible(False)
 
         self.ui.shot_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.shot_table.customContextMenuRequested.connect(self.shot_table_request)
@@ -996,10 +996,12 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             self.ui.create_master_btn.setText(u"convert")
             self.ui.render_btn.setText(u"master render")
             self.ui.render_btn.setVisible(False)
+            self.ui.split_check.setVisible(True)
         else:
             self.ui.create_master_btn.setText(u"create master")
             self.ui.render_btn.setText(u"edit render")
             self.ui.render_btn.setVisible(True)
+            self.ui.split_check.setVisible(False)
 
 
     def shot_table_item_double_clicked(self, item):
@@ -1602,6 +1604,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
                 if cam_asset:
                     post_end_["assets"].append(cam_asset)
+                
+                post_end_["split_flg"] = self.ui.split_check.checkState() == QtCore.Qt.Checked
 
                 data["separate_main"].append(post_end_)
 

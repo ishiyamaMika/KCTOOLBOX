@@ -13,6 +13,7 @@ from puzzle.Piece import Piece
 
 import KcLibs.core.kc_env as kc_env
 import KcLibs.max.kc_file_io as file_io
+import KcLibs.max.kc_render as kc_render
 # import KcLibs.mobu.kc_transport_time as kc_transport_time
 
 reload(file_io)
@@ -41,11 +42,26 @@ class FileMerges(Piece):
                 detail += u"merge successed: {}\n".format(path)
                 if self.logger: 
                     self.logger.debug("file open: {}".format(path))
+                if "true_namespace" not in asset:
+                    continue
+                render_element_path = self.piece_data["render_element_path"].replace("<namespace>", asset["true_namespace"])
+                detail += "\nrps file name are: {}({})\n".format(os.path.basename(render_element_path), os.path.lexists(render_element_path))
+                if os.path.lexists(render_element_path):
+                    kc_render.rps_import(render_element_path)
+                    detail += u"append rps file\n"
+                    
             else:
                 detail += u"merge failed  : {}\n".format(path)
                 if self.logger: 
                     self.logger.debug("file open failed: {}".format(path))
                 flg = False
+        root = self.data["path"].split("3D")[0]
+        root_directory = "{}/aep/render".format(root)
+        if self.logger:
+            self.logger.debug("output_path: {}".format(root_directory))
+        kc_render.rename_element_paths(root_directory, self.data["name"])
+
+        self.pass_data["element_names"] = kc_render.get_element_names()
         
         return flg, self.pass_data, header, detail
 

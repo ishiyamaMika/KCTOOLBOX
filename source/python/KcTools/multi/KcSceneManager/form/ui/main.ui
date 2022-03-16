@@ -151,6 +151,13 @@
          <item>
           <widget class="QComboBox" name="render_scale_combo"/>
          </item>
+         <item>
+          <widget class="QCheckBox" name="split_check">
+           <property name="text">
+            <string>split</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
