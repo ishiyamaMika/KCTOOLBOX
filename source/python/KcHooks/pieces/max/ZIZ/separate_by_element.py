@@ -83,9 +83,9 @@ class SeparateByElement(Piece):
                 self.logger.debug("copy failed:\n{}\n{}".format(path, archive_path))
 
     def execute(self):
-        with open("D:/test.json", "w") as f:
-            import json
-            json.dump({"data": self.data, "pass_data": self.pass_data}, f)
+        #with open("D:/test.json", "w") as f:
+        #    import json
+        #    json.dump({"data": self.data, "pass_data": self.pass_data}, f)
         flg = True
         header = "split file"
         detail = ""
