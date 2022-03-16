@@ -123,6 +123,15 @@ class SetRenderSetting(Piece):
                                                                                                 self.data["height"], 
                                                                                                 result, 
                                                                                                 "\n".join(self.details))
+
+        self.pass_data["render_setup"] = {
+                                          "start": self.data["start"],
+                                          "end": self.data["end"],
+                                          "width": self.data["width"],
+                                          "height": self.data["height"],
+                                          "options": options
+                                         }
+
         return flg, self.pass_data, header, detail
 
 if __name__ == "__main__":

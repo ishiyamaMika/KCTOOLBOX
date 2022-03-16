@@ -32,7 +32,7 @@ class SeparateByElement(Piece):
 
         elif type_ == "tex":
             key_shell = [0, 0] # [1, 1]
-            col_shell = [0, 0] # [1, 1]
+            col_shell = [1, 1] # [1, 1]
 
         elif type_ == "ID_mask":
             key_shell = [1, 1] # [0, 0]
@@ -44,7 +44,7 @@ class SeparateByElement(Piece):
 
         else: # sdw
             key_shell = [0, 0] # [1, 1]
-            col_shell = [1, 1] # [0, 0]
+            col_shell = [0, 0] # [0, 0]
 
         cmd = """
         root_value = 0
@@ -61,6 +61,8 @@ class SeparateByElement(Piece):
         return MaxPlus.Core.EvalMAXScript(cmd)
     
     def archive_file(self, path):
+        if not os.path.lexists(path):
+            return
         file_meta = time.localtime(os.stat(path).st_mtime)
         file_time = "{:04d}{:02d}{:02d}{:02d}{:02d}".format(file_meta[0], 
                                                             file_meta[1], 
@@ -71,7 +73,7 @@ class SeparateByElement(Piece):
         archive_path = "{}/archives/{}_{}".format(d, file_time, f)
         if not os.path.exists(os.path.dirname(archive_path)):
             os.makedirs(os.path.dirname(archive_path))
-        
+
         try:
             shutil.copy2(path, archive_path)
             if self.logger:
@@ -81,6 +83,9 @@ class SeparateByElement(Piece):
                 self.logger.debug("copy failed:\n{}\n{}".format(path, archive_path))
 
     def execute(self):
+        with open("D:/test.json", "w") as f:
+            import json
+            json.dump({"data": self.data, "pass_data": self.pass_data}, f)
         flg = True
         header = "split file"
         detail = ""
@@ -121,20 +126,26 @@ class SeparateByElement(Piece):
                     os.makedirs(os.path.dirname(save_path))
 
                 self.archive_file(save_path)
+                kc_render.setup(self.pass_data["render_setup"]["start"], 
+                                self.pass_data["render_setup"]["end"], 
+                                self.pass_data["render_setup"]["width"],
+                                self.pass_data["render_setup"]["height"],
+                                **self.pass_data["render_setup"]["options"])
                 if kc_file_io.file_save(save_path):
-                    self.details.append("saved: {}\n".format(save_path))
+                    self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
-                        self.logger.debug("saved: {}\n".format(save_path))
+                        self.logger.debug("saved: {}\n".format(save_path.replace("/", "\\")))
                 else:
-                    self.details.append("save failed: {}\n".format(save_path))
+                    self.details.append("save failed: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
-                        self.logger.debug("save failed: {}\n".format(save_path))
+                        self.logger.debug("save failed: {}\n".format(save_path.replace("/", "\\")))
 
         return flg, self.pass_data, header, u"\n".join(self.details)
 
 if __name__ == "__main__":
     import json
     path = "F:/works/keica/KcToolBox/source/python/KcHooks/pieces/max/ZIZ/test_data/separate_by_element.json"
+    path = "D:/test.json"
     js = json.load(open(path, "r"))
     piece_data = {"render_element_path": "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/rps"}
 
