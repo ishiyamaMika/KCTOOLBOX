@@ -60,7 +60,7 @@ class FileMerges(Piece):
         if self.logger:
             self.logger.debug("output_path: {}".format(root_directory))
         kc_render.rename_element_paths(root_directory, self.data["name"])
-
+        self.pass_data["root_directory"] = "{}/{}".format(root_directory, self.data["name"])
         self.pass_data["element_names"] = kc_render.get_element_names()
         
         return flg, self.pass_data, header, detail

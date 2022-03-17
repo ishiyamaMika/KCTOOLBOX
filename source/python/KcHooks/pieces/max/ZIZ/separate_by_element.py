@@ -3,6 +3,7 @@ import sys
 import time
 import MaxPlus
 import pymxs
+import copy
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
@@ -109,9 +110,19 @@ class SeparateByElement(Piece):
         f, ext = os.path.splitext(f)
         path_ = d.replace("master", "rend")
 
-        dic = {"col": {"type": "col", "elements": [], "name": "col.rps"},
-               "tex": {"type": "tex", "elements": [],"name": "tex_IDmask.rps"},
-               "ID_mask": {"type": "ID_mask", "elements": [],"name": "tex_IDmask.rps"}}
+        dic = {"col": {"type": "col", 
+                       "elements": [], 
+                       "output_path": "{}/col/{}_col_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                       "name": "col.rps"},
+               "tex": {"type": "tex", 
+                       "output_path": "{}/tex/{}_tex_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                       "elements": [],
+                       "name": "tex_IDmask.rps"},
+               "ID_mask": {"type": "ID_mask", 
+                           "output_path": "{}/IDMask/{}_IDMask_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                           "elements": [],
+                           "name": "tex_IDmask.rps"}
+                           }
 
         for each in self.pass_data["element_names"]:
             if "_line_" in each:
@@ -136,14 +147,17 @@ class SeparateByElement(Piece):
                 save_path = "{}/{}/{}_{}_00{}".format(path_, self.data["name"], f, k, ext)
                 if not os.path.exists(os.path.dirname(save_path)):
                     os.makedirs(os.path.dirname(save_path))
-
+                
                 self.archive_file(save_path)
                 if "render_setup" in self.pass_data:
-                    kc_render.setup(self.pass_data["render_setup"]["start"], 
-                                    self.pass_data["render_setup"]["end"], 
-                                    self.pass_data["render_setup"]["width"],
-                                    self.pass_data["render_setup"]["height"],
-                                    **self.pass_data["render_setup"]["options"])
+                    dic = copy.deepcopy(self.pass_data["render_setup"])
+                    if "output_path" in v:
+                        dic["options"]["output_path"] = v["output_path"]
+                    kc_render.setup(dic["start"], 
+                                    dic["end"], 
+                                    dic["width"],
+                                    dic["height"],
+                                    **dic["options"])
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:

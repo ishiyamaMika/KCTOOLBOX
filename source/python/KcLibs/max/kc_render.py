@@ -12,6 +12,8 @@ def setup(start, end, width, height, **kwargs):
         height (int): render height
     """
 
+    
+
     pymxs.runtime.rendStart = start
     pymxs.runtime.rendEnd = end
     pymxs.runtime.renderWidth = width
@@ -21,7 +23,13 @@ def setup(start, end, width, height, **kwargs):
         pymxs.runtime.rendTimeType = 4
     else:
         pymxs.runtime.rendTimeType = 3
-
+    
+    if "output_path" in kwargs:
+        pymxs.runtime.rendSaveFile = True
+        pymxs.runtime.rendOutputFilename = kwargs["output_path"]
+    
+    MaxPlus.Core.EvalMAXScript("renderSceneDialog.update()")
+    
 
 def rps_import(rps_path):
     pymxs.runtime.renderpresets.LoadAll(0, rps_path)
@@ -69,5 +77,12 @@ if __name__ == "__main__":
     # remove_render_elements(["_mask"])
     # print dir(pymxs.runtime)
     # print(get_element_names())
-    root_directory = "E:/aaaaa/bbbbb/cccc"
-    rename_element_paths(root_directory, "TEST")
+    # root_directory = "E:/aaaaa/bbbbb/cccc"
+    # rename_element_paths(root_directory, "TEST")
+    pymxs.runtime.rendSaveFile = True
+    pymxs.runtime.rendOutputFilename = "E:/aaaddda/bbbffb/cccwwwwc_0000.png"
+    path = "E:/aaasadwffa/bbbb/ccsdsdcc_0000.png"
+    # cmd = 'rendOutputFilename = "{}"'.format(path)
+    # MaxPlus.Core.EvalMAXScript(cmd)
+    print(234234)
+    setup(0, 10, 720, 360, output_path=path)
