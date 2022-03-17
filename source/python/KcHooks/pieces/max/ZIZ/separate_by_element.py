@@ -112,14 +112,14 @@ class SeparateByElement(Piece):
 
         dic = {"col": {"type": "col", 
                        "elements": [], 
-                       "output_path": "{}/col/{}_col_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                       "output_path": "{}/{}_col/{}_col_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
                        "name": "col.rps"},
                "tex": {"type": "tex", 
-                       "output_path": "{}/tex/{}_tex_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                       "output_path": "{}/{}_tex/{}_tex_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
                        "elements": [],
                        "name": "tex_IDmask.rps"},
                "ID_mask": {"type": "ID_mask", 
-                           "output_path": "{}/IDMask/{}_IDMask_0000.png".format(self.pass_data["root_directory"], self.data["name"]),
+                           "output_path": "{}/{}_IDMask/{}_IDmask_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
                            "elements": [],
                            "name": "tex_IDmask.rps"}
                            }
@@ -153,6 +153,8 @@ class SeparateByElement(Piece):
                     dic = copy.deepcopy(self.pass_data["render_setup"])
                     if "output_path" in v:
                         dic["options"]["output_path"] = v["output_path"]
+                        if not os.path.exists(os.path.dirname(v["output_path"])):
+                            os.makedirs(os.path.dirname(v["output_path"]))
                     kc_render.setup(dic["start"], 
                                     dic["end"], 
                                     dic["width"],

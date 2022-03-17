@@ -1,7 +1,7 @@
 import pymxs
 # pymxs can not use quiet?
 import MaxPlus
-
+import os
 def setup(start, end, width, height, **kwargs):
     """warning: you must close render dialog before you use this function.
 
@@ -27,7 +27,10 @@ def setup(start, end, width, height, **kwargs):
     if "output_path" in kwargs:
         pymxs.runtime.rendSaveFile = True
         pymxs.runtime.rendOutputFilename = kwargs["output_path"]
-    
+        if not os.path.lexists(os.path.dirname(kwargs["output_path"])):
+            os.makedirs(os.path.dirname(kwargs["output_path"]))
+   
+
     MaxPlus.Core.EvalMAXScript("renderSceneDialog.update()")
     
 
@@ -55,10 +58,12 @@ def rename_element_paths(root_directory, group_name, ext="png"):
                                          group_name,
                                          group_name, 
                                          name)
-        path = "{}/{}_{}_0000.{}".format(directory,
-                                         group_name,
-                                         name,
-                                         ext)
+        path = "{}/{}_{}_.{}".format(directory,
+                                     group_name,
+                                     name,
+                                     ext)
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
 
         manager.SetRenderElementFilename(i, path)
 

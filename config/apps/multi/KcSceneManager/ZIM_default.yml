@@ -327,6 +327,7 @@ data:
           replace_ext: [".fbx", ".max"]
           piece: KcHooks.pieces.max.default.file_merge
           description: "merge asset files"
+          render_element_path: X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/rps/<category>_<namespace>_RenderElements.rps
           paint:
             path: mobu_master_export_path
 
