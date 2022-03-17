@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import MaxPlus
+import pymxs
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
@@ -46,19 +47,30 @@ class SeparateByElement(Piece):
             key_shell = [0, 0] # [1, 1]
             col_shell = [0, 0] # [0, 0]
 
-        cmd = """
-        root_value = 0
-        next_value = 0
-        Mats = for m in sceneMaterials where (matchPattern m.name pattern:"CH_*SS") collect m
-        for m in Mats do (try(
-            m.renderMtlIndex = {}
-            m.viewportMtlIndex = {} 
-            m[1].renderMtlIndex = {}
-            m[1].viewportMtlIndex = {}
-        )catch())
-        """.format(key_shell[0], key_shell[1], col_shell[0], col_shell[1])
+        key_materials = []
+        for material in pymxs.runtime.sceneMaterials:
+            if hasattr(material, "renderMtlIndex"):
+                key_materials.append(material.name)
+        
+        for material in key_materials:
+            cmd = """
+                  root_value = 0
+                  next_value = 0
+                  Mats = for m in sceneMaterials where (matchPattern m.name pattern:"{}") collect m
+                  for m in Mats do (try(
+                    m.renderMtlIndex = {}
+                    m.viewportMtlIndex = {}
+                    m[1].renderMtlIndex = {}
+                    m[1].viewportMtlIndex = {}
+                    print(m.name)
+                    )catch())
+                 """.format(material,
+                            key_shell[0],
+                            key_shell[1],
+                            col_shell[0],
+                            col_shell[1])
 
-        return MaxPlus.Core.EvalMAXScript(cmd)
+            MaxPlus.Core.EvalMAXScript(cmd)
     
     def archive_file(self, path):
         if not os.path.lexists(path):
@@ -126,11 +138,12 @@ class SeparateByElement(Piece):
                     os.makedirs(os.path.dirname(save_path))
 
                 self.archive_file(save_path)
-                kc_render.setup(self.pass_data["render_setup"]["start"], 
-                                self.pass_data["render_setup"]["end"], 
-                                self.pass_data["render_setup"]["width"],
-                                self.pass_data["render_setup"]["height"],
-                                **self.pass_data["render_setup"]["options"])
+                if "render_setup" in self.pass_data:
+                    kc_render.setup(self.pass_data["render_setup"]["start"], 
+                                    self.pass_data["render_setup"]["end"], 
+                                    self.pass_data["render_setup"]["width"],
+                                    self.pass_data["render_setup"]["height"],
+                                    **self.pass_data["render_setup"]["options"])
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
@@ -145,7 +158,7 @@ class SeparateByElement(Piece):
 if __name__ == "__main__":
     import json
     path = "F:/works/keica/KcToolBox/source/python/KcHooks/pieces/max/ZIZ/test_data/separate_by_element.json"
-    path = "D:/test.json"
+    # path = "D:/test.json"
     js = json.load(open(path, "r"))
     piece_data = {"render_element_path": "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/rps"}
 

@@ -34,6 +34,7 @@ class RenderScene(Piece):
         render = KcRender()
 
         cam = False
+        namespace = ""
         for camera in FBSystem().Scene.Cameras:
             long_name = camera.LongName
             if not ":" in long_name:
