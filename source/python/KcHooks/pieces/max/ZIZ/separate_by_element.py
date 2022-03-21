@@ -134,6 +134,7 @@ class SeparateByElement(Piece):
             elif "_sdw" in each:
                 dic.setdefault("sdw", {"ignore": "sdw", "elements": []})["elements"].append(each)
                 dic["sdw"]["format"] = [24, True]
+                data["sdw"]["anti"] = True
 
         for k, v in dic.items():
             if kc_file_io.file_open(path):
@@ -177,6 +178,13 @@ class SeparateByElement(Piece):
 
                     format_text += "renderSceneDialog.update()"
                     MaxPlus.Core.EvalMAXScript("{}\nrenderSceneDialog.update()".format(format_text))
+
+                if "anti" in v:
+                    if v["anti"]:
+                        anti_cmd = "renderers.production.AntiAliasing = true"
+                    else:
+                        anti_cmd = "renderers.production.AntiAliasing = false"
+                    MaxPlus.Core.EvalMAXScript(anti_cmd)
 
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
