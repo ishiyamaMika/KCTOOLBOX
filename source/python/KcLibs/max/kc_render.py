@@ -54,14 +54,24 @@ def rename_element_paths(root_directory, group_name, ext="png"):
         element = manager.getRenderElement(i)
         name = element.elementname
 
-        directory = "{}/{}/{}_{}".format(root_directory,
+
+        group_and_name = "{}_{}".format(group_name, name)
+        name_list = []
+        for each in group_and_name.split("_"):
+            if each in name_list:
+                continue
+            name_list.append(each)
+        
+        group_and_name = "_".join(group_and_name)
+
+        directory = "{}/{}/{}".format(root_directory,
                                          group_name,
-                                         group_name, 
-                                         name)
-        path = "{}/{}_{}_.{}".format(directory,
-                                     group_name,
-                                     name,
-                                     ext)
+                                         group_and_name)
+
+        path = "{}/{}_.{}".format(directory,
+                                  group_and_name,
+                                  ext)
+
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
 

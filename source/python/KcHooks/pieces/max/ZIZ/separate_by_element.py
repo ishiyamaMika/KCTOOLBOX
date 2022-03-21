@@ -125,7 +125,7 @@ class SeparateByElement(Piece):
                            }
 
         for each in self.pass_data["element_names"]:
-            if "_line_" in each:
+            if "_line" in each:
                 dic.setdefault("line", {"ignore": "_line", "elements": []})["elements"].append(each)
             elif "_sdw" in each:
                 dic.setdefault("sdw", {"ignore": "sdw", "elements": []})["elements"].append(each)
