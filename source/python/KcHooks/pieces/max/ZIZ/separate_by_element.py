@@ -113,22 +113,27 @@ class SeparateByElement(Piece):
         dic = {"col": {"type": "col", 
                        "elements": [], 
                        "output_path": "{}/{}_col/{}_col_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
-                       "name": "col.rps"},
+                       "name": "col.rps", 
+                       "format": [24, False]},
                "tex": {"type": "tex", 
                        "output_path": "{}/{}_tex/{}_tex_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
                        "elements": [],
-                       "name": "tex_IDmask.rps"},
+                       "name": "tex_IDmask.rps", 
+                       "format": [24, True]},
                "ID_mask": {"type": "ID_mask", 
                            "output_path": "{}/{}_IDMask/{}_IDmask_.png".format(self.pass_data["root_directory"], self.data["name"], self.data["name"]),
                            "elements": [],
+                           "format": [24, False],
                            "name": "tex_IDmask.rps"}
                            }
 
         for each in self.pass_data["element_names"]:
             if "_line" in each:
                 dic.setdefault("line", {"ignore": "_line", "elements": []})["elements"].append(each)
+                dic["line"]["format"] = [24, False]
             elif "_sdw" in each:
                 dic.setdefault("sdw", {"ignore": "sdw", "elements": []})["elements"].append(each)
+                dic["sdw"]["format"] = [24, True]
 
         for k, v in dic.items():
             if kc_file_io.file_open(path):
@@ -160,6 +165,19 @@ class SeparateByElement(Piece):
                                     dic["width"],
                                     dic["height"],
                                     **dic["options"])
+                
+                if "format" in v:
+                    format_text = ""
+                    if v[1] == True:
+                        format_text += "pngio.setAlpha(true)\n"
+                    else:
+                        format_text += "pngio.setAlpha(false)\n"
+                    if v[0] == 24:
+                        format_text += "pngio.setType(#true24)\n"
+                    
+                    format_text += "renderSceneDialog.update()"
+                    MaxPlus.Core.EvalMAXScript("{}\nrenderSceneDialog.update()".format(format_text))
+
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
