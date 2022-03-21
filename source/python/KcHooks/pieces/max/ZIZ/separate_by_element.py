@@ -134,7 +134,7 @@ class SeparateByElement(Piece):
             elif "_sdw" in each:
                 dic.setdefault("sdw", {"ignore": "sdw", "elements": []})["elements"].append(each)
                 dic["sdw"]["format"] = [24, True]
-                data["sdw"]["anti"] = True
+                dic["sdw"]["anti"] = True
 
         for k, v in dic.items():
             if kc_file_io.file_open(path):
