@@ -62,7 +62,7 @@ def rename_element_paths(root_directory, group_name, ext="png"):
                 continue
             name_list.append(each)
         
-        group_and_name = "_".join(group_and_name)
+        group_and_name = "_".join(name_list)
 
         directory = "{}/{}/{}".format(root_directory,
                                          group_name,
