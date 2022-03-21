@@ -152,7 +152,7 @@ class SeparateByElement(Piece):
                 save_path = "{}/{}/{}_{}_00{}".format(path_, self.data["name"], f, k, ext)
                 if not os.path.exists(os.path.dirname(save_path)):
                     os.makedirs(os.path.dirname(save_path))
-                
+
                 self.archive_file(save_path)
                 if "render_setup" in self.pass_data:
                     dic = copy.deepcopy(self.pass_data["render_setup"])
@@ -165,16 +165,16 @@ class SeparateByElement(Piece):
                                     dic["width"],
                                     dic["height"],
                                     **dic["options"])
-                
+
                 if "format" in v:
                     format_text = ""
-                    if v[1] == True:
+                    if v["format"][1]:
                         format_text += "pngio.setAlpha(true)\n"
                     else:
                         format_text += "pngio.setAlpha(false)\n"
-                    if v[0] == 24:
+                    if v["format"][0] == 24:
                         format_text += "pngio.setType(#true24)\n"
-                    
+
                     format_text += "renderSceneDialog.update()"
                     MaxPlus.Core.EvalMAXScript("{}\nrenderSceneDialog.update()".format(format_text))
 
