@@ -130,10 +130,10 @@ class SeparateByElement(Piece):
         for each in self.pass_data["element_names"]:
             if "_line" in each:
                 dic.setdefault("line", {"ignore": "_line", "elements": []})["elements"].append(each)
-                dic["line"]["format"] = [24, False]
+                # dic["line"]["format"] = [24, False]
             elif "_sdw" in each:
                 dic.setdefault("sdw", {"ignore": "sdw", "elements": []})["elements"].append(each)
-                dic["sdw"]["format"] = [24, True]
+                # dic["sdw"]["format"] = [24, True]
                 dic["sdw"]["anti"] = True
 
         for k, v in dic.items():
@@ -168,16 +168,18 @@ class SeparateByElement(Piece):
                                     **dic["options"])
 
                 if "format" in v:
-                    format_text = ""
-                    if v["format"][1]:
-                        format_text += "pngio.setAlpha(true)\n"
-                    else:
-                        format_text += "pngio.setAlpha(false)\n"
+                    format_text = "renderSceneDialog.close()\n"
                     if v["format"][0] == 24:
-                        format_text += "pngio.setType(#true24)\n"
-
+                        format_text += "pngio.setType #true24\n"
+                    if v["format"][1]:
+                        format_text += "pngio.setAlpha true\n"
+                    else:
+                        format_text += "pngio.setAlpha false\n"
+                    
+                    format_text += "rendOutputFilename = rendOutputFilename\n"
                     format_text += "renderSceneDialog.update()"
                     MaxPlus.Core.EvalMAXScript("{}\nrenderSceneDialog.update()".format(format_text))
+                    self.details.append(format_text)
 
                 if "anti" in v:
                     if v["anti"]:
