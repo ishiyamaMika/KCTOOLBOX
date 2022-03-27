@@ -418,6 +418,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
         open_file_action.triggered.connect(self.open_file_action_triggered)
         self.ui.split_check.setVisible(False)
+        self.ui.render_check.setVisible(False)
 
         self.ui.shot_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.shot_table.customContextMenuRequested.connect(self.shot_table_request)
@@ -963,6 +964,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             self.ui.shot_table.itemDoubleClicked.connect(self.shot_table_item_double_clicked)
             self.ui.master_check.clicked.connect(self.master_check_clicked)
+            self.ui.split_check.clicked.connect(self.split_check_clicked)
 
 
             self.connected = True
@@ -985,11 +987,14 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             self.ui.shot_table.itemDoubleClicked.disconnect(self.shot_table_item_double_clicked)
 
             self.ui.master_check.clicked.disconnect(self.master_check_clicked)
-
+            self.ui.split_check.clicked.disconnect(self.split_check_clicked)
 
             self.connected = False
 
         print "connect:", self.connected
+    
+    def split_check_clicked(self):
+        self.ui.render_check.setCheckState(self.sender().checkState())
 
     def master_check_clicked(self):
         if self.sender().checkState() == QtCore.Qt.Checked:
@@ -997,11 +1002,13 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             self.ui.render_btn.setText(u"master render")
             self.ui.render_btn.setVisible(False)
             self.ui.split_check.setVisible(True)
+            self.ui.render_check.setVisible(True)
         else:
             self.ui.create_master_btn.setText(u"create master")
             self.ui.render_btn.setText(u"edit render")
             self.ui.render_btn.setVisible(True)
             self.ui.split_check.setVisible(False)
+            self.ui.render_check.setVisible(False)
 
 
     def shot_table_item_double_clicked(self, item):
@@ -1478,6 +1485,12 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
     
 
     def convert_execute(self):
+        address = False
+        if self.ui.render_check.checkState() == QtCore.Qt.Checked:
+            address, ok = QtWidgets.QInputDialog.getText(self, "info", u"address", text=self.project.config["general"]["network"]["backbarner"])
+            if not ok:
+                address = False
+
         items = [l for l in self.get_shot_table_active_item_data()]
         render_scale = self.get_render_scale()
         results_all = []
@@ -1606,7 +1619,9 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                     post_end_["assets"].append(cam_asset)
                 
                 post_end_["split_flg"] = self.ui.split_check.checkState() == QtCore.Qt.Checked
-
+                if address:
+                    post_end_["render"] = True
+                    post_end_["address"] = address
                 data["separate_main"].append(post_end_)
 
             if len(errors) > 0:

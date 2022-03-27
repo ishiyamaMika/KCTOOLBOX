@@ -158,6 +158,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="render_check">
+           <property name="text">
+            <string>network rendering</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>

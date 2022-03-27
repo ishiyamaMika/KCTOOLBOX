@@ -126,6 +126,22 @@ class SeparateByElement(Piece):
                            "format": [24, False],
                            "name": "tex_IDmask.rps"}
                            }
+        
+        if self.data.get("render", False):
+            net_render = pymxs.runtime.netrender
+            manager = net_render.GetManager()
+            try:
+                manager.connect(pymxs.runtime.Name("manual"), self.data["address"])
+                if self.logger:
+                    self.logger.debug("connect backburner manager")
+                    self.details.append("connect: backburner manager")
+            except:
+                manager = False
+                if self.logger:
+                    self.logger.debug("connection failed")
+                    self.details.append("connect failed: backburner manager")
+        else:
+            manager = False
 
         for each in self.pass_data["element_names"]:
             if "_line" in each:
@@ -161,8 +177,8 @@ class SeparateByElement(Piece):
                         dic["options"]["output_path"] = v["output_path"]
                         if not os.path.exists(os.path.dirname(v["output_path"])):
                             os.makedirs(os.path.dirname(v["output_path"]))
-                    kc_render.setup(dic["start"], 
-                                    dic["end"], 
+                    kc_render.setup(dic["start"],
+                                    dic["end"],
                                     dic["width"],
                                     dic["height"],
                                     **dic["options"])
@@ -192,6 +208,14 @@ class SeparateByElement(Piece):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
                         self.logger.debug("saved: {}\n".format(save_path.replace("/", "\\")))
+                    if manager:
+                        job = manager.newjob()
+                        job.name = "{}_{}_{}".format(self.data["name"], f, k)
+                        status = job.submit()
+                        if self.logger:
+                            self.logger.debug("status: {}".format(status))
+                        self.details.append("job created. status: {}".format(status))
+
                 else:
                     self.details.append("save failed: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
