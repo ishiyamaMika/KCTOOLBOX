@@ -208,7 +208,7 @@ class SeparateByElement(Piece):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
                         self.logger.debug("saved: {}\n".format(save_path.replace("/", "\\")))
-                    if manager:
+                    if manager and "name" in self.data:
                         job = manager.newjob()
                         job.name = "{}_{}_{}".format(self.data["name"], f, k)
                         status = job.submit()
