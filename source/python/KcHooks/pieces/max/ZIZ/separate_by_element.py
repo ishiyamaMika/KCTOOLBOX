@@ -211,6 +211,7 @@ class SeparateByElement(Piece):
                     if manager and "name" in self.data:
                         job = manager.newjob()
                         job.name = "{}_{}_{}".format(self.data["name"], f, k)
+                        job.renderCamera = self.data["camera"]
                         status = job.submit()
                         if self.logger:
                             self.logger.debug("status: {}".format(status))
