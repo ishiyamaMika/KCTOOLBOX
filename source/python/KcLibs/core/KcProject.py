@@ -97,7 +97,9 @@ class KcProject(object):
             "fps": fps
             }
 
-        piece_data = self.config["puzzle"]["change_camera"].replace("<app>", kc_env.mode)
+        piece_data = self.config["puzzle"]["change_camera"]["main"][0]
+        piece_data["piece"] = piece_data["piece"].replace("<app>", kc_env.mode)
+
         pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
 
 
@@ -322,4 +324,4 @@ if __name__ in ["__main__", "__builtin__"]:
     print "________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad")
 
     print x.get_cameras()
-    # x.change_camera("TEST", 0, 20, 24)
+    x.change_camera("cam_s99c999", 0, 100, 24)

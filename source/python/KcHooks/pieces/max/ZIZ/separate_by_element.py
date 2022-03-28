@@ -127,7 +127,7 @@ class SeparateByElement(Piece):
                            "name": "tex_IDmask.rps"}
                            }
         
-        if self.data.get("render", False):
+        if self.data.get("network_rendering", False):
             net_render = pymxs.runtime.netrender
             manager = net_render.GetManager()
             try:
@@ -153,6 +153,13 @@ class SeparateByElement(Piece):
                 dic["sdw"]["anti"] = True
 
         for k, v in dic.items():
+            if not os.path.exists(path):
+                continue
+            if self.data["network_rendering"]:
+                if not self.data["job_create"]:
+                    self.details.append("file & job create skip.")
+                    continue
+
             if kc_file_io.file_open(path):
                 render_element_path = self.piece_data["render_element_path"]
                 self.details.append("type: {}".format(k))
@@ -203,24 +210,45 @@ class SeparateByElement(Piece):
                     else:
                         anti_cmd = "renderers.production.AntiAliasing = false"
                     MaxPlus.Core.EvalMAXScript(anti_cmd)
+                
+                if self.data["network_rendering"]:
+                    if k == "sdw" and not self.data["sdw_create"]:
+                        self.details.append("sdw file & job create skip.")
+                        self.details.append("")
+                        self.details.append("")
+                        continue
 
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
                         self.logger.debug("saved: {}\n".format(save_path.replace("/", "\\")))
-                    if manager and "name" in self.data:
-                        job = manager.newjob()
-                        job.name = "{}_{}_{}".format(self.data["name"], f, k)
-                        job.renderCamera = self.data["camera"]
-                        status = job.submit()
-                        if self.logger:
-                            self.logger.debug("status: {}".format(status))
-                        self.details.append("job created. status: {}".format(status))
 
+                    if self.data["network_rendering"]:
+                        self.details.append("-----job-----")
+                        if manager and "name" in self.data:
+                            job = manager.newjob()
+                            job.name = "{}_{}_{}".format(self.data["name"], f, k)
+                            job.renderCamera = self.data["camera"]
+                            if k == "sdw":
+                                job.suspended = self.data["sdw_suspended"]
+                                self.details.append("{} suspended: {}".format(k, self.data["sdw_suspended"]))
+                            else:
+                                job.suspended = False
+                                self.details.append("{} suspended: False".format(k))
+
+                            status = job.submit()
+                            if self.logger:
+                                self.logger.debug("status: {}".format(status))
+                            self.details.append("job created. status: {}".format(status))
+                        else:
+                            self.details.append("manager is not exists: {}".format(data))
                 else:
                     self.details.append("save failed: {}\n".format(save_path.replace("/", "\\")))
                     if self.logger:
                         self.logger.debug("save failed: {}\n".format(save_path.replace("/", "\\")))
+                
+                self.details.append("")
+                self.details.append("")
 
         return flg, self.pass_data, header, u"\n".join(self.details)
 

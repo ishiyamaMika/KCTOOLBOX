@@ -42,6 +42,67 @@ kc_env.append_sys_paths()
 from Sticky.Sticky import FieldValueGenerator
 from KcTools.multi.KcResultDialog.form.main import KcResultDialog
 
+class GroupDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super(GroupDialog, self).__init__(parent)
+    
+    def set_ui(self, shot_name, groups):
+        layout = QtWidgets.QVBoxLayout()
+        self.widgets = {}
+        layout.addWidget(QtWidgets.QLabel("create file & backburner option"))
+        layout.addWidget(QtWidgets.QLabel(shot_name))
+        for group in groups:
+            hlayout = QtWidgets.QHBoxLayout()
+            label = QtWidgets.QLabel(group)
+            job_create = QtWidgets.QCheckBox()
+
+            sdw_suspended = QtWidgets.QCheckBox()
+            sdw_suspended.setText("sdw suspended")
+
+            sdw_create = QtWidgets.QCheckBox()
+            sdw_create.setText("create sdw file && job")
+            sdw_create.setCheckState(QtCore.Qt.Checked)
+            sdw_create.sdw_suspended = sdw_suspended
+
+            job_create.sdw_suspended = sdw_suspended
+            job_create.sdw_create = sdw_create
+            job_create.setText("create file && job")
+            job_create.setCheckState(QtCore.Qt.Checked)
+
+            hlayout.addWidget(label)
+            hlayout.addWidget(job_create)
+            hlayout.addWidget(sdw_create)
+            hlayout.addWidget(sdw_suspended)
+
+            self.widgets[group] = {
+                                   "sdw_create": sdw_create,
+                                   "job_create": job_create,
+                                   "sdw_suspended": sdw_suspended
+                                  }
+
+            job_create.clicked.connect(self.job_create_clicked)
+            sdw_create.clicked.connect(self.sdw_create_clicked)
+            layout.addLayout(hlayout)
+
+        btn = QtWidgets.QPushButton()
+        layout.addWidget(btn)
+
+        btn.clicked.connect(self.btn_clicked)
+        btn.setText("OK")
+        self.setLayout(layout)
+    
+    def sdw_create_clicked(self):
+        self.sender().sdw_suspended.setEnabled(self.sender().checkState() == QtCore.Qt.Checked)
+
+    def job_create_clicked(self):
+        self.sender().sdw_create.setEnabled(self.sender().checkState() == QtCore.Qt.Checked)
+        self.sender().sdw_suspended.setEnabled(self.sender().checkState() == QtCore.Qt.Checked)
+    
+    def btn_clicked(self):
+        self.close()
+        
+
+
 class AssetDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(AssetDialog, self).__init__(parent)
@@ -1019,6 +1080,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         if name_item.is_file_opened:
             namespace = self.project.path_generate(self.project.config["asset"]["namespaces"]["camera"], name_item.row_data["fields"])
             frame = name_item.row_data["frame"]
+            print "XXX:", namespace
             self.project.change_camera(namespace, **frame)
 
     def project_combo_changed(self):
@@ -1572,6 +1634,15 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             if len(no_group_error) > 0:
                 QtWidgets.QMessageBox.warning(self, "info", u"assetがgroup化されていません\n{}".format(u"\n".join(no_group_error)), QtWidgets.QMessageBox.Cancel)
                 return
+            
+            asset_group_names = assets_by_groups.keys()
+            asset_group_names.sort()
+            
+            
+            if address:
+                group_dialog = GroupDialog(self)
+                group_dialog.set_ui(item["shot_name"], asset_group_names)
+                group_dialog.exec_()
 
             post_primary = {}
             post_primary["path"] = self.project.path_generate(self.project.config["shot"]["max"]["paths"]["master"], item["fields"])
@@ -1614,15 +1685,24 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 f, ext = os.path.splitext(f)
                 post_end_["movie_path"] = "{}/{}_{}{}" .format(d, f, k, ext)
 
+                if address:
+                    post_end_["network_rendering"] = True
+                    post_end_["job_create"] = group_dialog.widgets[k]["job_create"].checkState() == QtCore.Qt.Checked
+                    post_end_["sdw_suspended"] = group_dialog.widgets[k]["sdw_suspended"].checkState() == QtCore.Qt.Checked
+                    post_end_["sdw_create"] = group_dialog.widgets[k]["sdw_create"].checkState() == QtCore.Qt.Checked
+                else:
+                    post_end_["network_rendering"] = False
+                    post_end_["job_create"] = False
 
                 if cam_asset:
                     post_end_["assets"].append(cam_asset)
                 
                 post_end_["split_flg"] = self.ui.split_check.checkState() == QtCore.Qt.Checked
                 if address:
-                    post_end_["render"] = True
                     post_end_["address"] = address
                 data["separate_main"].append(post_end_)
+
+                pprint.pprint(post_end_)
 
             if len(errors) > 0:
                 results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
