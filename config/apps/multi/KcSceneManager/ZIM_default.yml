@@ -239,6 +239,9 @@ data:
           description: save koma config
           paint:
             path: mobu_master_export_path
+            start: "@start"
+            end: "@end"
+            fps: "@fps"
 
         - name: export asset
           piece: KcHooks.pieces.mobu.default.asset_export
