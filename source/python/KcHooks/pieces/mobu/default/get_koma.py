@@ -41,8 +41,18 @@ class GetKoma(Piece):
             modified_list = []
             for ii, k in enumerate(anim_node.Keys):
                 frame = self.get_frame(k.Time)
-                all_keys.setdefault(frame, {})
+                # print frame, "----", self.data["start"], self.data["end"]
                 keyframe = {}
+
+                if frame < self.data["start"]:
+                    keyframe["frame"] = k.Time.GetFrame()
+                    keyframe["value"] = k.Value
+                    temp_key = keyframe
+                    continue
+                elif frame > self.data["end"]:
+                    continue
+
+                all_keys.setdefault(frame, {})
                 # keyframe["type"] = "{}{}".format(trs[0], ["x", "y", "z"][i])
                 # keyframe["axis"] = i
                 keyframe["frame"] = k.Time.GetFrame()
@@ -108,7 +118,10 @@ class GetKoma(Piece):
             """
             x = list(set(mix))
             x.sort()
-            return mix
+            if x[0] > self.data["start"]:
+                x.insert(0, self.data["start"])
+
+            return x
 
     def execute(self):
         flg = True
@@ -157,10 +170,15 @@ if __name__ == "__builtin__":
     kc_project.set("ZIM", "default")
 
     pass_data = {"project": kc_project}
+    in_frame = FBPlayerControl().ZoomWindowStart
+    out_frame= FBPlayerControl().ZoomWindowStop    
+    start = int(FBTime.GetTimeString(in_frame).replace("*", ""))
+    end = int(FBTime.GetTimeString(out_frame).replace("*", ""))
+
     data = {u'category': u'CH',
            'config': {'export': False, 'plot': False},
            'cut': u'001',
-           'end': 0,
+           'end': end,
            'mobu_edit_export_path': u'X:/Project/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_CH_tsukikoQuad.fbx',
             u'config': {'export': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/usaoSS/MB/config/CH_usaoSS_export.json",
                         'plot': "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/usaoSS/MB/config/CH_usaoSS_plot.json"},
@@ -168,13 +186,15 @@ if __name__ == "__builtin__":
            u'namespace': u'CH_tsukikoQuad',
            'scene': u'01',
            u'selection': True,
-           'start': 0,
+           'start': start,
            u'take': 2.0,
            u"path": "E:/works/client/keica/data/junkscript/test.json",
            u'true_namespace': u'CH_usaoSS',
            u'type': u'both',
            u'update_at': u'2021/11/18 01:17:16',
            u'update_by': u'amek'}
+
+
 
     piece_data = {}
 
