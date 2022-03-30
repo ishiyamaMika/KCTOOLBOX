@@ -160,7 +160,7 @@ class GetKoma(Piece):
         detail += "start: {}".format(self.data["start"])
         detail += "end  : {}".format(self.data["end"])
         detail += "fps  : {}".format(FBPlayerControl().GetTransportFpsValue())
-        datail += ", ".join([str(l) for l in keys])
+        detail += ", ".join([str(l) for l in keys])
         detail += u", ".join([unicode(l) for l in keys])
         detail += u"\n".join(model_names)
         detail += u"\n"
