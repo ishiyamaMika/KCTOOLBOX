@@ -157,10 +157,10 @@ class GetKoma(Piece):
 
         header = u"コマファイルをエクスポートしました: {}".format(self.data["namespace"])
         detail = u"path: \n{}\n\n".format(koma_path)
-        detail += "start: {}".format(self.data["start"])
-        detail += "end  : {}".format(self.data["end"])
-        detail += "fps  : {}".format(FBPlayerControl().GetTransportFpsValue())
-        detail += ", ".join([str(l) for l in keys])
+        detail += "start: {}\n".format(self.data["start"])
+        detail += "end  : {}\n".format(self.data["end"])
+        detail += "fps  : {}\n".format(FBPlayerControl().GetTransportFpsValue())
+        detail += ", ".join([str(l) for l in keys]) + "\n\n"
         detail += u", ".join([unicode(l) for l in keys])
         detail += u"\n".join(model_names)
         detail += u"\n"
