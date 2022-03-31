@@ -159,6 +159,8 @@ class SeparateByElement(Piece):
                 if not self.data["job_create"]:
                     self.details.append("file & job create skip.")
                     continue
+            if self.logger:
+                self.logger.debug("open:{}".format(path))
 
             if kc_file_io.file_open(path):
                 render_element_path = self.piece_data["render_element_path"]
@@ -220,10 +222,17 @@ class SeparateByElement(Piece):
                 
                 if k == "sdw":
                     for geo in pymxs.runtime.Geometry:
-                        if "GEO_body" in geo.name or "sdw_Plane" in geo.name:
+                        if "GEO_body" in geo.name:
                             geo.primaryVisibility = False
+                            self.details.append("set primaryVisibility: {}".format(geo.name))
                         else:
                             pymxs.runtime.hide(geo)
+                            self.details.append("set hide: {}".format(geo.name))
+
+                    obj = pymxs.runtime.getNodeByName("sdw_Plane")
+                    if obj:
+                        self.details.append("unhide: sdw_Plane")
+                        pymxs.runtime.unhide(obj)
 
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
