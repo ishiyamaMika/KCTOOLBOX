@@ -323,7 +323,7 @@ data:
         - name: open base file
           piece: KcHooks.pieces.max.default.create_base_scene
           description: import base file
-          base_path: "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/camera/base.max"
+          base_path: "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/base.max"
 
       post_main:
         - name: merge asset

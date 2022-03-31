@@ -217,6 +217,13 @@ class SeparateByElement(Piece):
                         self.details.append("")
                         self.details.append("")
                         continue
+                
+                if k == "sdw":
+                    for geo in pymxs.runtime.Geometry:
+                        if "GEO_body" in geo.name or "sdw_Plane" in geo.name:
+                            geo.primaryVisibility = False
+                        else:
+                            pymxs.runtime.hide(geo)
 
                 if kc_file_io.file_save(save_path):
                     self.details.append("saved: {}\n".format(save_path.replace("/", "\\")))
