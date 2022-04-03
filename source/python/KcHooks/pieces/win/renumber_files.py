@@ -56,7 +56,7 @@ class RenumberFiles(Piece):
         successed = []
         error = []
         mode = self.piece_data.get("mode", "move")
-
+        start_frame_offset = -1
         for i, f in enumerate(files):
             source_path = "{}/{}".format(self.data["source_directory"], f)
             if os.path.isdir(source_path):
@@ -65,15 +65,30 @@ class RenumberFiles(Piece):
             match = re.match(".*_([0-9]*).*", f)
             if match:
                 number = match.groups()[0]
+                if start_frame_offset == -1 and self.piece_data.get("frame_offset", False):
+                    print("frame_offset: True: {}".format(number))
+                    start_frame_offset = int(number)
+
+                elif not self.piece_data.get("frame_offset"):
+                    start_frame_offset = 0
+
                 padding = "{:0" + str(len(number)) + "d}"
                 cell_category = os.path.basename(self.data["destination_directory"])
                 f_, ext = os.path.splitext(f)
                 new_f = "{}_{}{}".format(cell_category, padding.format(frame), ext)
-                renumber.append("{}@{}".format(frame, int(number)))
+                if self.logger:
+                    self.logger.debug("old: {}".format(f))
+                    self.logger.debug("new: {}".format(new_f))
+                print("old   : {}".format(f))
+                print("new   : {}".format(new_f))
+                print("frame : {}".format(int(number)))
+                print("offset: -{}".format(start_frame_offset))
+
+                renumber.append("{}@{}".format(frame, int(number) - start_frame_offset))
                 destination_path = "{}/{}".format(self.data["destination_directory"], new_f)
                 if signal:
                     signal.emit(u"{} start: {} > {}".format(mode, f, new_f))
-                
+
                 if mode == "copy":
                     try:
                         shutil.copy2(source_path, destination_path)
@@ -92,7 +107,7 @@ class RenumberFiles(Piece):
                     if self.logger:
                         self.logger.debug("{} successed: {} > {}".format(mode, f, new_f))
                     if signal:
-                        signal.emit(u"{} successed: {} > {}".format(mode, source_path, destination_path))                        
+                        signal.emit(u"{} successed: {} > {}".format(mode, source_path, destination_path))
                 else:
                     error.append(u"src: {}\ndst: {}\n".format(f, new_f))
                     if self.logger:
@@ -108,6 +123,7 @@ class RenumberFiles(Piece):
             renumber_path = "{}/{}_renumber.txt".format(d, f)
             with open(renumber_path, "w") as f:
                 f.write("\n".join(renumber))
+                print("\n".join(renumber))
                 if self.logger:
                     self.logger.debug("renumber path: {}".format(renumber_path))
         
@@ -128,4 +144,4 @@ if __name__ == "__main__":
     x = RenumberFiles(piece_data=piece_data, data=data)
     x.execute()
 
-    print x.pass_data
+    print(x.pass_data)
