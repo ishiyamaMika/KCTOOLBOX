@@ -56,7 +56,12 @@ class RenumberFiles(Piece):
         successed = []
         error = []
         mode = self.piece_data.get("mode", "move")
-        start_frame_offset = -1
+        if not self.piece_data.get("frame_offset"):
+            start_frame_offset = 0
+        else:
+            # override value by first file name
+            start_frame_offset = -1
+
         for i, f in enumerate(files):
             source_path = "{}/{}".format(self.data["source_directory"], f)
             if os.path.isdir(source_path):
@@ -65,12 +70,9 @@ class RenumberFiles(Piece):
             match = re.match(".*_([0-9]*).*", f)
             if match:
                 number = match.groups()[0]
-                if start_frame_offset == -1 and self.piece_data.get("frame_offset", False):
+                if start_frame_offset == -1:
                     print("frame_offset: True: {}".format(number))
                     start_frame_offset = int(number)
-
-                elif not self.piece_data.get("frame_offset"):
-                    start_frame_offset = 0
 
                 padding = "{:0" + str(len(number)) + "d}"
                 cell_category = os.path.basename(self.data["destination_directory"])
