@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import pprint
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
@@ -33,7 +32,7 @@ class FileImport(Piece):
         detail = ""
         file_path = "new"
         if self.piece_data.get("new"):
-            print "new"
+            print("new")
 
         current_path = "get file path" #file_io.get_file_path()
 

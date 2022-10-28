@@ -41,7 +41,7 @@ class GetKoma(Piece):
             modified_list = []
             for ii, k in enumerate(anim_node.Keys):
                 frame = self.get_frame(k.Time)
-                # print frame, "----", self.data["start"], self.data["end"]
+                # print(frame, "----", self.data["start"], self.data["end"])
                 keyframe = {}
 
                 if frame < self.data["start"]:
@@ -90,10 +90,10 @@ class GetKoma(Piece):
                         continue
                 
                     if each.GetAnimationNode().FCurve is not None:
-                        # print each.Name
+                        # print(each.Name)
                         all_keys[each.Name], modified_list_ = _get_each_keys(each.GetAnimationNode().FCurve, each.Name)
                         modified.extend(modified_list_)                    
-                        # print "*****", modified_list_
+                        # print("*****", modified_list_)
 
                     elif len(each.GetAnimationNode().Nodes) > 0:
                         for i in range(len(each.GetAnimationNode().Nodes)):
@@ -207,4 +207,4 @@ if __name__ == "__builtin__":
     FBGetSelectedModels(m_list)
     keys = list(set(x.get_all_keys(m_list)))
     keys.sort()
-    print keys
+    print(keys)

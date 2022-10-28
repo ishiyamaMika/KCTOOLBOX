@@ -40,4 +40,4 @@ def get_group_hierachy(group):
 
 if __name__ == "__builtin__":
     for group in FBSystem().Scene.Groups:
-        print group.Name, "/".join([l.LongName for l in get_group_hierachy(group)]) 
+        print(group.Name, "/".join([l.LongName for l in get_group_hierachy(group)]) )

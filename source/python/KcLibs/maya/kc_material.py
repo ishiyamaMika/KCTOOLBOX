@@ -44,11 +44,11 @@ def get_material_color(material):
 def set_material_color(material, value):
     def _check(attr):
         if cmds.getAttr(attr, lock=True):
-            print "attr was locked: pass"
+            print("attr was locked: pass")
             return True
         connections = cmds.listConnections(attr, s=True, d=False) or []
         if len(connections) > 0:
-            print "attr was connected: pass"
+            print("attr was connected: pass")
             return True
 
         return False
@@ -96,7 +96,7 @@ def create_file_node(name, file_path):
     p2d_node = cmds.shadingNode("place2dTexture", asUtility=True)
     _connect_file_node(file_node, p2d_node)
     import os
-    print file_node, file_path, os.path.exists(file_path)
+    print(file_node, file_path, os.path.exists(file_path))
     cmds.setAttr("{}.fileTextureName".format(file_node), file_path, type="string")
     return file_node, p2d_node
 
@@ -201,27 +201,27 @@ if __name__ == "__main__":
     dic["name"] = "skin"
     dic["type"] = "lambert"
     dic["color"] = [255, 255, 255]
-    print "\n\n\n\n\n"
-    print 1, cmds.listConnections(dic["name"], s=True, d=False)
-    print 2, cmds.listConnections(dic["name"], d=True, s=False)
-    print 3, cmds.listConnections(dic["name"], p=True)
-    print 4, cmds.listConnections(dic["name"], c=True)
+    print("\n\n\n\n\n")
+    print(1, cmds.listConnections(dic["name"], s=True, d=False))
+    print(2, cmds.listConnections(dic["name"], d=True, s=False))
+    print(3, cmds.listConnections(dic["name"], p=True))
+    print(4, cmds.listConnections(dic["name"], c=True))
 
-    #print replace_material_type(dic)
+    #print(replace_material_type(dic))
 
-    print 1, cmds.listConnections(dic["name"], s=True, d=False)
-    print 2, cmds.listConnections(dic["name"], d=True, s=False)
-    print 3, cmds.listConnections(dic["name"], p=True)
-    print 4, cmds.listConnections(dic["name"], c=True)
+    print(1, cmds.listConnections(dic["name"], s=True, d=False))
+    print(2, cmds.listConnections(dic["name"], d=True, s=False))
+    print(3, cmds.listConnections(dic["name"], p=True))
+    print(4, cmds.listConnections(dic["name"], c=True))
     """
 
     src = "RORAI_coat_inner"
     dst = "Rollei_Fuku_coat_inner"
-    #print select_face_from_material("RORAI_face")
-    #print change_material_connections("RORAI_face", "Rollei_face")
+    #print(select_face_from_material("RORAI_face"))
+    #print(change_material_connections("RORAI_face", "Rollei_face"))
 
-    # print get_material_color("col_mat")
-    print 111
+    # print(get_material_color("col_mat"))
+    print(111)
     """
     change_material_connections(src, dst)
 

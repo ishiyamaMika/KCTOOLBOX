@@ -34,8 +34,8 @@ class FileRender(Piece):
         header = ""
         detail = ""
 
-        print "select camera"
-        print "set size"
+        print("select camera")
+        print("set size")
 
         return flg, self.pass_data, header, detail
 

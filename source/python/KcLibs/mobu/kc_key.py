@@ -47,9 +47,9 @@ def _get_property_list_data(src=True):
     for m in m_list:
         dic.setdefault(m.LongName, {})
         if src:
-            print "src model:", m.LongName
+            print("src model: {}".format(m.LongName))
         else:
-            print "dst model:", m.LongName
+            print("dst model: {}".format(m.LongName))
         for attr in m.PropertyList:
             try:
                 value = attr.Data
@@ -157,7 +157,7 @@ def scl_tangent_to(node, time_range, tangent_name, axis=[True, True, True]):
                 keys = node.Scaling.GetAnimationNode().Nodes[i].FCurve.Keys
                 _change_tangent(keys, time_range, tangent_name)
             except:
-                print traceback.format_exc()
+                print(traceback.format_exc())
 
     FBSystem().Scene.Evaluate()
 
@@ -267,7 +267,7 @@ def remove_trs(node, time_range):
         try:
             node.Translation.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
 
     FBSystem().Scene.Evaluate()
 
@@ -279,7 +279,7 @@ def remove_rot(node, time_range):
         try:
             node.Rotation.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
     FBSystem().Scene.Evaluate()
 
 
@@ -290,7 +290,7 @@ def remove_scl(node, time_range):
         try:
             node.Scaling.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
     FBSystem().Scene.Evaluate()
 
 
@@ -583,22 +583,6 @@ def copy_local_scaling(src, dst, delete_base=False):
         src.Scaling = FBVector3d(0, 0, 0)
 
 
-
-#        if len(xyz_keys[1]) > i:
-#            print xyz_keys[1][i].xyz, xyz_keys[1][i].frame, xyz_keys[1][i].value
-#        
-#        if len(xyz_keys[2]) > i:
-#            print xyz_keys[2][i].xyz, xyz_keys[2][i].frame, xyz_keys[2][i].value
-
-
-#    dst.Translation.Key()
-#    for i in range(3):
-#        curve = src.Translation.GetAnimationNode().Nodes[i].FCurve.Keys
-#        print dir(curve)
-        
-#        dst.Translation.GetAnimationNode().Nodes[i].FCurve.Keys = curve
-#EditBegin   
-
 _KEY_ATTRS_ = ["TangentMode", "TangentClampMode", "TangentConstantMode", "TangentBreak", "Continuity", "Bias", "Interpolation", 
                "RightBezierTangent", "RightDerivative", "LeftBezierTangent", "LeftDerivative", "LeftTangentWeight", 
                "MarkedForManipulation", "RightTangentWeight",  
@@ -718,6 +702,6 @@ if __name__ == "__builtin__":
 
     m_list = FBModelList()
     FBGetSelectedModels(m_list)
-    print change_key_to_stepped([l for l in m_list])
-    print "DONE"
+    print(change_key_to_stepped([l for l in m_list]))
+    print("DONE")
 

@@ -4,7 +4,7 @@ import os
 import sys
 import glob
 import re
-import pprint
+
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if mod not in sys.path:
     sys.path.append(mod)

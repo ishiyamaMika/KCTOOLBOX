@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import pprint
 import pymxs
 import glob
 
@@ -106,7 +105,7 @@ class SetRenderSetting(Piece):
             if self.logger: 
                 self.logger.debug("render frames: {}".format(render_frames))
             else:
-                print result
+                print(result)
 
             options["render_frames"] = render_frames
 
@@ -137,10 +136,7 @@ class SetRenderSetting(Piece):
 if __name__ == "__main__":
 
     piece_data = {}
-    print 111
 
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/master/ZIM_s99c500_anim.max"
     data = {"start": 12, "end": 50, "fps": 24, "width": 720, "height": 360, "path": path}
     x = SetRenderSetting(piece_data=piece_data, data=data)
-    import pprint
-    pprint.pprint(x.execute())

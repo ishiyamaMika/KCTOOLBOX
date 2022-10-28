@@ -106,7 +106,7 @@ if __name__ == "__builtin__":
     FBGetSelectedModels(m_list)
 
     infos = get_all_keys(m_list)
-    print get_changed_frames(infos)
-    print 
+    print(get_changed_frames(infos))
+    print("") 
     for info, key in infos.items():
-        print info, get_changed_frames({info: key})
+        print(info, get_changed_frames({info: key}))

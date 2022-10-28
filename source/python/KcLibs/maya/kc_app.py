@@ -6,7 +6,6 @@ import sys
 from maya import OpenMayaUI
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-print mod
 
 if mod not in sys.path:
     sys.path.append(mod)

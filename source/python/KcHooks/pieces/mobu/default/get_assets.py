@@ -64,5 +64,3 @@ if __name__ == "__builtin__":
 
     x = GetAssets(piece_data=piece_data, data=data)
     x.execute()
-    import pprint
-    pprint.pprint(x.pass_data)

@@ -10,7 +10,7 @@ import datetime
 import importlib
 import shutil
 import glob
-import pprint
+
 
 from logging import getLogger
 
@@ -185,8 +185,8 @@ class GetConfigs(QtCore.QThread):
                 self.each_signal.emit(info, data, path)
                 time.sleep(0.05)
             except:
-                print traceback.format_exc()
-                print path, "---failed"
+                print(traceback.format_exc())
+                print(path, "---failed")
 
 class RecordDialog(QtWidgets.QDialog):
     record = QtCore.Signal(dict, unicode, list, bool)
@@ -1052,7 +1052,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
             self.connected = False
 
-        print "connect:", self.connected
+        print("connect:", self.connected)
     
     def split_check_clicked(self):
         self.ui.render_check.setCheckState(self.sender().checkState())
@@ -1080,7 +1080,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         if name_item.is_file_opened:
             namespace = self.project.path_generate(self.project.config["asset"]["namespaces"]["camera"], name_item.row_data["fields"])
             frame = name_item.row_data["frame"]
-            print "XXX:", namespace
             self.project.change_camera(namespace, **frame)
 
     def project_combo_changed(self):
@@ -1097,14 +1096,14 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 item.row_data["frame"]["start"] = int(self.ui.shot_table.item(r, c).text())
             except:
                 import traceback
-                print traceback.format_exc()
+                print(traceback.format_exc())
                 return
         elif c == self.shot_table_list.index("end"):
             try:
                 item.row_data["frame"]["end"] = int(self.ui.shot_table.item(r, c).text())
             except:
                 import traceback
-                print traceback.format_exc()                
+                print(traceback.format_exc())                
                 return
 
         elif c == self.shot_table_list.index("fps"):
@@ -1112,7 +1111,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 item.row_data["frame"]["fps"] = int(self.ui.shot_table.item(r, c).text())
             except:
                 import traceback
-                print traceback.format_exc()                
+                print(traceback.format_exc())                
                 return
 
         # json.dump(data, open(item.config_path, "w"), "utf8", indent=4)
@@ -1493,10 +1492,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 data["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], data)
 
             if not data["path"]:
-                print "parse error:", self.project.config["shot"][kc_env.mode]["paths"]["master"]
+                print("parse error:", self.project.config["shot"][kc_env.mode]["paths"]["master"])
                 continue
             if not os.path.exists(data["path"]):
-                print "master not exists:", data["path"]
+                print("master not exists:", data["path"])
                 continue
 
             flg = True
@@ -1701,8 +1700,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 if address:
                     post_end_["address"] = address
                 data["separate_main"].append(post_end_)
-
-                pprint.pprint(post_end_)
 
             if len(errors) > 0:
                 results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
@@ -2014,7 +2011,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             try:
                 js = json.load(open(path, "r"), "utf8")
             except:
-                print traceback.format_exc()
+                print(traceback.format_exc())
                 continue
             
             current_file_path = self.cmd.get_current_path()

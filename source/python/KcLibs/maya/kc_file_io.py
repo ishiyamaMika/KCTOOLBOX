@@ -19,7 +19,7 @@ def remove_anim_curve(anim_path):
         for l_ in l:
             match = re.match(pattern, l)
             if match:
-                print match
+                print(match)
 
 
 
@@ -102,7 +102,7 @@ def reference_can_trace(rf_name):
         return True
     except:
         #import traceback
-        #print traceback.format_exc()
+        #print(traceback.format_exc())
         return False
 
 def save_file(path=False):
@@ -118,9 +118,9 @@ def save_file(path=False):
     if path.endswith(".mb"):
         try:
             cmds.file(save=True, force=True, type='mayaBinary')
-            print path, "saved to mayaBinary"
+            print(path, "saved to mayaBinary")
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
             if tmp_path:
                 cmds.file(rename=tmp_path)
             else:
@@ -129,9 +129,9 @@ def save_file(path=False):
     else:
         try:
             cmds.file(save=True, force=True, type='mayaAscii')
-            print path, "saved to mayaAscii"
+            print(path, "saved to mayaAscii")
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
             if tmp_path:
                 cmds.file(rename=tmp_path)
             else:
@@ -170,7 +170,7 @@ def load_reference(ref_node):
         return True
     except:
         import traceback
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False
 
 def remove_reference(ref_node, unload=False, delete=False):
@@ -185,7 +185,7 @@ def remove_reference(ref_node, unload=False, delete=False):
 
 def replace_reference(src_ns, dst):
     print
-    print src_ns, dst
+    print(src_ns, dst)
     if isinstance(src_ns, list):
         for s in src_ns:
             replace_reference(s, dst)

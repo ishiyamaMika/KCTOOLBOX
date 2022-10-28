@@ -14,6 +14,6 @@ def create(type_, name, intensity=1.0, **kwargs):
     elif type_ == "directionalLight":
         light = cmds.directionalLight(n=name, intensity=intensity)
     else:
-        print "out of type presets: {}".format(type_)
+        print("out of type presets: {}".format(type_))
     return light
 

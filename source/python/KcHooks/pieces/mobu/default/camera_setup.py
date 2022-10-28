@@ -57,8 +57,8 @@ class CameraSetup(Piece):
             detail = self.data
 
 
-        print "select camera"
-        print "set size"
+        print("select camera")
+        print("set size")
 
         return flg, self.pass_data, header, detail
 
@@ -74,4 +74,4 @@ if __name__ == "__builtin__":
             }
 
     x = CameraSetup(piece_data=piece_data, data=data)
-    print x.execute()
+    print(x.execute())

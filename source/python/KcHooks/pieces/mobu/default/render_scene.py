@@ -99,25 +99,25 @@ if __name__ == "__builtin__":
     x = RenderScene(piece_data=piece_data, data=data)
     x.execute()
 
-    print x.pass_data
+    print(x.pass_data)
 
 
     start = 4
     end = 8
 
     fps = 30
-    print "base"
-    print "start :", start
-    print "end   :", end
-    print "fps   :", fps
+    print("base")
+    print("start :", start)
+    print("end   :", end)
+    print("fps   :", fps)
 
     print
 
     value = 24.0/fps
 
 
-    print "start :", start * value
-    print "end   :", end * value
-    print "fps   :", fps * value
+    print("start :", start * value)
+    print("end   :", end * value)
+    print("fps   :", fps * value)
 
 

@@ -17,7 +17,7 @@ import maya.cmds as cmds
 from functools import partial
 
 def execute(p, *args):
-    print p, "execute"
+    print(p, "execute")
     if p.endswith(".py"):
         execfile(p)
 

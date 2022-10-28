@@ -30,9 +30,9 @@ class HOGE(object):
         a_only = a - b
         b_only = b - a
 
-        print both
-        print a_only
-        print b_only
+        print(both)
+        print(a_only)
+        print(b_only)
 
         merge_assets = {}
         add_namespace = []
@@ -86,6 +86,5 @@ config_assets = [
                 "true_namespace": "CH_tsukikoQuad"
             }
         ]
-import pprint
+
 results = x.list_asset_table(config_assets)
-pprint.pprint(results)

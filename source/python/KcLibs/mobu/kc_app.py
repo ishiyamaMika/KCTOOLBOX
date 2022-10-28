@@ -6,10 +6,11 @@ import sys
 from pyfbsdk import ShowTool, FBAttachType, FBWidgetHolder, FBTool, FBAddRegionParam
 from pyfbsdk_additions import FBAddTool, FBToolList, FBDestroyToolByName
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-if mod not in sys.path:
-    sys.path.append(mod)
 
 os.environ["QT_PREFERRED_BINDING"] = os.pathsep.join(["PySide", "PySide2"])
 
@@ -30,7 +31,6 @@ except:
 class NativeWidgetHolder(FBWidgetHolder):
     def WidgetCreate(self, parent):
         self.native_widget = self.tool(parent=shiboken.wrapInstance(parent, QtWidgets.QWidget))
-        print type(self.native_widget.parent())
         self.native_widget.set_ui()
         return shiboken.getCppPointer(self.native_widget)[0]
 

@@ -51,9 +51,9 @@ def remove_unused_influences(meshes):
     for mesh in meshes:
         try:
             cmds.select(mesh, add=True)
-            print "select:", mesh
+            print("select:", mesh)
         except:
-            print "select failed:", mesh
+            print("select failed:", mesh)
     mm.eval("removeUnusedInfluences")
 
 def copy_weight(src, dst):
@@ -63,24 +63,24 @@ def copy_weight(src, dst):
 
     if src_skin == 0 or dst_skin == 0:
         return False
-    print src_skin
-    print dst_skin
+    print(src_skin)
+    print(dst_skin)
     src_skin = src_skin[0]
     dst_skin = dst_skin[0]
     """
-    print cmds.objectType(src)
+    print(cmds.objectType(src))
     if not cmds.objExists(src):
-        print "src not exists: ", src
+        print("src not exists: ", src)
         return
     if cmds.objectType(src) == "mesh":
         src = cmds.listRelatives(src, p=True, f=True)[0]
     if not cmds.objExists(dst):
-        print "src not exists: ", dst
+        print("src not exists: ", dst)
         return
     if cmds.objectType(dst) == "mesh":
         dst = cmds.listRelatives(dst, p=True, f=True)[0]
-    print "src:", src
-    print "dst:", dst
+    print("src:", src)
+    print("dst:", dst)
     cmds.select(src, r=True)
     cmds.select(dst, add=True)
     cmds.copySkinWeights(influenceAssociation="oneToOne",
@@ -96,12 +96,12 @@ if __name__ == "__main__":
         import KcLibs.maya.kc_file_io as kc_file_io
         import shutil
         reload(kc_file_io)
-        print mesh_list
-        print joint_list
+        print(mesh_list)
+        print(joint_list)
         detach_bind(mesh_list)
         set_poly_smooth(1, mesh_list)
         cmds.bakePartialHistory(all=True)
-        print "bind------"
+        print("bind------")
         bind(mesh_list, joint_list)
 
         current = cmds.file(sn=True, q=True)
@@ -115,9 +115,9 @@ if __name__ == "__main__":
             temp = "|".join(["TEMP:{}".format(l) for l in mesh.split("|") if l != ""])
             try:
                 copy_weight(temp, mesh)
-                print "---done"
+                print("---done")
             except:
-                print "---failed"
+                print("---failed")
 
         cmds.file(removeReference=True, referenceNode=cmds.ls(type="reference")[0])
 
@@ -126,18 +126,18 @@ if __name__ == "__main__":
     def test02():
         # kc_file_io.reference_file("TEMP", temp_path)
         mesh_list = get_mesh_parent(cmds.listRelatives("Mesh", ad=True, f=True))
-        print mesh_list
+        print(mesh_list)
         for mesh in mesh_list:
             temp = "TEMP:{}".format(mesh)
-            print mesh, temp
+            print(mesh, temp)
             try:
                 copy_weight(temp, mesh)
-                print "---done"
+                print("---done")
             except:
                 import traceback
-                print traceback.format_exc()
-                print "---failed"
+                print(traceback.format_exc())
+                print("---failed")
 
     test01()
-    print "done"
+    print("done")
 

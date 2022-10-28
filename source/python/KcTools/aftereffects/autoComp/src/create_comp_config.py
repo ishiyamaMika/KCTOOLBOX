@@ -130,10 +130,10 @@ else:
     debug = False
 
 
-print debug
+print(debug)
 
 if len(sys.argv) < 2:
-    print "you need to set shot directory: exit"
+    print("you need to set shot directory: exit")
     sys.exit()
 
 shot_name = sys.argv[-1]
@@ -142,7 +142,7 @@ if not match:
     match = re.match("(ep00)(s.*)(c[0-9]{3})", shot_name)
 
 if not match:
-    print "shot name pattern failed: {}".format(sys.argv[-1])
+    print("shot name pattern failed: {}".format(sys.argv[-1]))
     sys.exit()
 
 episode, scene, cut = match.groups()
@@ -150,7 +150,7 @@ root_directory = "X:/Project/_952_SA/04_animation/CP/{}/{}/{}".format(episode, s
 footage_path = "{}/footage".format(root_directory)
 
 if not os.path.exists(footage_path):
-    print "footage folder not exists: exit"
+    print("footage folder not exists: exit")
     sys.exit()    
 
 shot = os.path.basename(root_directory)
@@ -161,10 +161,10 @@ shot_name = "ep00{}{}".format(scene, shot)
 shot_info = kc_sg.get_scene_info(shot_name)
 
 if not shot_info:
-    print "shot name not in shotgun: exit"
+    print("shot name not in shotgun: exit")
     sys.exit()
 
-print shot_name
+print(shot_name)
 
 data = create_ae_config(footage_path, shot_info["width"], shot_info["height"], shot_name)
 now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -184,7 +184,7 @@ env_copy["__AUTOCOMP_SAVE_PATH__"] = data_path.replace("/", "\\").replace(".json
 ae_path = os.environ["__AE_PATH__"].replace("/", "\\")
 jsx_path = "{}\\source\\python\\KcTools\\aftereffects\\autoComp\\src\\auto_comp.jsx".format(os.environ["KEICA_TOOL_PATH"])
 jsx_path = jsx_path.replace("/", "\\")
-print "save data:", env_copy["__AUTOCOMP_SAVE_PATH__"]
+print("save data:", env_copy["__AUTOCOMP_SAVE_PATH__"])
 subprocess.Popen([ae_path, "-r", jsx_path], env=env_copy, shell=False).wait()
-print "done"
+print("done")
 

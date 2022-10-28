@@ -93,7 +93,7 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
     def set_ui(self, outside_mode=False, config_item=False):
         ui_path = "{}/form/ui/main.ui".format(self.tool_directory)
         self.ui = kc_qt.load_ui(ui_path, self)
-        print ui_path
+        print(ui_path)
         self.outside_mode = outside_mode
 
         self.graphics_view = KcGraphicsView(self)
@@ -103,7 +103,7 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
         self.set_table(self.ui.material_table)
 
         self.config_path = self.cmd.get_info_config_path()
-        print self.config_path
+        print(self.config_path)
         if self.outside_mode:
             if "path" in config_item:
                 self.config_path = config_item["path"]
@@ -226,10 +226,10 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
             os.makedirs(os.path.dirname(save_path))
 
         if not self.outside_mode:
-            print "save config path: {}".format(save_path)
+            print("save config path: {}".format(save_path))
             json.dump({"data": {"path": unicode(self.ui.file_line.text()), "items": items}, "info": {}}, open(save_path, "w"), "utf8", indent=4)
         else:
-            print "outside mode: save pass"
+            print("outside mode: save pass")
         if change_materials:
             for each in mat_sets:
                 try:
@@ -268,7 +268,7 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
         if reload_path is None:
             self.save_config(False)
             reload_path = self.config_path
-        print ">>>>", reload_path
+        print(">>>>", reload_path)
 
         if reload_path == "":
             return
@@ -282,7 +282,7 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
             self.graphics_view.scene().removeItem(item)
 
         self.get_materials()
-        print "image:", self.file_config["data"]["path"]
+        print("image:", self.file_config["data"]["path"])
         self.change_pixmap(self.file_config["data"]["path"], self.file_config["data"]["items"])
         self.ui.file_line.setText(self.file_config["data"]["path"])
         self.reset_splitter()
@@ -390,7 +390,7 @@ class KcImageMapper(kc_qt.ROOT_WIDGET):
             #    item = QtWidgets.QTableWidgetItem()
             #    if name == "name":
             #        item.setText(data["name"])
-            #    print data["name"]
+            #    print(data["name"])
             #    self.ui.material_table.setItem(r, c, item)
 
     def change_pixmap(self, path=None, item_infos=[]):

@@ -57,5 +57,3 @@ if __name__ == "__builtin__":
 
     x = GetCameras(piece_data=piece_data, data=data)
     x.execute()
-
-    print x.pass_data

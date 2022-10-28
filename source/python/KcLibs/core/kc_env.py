@@ -8,17 +8,15 @@ import logging
 from logging import getLogger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-
-if not mod in sys.path:
-    sys.path.append(mod)
-
-
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 try:
     import KcLibs.core.kc_sentry as kc_sentry
     kc_sentry.load()
-    print "load: sentry"
+    print("load: sentry")
 except:
     pass
 
@@ -46,6 +44,14 @@ if mode is None:
 if mode is None:
     mode = "win"
 
+
+def get_python_version():
+    return sys.version_info
+
+
+def get_platform():
+    return sys.platform
+
 def get_logger(name="KcToolBox", level="DEBUG"):
     logger = getLogger(name)
     logger.setLevel(getattr(logging, level))
@@ -64,10 +70,10 @@ def get_logger(name="KcToolBox", level="DEBUG"):
         os.makedirs(path)
 
     log_path = "{}/{}.log".format(path, name)
-    print log_path
+    print(log_path)
     file_handler = TimedRotatingFileHandler(log_path, when="W0")
     file_handler.setFormatter(formatter)
-    
+
     logger.addHandler(stream_handler)
     logger.addHandler(file_handler)
 
@@ -80,7 +86,12 @@ def get_root_directory():
     return os.environ["KEICA_TOOL_PATH"].replace("\\", "/")
 
 def append_sys_paths():
-    sys_paths = ["{}/source/python/KcLibs/site-packages".format(get_root_directory())]
+    if get_python_version().major == 2:
+        sys_paths = ["{}/source/python/site-packages/py2".format(get_root_directory())]
+    else:
+        sys_paths = ["{}/source/python/site-packages/py3".format(get_root_directory())]
+
+    sys_paths = [os.path.normpath(l).replace("\\", "/") for l in sys_paths]
     for sys_path in sys_paths:
         if sys_path not in sys.path:
             sys.path.append(sys_path)
@@ -152,19 +163,19 @@ def save_config(path, name, category, data, **kwargs):
 
 if __name__ in ["__builtin__", "__main__"]:
     def get_root_directory_test():
-        print get_root_directory()
+        print(get_root_directory())
 
     def append_sys_paths_test():
-        print append_sys_paths()
+        print(append_sys_paths())
 
     def get_app_config_test():
-        print get_app_config("Ksubmitter")
+        print(get_app_config("Ksubmitter"))
 
     def get_user_config_test():
-        print get_user_config("Ksubmitter", "ui_config.json")
+        print(get_user_config("Ksubmitter", "ui_config.json"))
 
     def get_log_directory_test():
-        print get_log_directory("Ksubmitter", "main.log")
+        print(get_log_directory("Ksubmitter", "main.log"))
 
 
     get_root_directory_test()
@@ -178,9 +189,9 @@ if __name__ in ["__builtin__", "__main__"]:
     x.info("info")
     x.warning("warning")
     x.critical("critical")
-    print dir(x)
+    print(dir(x))
     print
-    print 
+    print()
     for handler in x.handlers:
-        print handler
+        print(handler)
 

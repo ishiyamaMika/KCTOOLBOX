@@ -5,20 +5,18 @@ import pymxs
 # pymxs can not use quiet?
 import MaxPlus
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-
-if mod not in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
 import KcLibs.max.kc_model as kc_model
-reload(kc_model)
 
 def file_open(path, prompts=False):
     path = path.replace("\\", "/")
     # return MaxPlus.FileManager.Open(path, quiet=True)
     cmd = 'loadMaxFile "{}" quiet: true'.format(path)
-    print cmd
     return MaxPlus.Core.EvalMAXScript(cmd)
     # return pymxs.runtime.loadMaxFile(path, quiet=True)
 
@@ -56,7 +54,7 @@ def file_import(path, param=[{"name": "Mode", "value": "#exmerge"}]):
             error = "import setting failed:"
             for l in param:
                 error += "{} --- {}".format(l["name"], l["value"])
-            print error
+            print(error)
 
         # return MaxPlus.Core.EvalMAXScript('{}\nimportFile "{}" #noPrompt'.format(cmd, path))
     # else:
@@ -100,13 +98,13 @@ if __name__ == "__main__":
     
     """
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad.max"
-    # print file_merge(path)
+    # print(file_merge(path))
 
     path = "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad_02.max"
-    # print file_merge(path)
+    # print(file_merge(path))
     export_cam_path = r"X:\Project\_942_ZIZ\3D\s99\c999\3D\import\ZIM_s99c999_cam_s99c999.fbx"
-    # print os.path.exists(export_cam_path)
-    print file_import(export_cam_path, param=[{"name": "Mode", "value": "#exmerge"}])
+    # print(os.path.exists(export_cam_path))
+    print(file_import(export_cam_path, param=[{"name": "Mode", "value": "#exmerge"}]))
     """
     
     path = r"X:\Project\_942_ZIZ\2020_ikimono_movie\_work\14_partC_Japan\26_animation\_3D_assets\CH\usagizakiSS\CH_usagizakiSS_rig_t01_02.max"

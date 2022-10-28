@@ -27,7 +27,7 @@ def get_file_path():
     return MaxPlus.FileManager.GetFileNameAndPath()
 
 def file_merge(file_path="", namespace=None, padding=2, force=False):
-    print 111
+    print(111)
     # MaxPlus.FileManager.import(file_path)
     if namespace is not None and not force:
         root_node = MaxPlus.Core.GetRootNode()
@@ -52,7 +52,7 @@ def file_import(file_path, suppress_prompts=True):
 
 if __name__ == "__main__":
     path = r"E:\works\client\keica\_942_ZIZ\2020_ikimono_movie\_work\14_partC_Japan\26_animation\_3D_assets\CH\tsukikoQuad\CH_tsukikoQuad_rig_t05_01.max"
-    print file_merge(path, namespace="Mia")
-    print 1111
+    print(file_merge(path, namespace="Mia"))
+    print(1111)
     
-    print MaxPlus.INode.GetINodeByName("CH_tsukikoQuad:*")
+    print(MaxPlus.INode.GetINodeByName("CH_tsukikoQuad:*"))

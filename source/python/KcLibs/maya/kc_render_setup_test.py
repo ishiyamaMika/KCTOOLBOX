@@ -343,7 +343,7 @@ def create_render_collection(layer):
     # col = collection.create("RenderSettingsCollection", collection.RenderSettingsCollection.kTypeId)
     col = layer.renderSettingsCollectionInstance()
     # layer.attachCollection(0, col)
-    # print dir(layer)
+    # print(dir(layer))
     col.getSelector().setStaticSelection("defaultRenderGlobals\ndefaultResolution\ndefaultRenderQuality")
     return col
 
@@ -462,10 +462,10 @@ def set_material_override(layer, override):
                 continue
             if cmds.getAttr("{}.gradation[{}].gradation_Position".format(material, i)) in [0.0, 0.5]:
                 continue
-            print "REM::", i
+            print("REM::", i)
             cmds.removeMultiInstance("{}.gradation[{}]".format(material, i), b=True)
 
-        print "gradation color: ", len(cmds.ls("{}.gradation[*]".format(material)))
+        print("gradation color: ", len(cmds.ls("{}.gradation[*]".format(material))))
 
     collection_name = override.get("collection_name", "{}_collection".format(layer.name()))
     col = create_collection(layer, collection_name, override.get("static_models", None), pattern=override.get("pattern", None), force=override.get("force", False))
@@ -494,7 +494,7 @@ def set_material_override(layer, override):
 
         for k, v in override.get("mat_attributes", {}).items():
             if k != "color":
-                print k, material
+                print(k, material)
                 try:
                     cmds.setAttr("{}.{}".format(material, k), v)
                 except:
@@ -549,7 +549,7 @@ if __name__ == "__main__":
     def create_collection02__TEST():
         layer = create_layer("test")
         meshes = cmds.ls(type="mesh", l=True)
-        print meshes
+        print(meshes)
         overrides = []
         # overrides.append({"type": "material", "name": "color", "color": [255, 255, 255], "material_type": "surfaceShader"})
         overrides.append({"type": "render_setting", "name": "start_frame", "attribute": "defaultRenderGlobals.startFrame", "value": 30})
@@ -559,14 +559,14 @@ if __name__ == "__main__":
     def create_light_collection__TEST():
         layer = create_layer("test")
         l = cmds.ls(type="light", l=True)
-        print l[0]
+        print(l[0])
         create_light_collection(layer, "amb_light", l[0], "intensity", 0.4)
 
     def create_layer_with_collections__TEST():
         # (name, static_models, ** kwargs)
         file_path = u"X:\\images\\icon\\CheckBack.png"
         meshes = cmds.ls(type="mesh", l=True)
-        print "--", meshes
+        print("--", meshes)
         l = cmds.ls(type="light", l=True)
         overrides = []
         overrides.append({"type": "material", "collection_name": "Ikon_texture_collection", "name": "Ikon_texture_ov", "file_path": file_path, "material_type": "surfaceShader", "static_models": meshes})
@@ -583,7 +583,7 @@ if __name__ == "__main__":
         #overrides.append({"type": "light", "name": "{}".format(l[0].split("|")[-1]), "node": l[0], "value": 2, "attribute": "intensity"})
         #overrides.append({"type": "light", "name": "{}".format(l[1].split("|")[-1]), "node": l[1], "value": 0, "attribute": "intensity"})
 
-        print "!!!!!!!!!!", create_layer_with_collections("test", collections=overrides)
+        print("!!!!!!!!!!", create_layer_with_collections("test", collections=overrides))
 
     def get_layer_info__TEST():
         info = get_layer_info("LomoKai_Line", "")
@@ -596,8 +596,8 @@ if __name__ == "__main__":
         path = "X:/Project/_952_SA/03_asset/00_master/maya/_info/render_preset/Ikon_renderSet_.json"
         import_layer(path)
 
-    #print create_layer_with_collections__TEST()
-    #print 1
+    #print(create_layer_with_collections__TEST())
+    #print(1)
 
     def get_layer_list__TEST():
         layers = get_layer_list()
@@ -606,7 +606,7 @@ if __name__ == "__main__":
             name = layer.name().split("_")[0]
             dic.setdefault(name, {})
             dic[name][layer.name()] = get_layer_info(layer.name())
-            print dir(layer)
+            print(dir(layer))
             layer.setRenderable(False)
 
 
@@ -614,8 +614,8 @@ if __name__ == "__main__":
         import json
         json.dump(dic, open(path, "w"), "utf8", indent=4)
 
-        print layers
+        print(layers)
 
-    print "----------", get_master_layer().setRenderable(False)
+    print("----------", get_master_layer().setRenderable(False))
 
-    print 1
+    print(1)

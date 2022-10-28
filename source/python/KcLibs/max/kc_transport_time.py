@@ -15,6 +15,6 @@ def set_scene_time(start, end, fps):
 if __name__ == "__main__":
     # get_scene_time()
     set_scene_time(5, 100,30)
-    print get_scene_time()
-print pymxs.runtime.rendTimeType
+    print(get_scene_time())
+print(pymxs.runtime.rendTimeType)
 pymxs.runtime.rendTimeType = 4

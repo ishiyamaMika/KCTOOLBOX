@@ -1,6 +1,5 @@
 import os
 import sys
-import pprint
 import pymxs
 import subprocess
 import shutil
@@ -36,7 +35,7 @@ class RenderScene(Piece):
         if self.logger:
             self.logger.debug("output_path: {}".format(dst_path))
             self.logger.debug(cmd)
-        print cmd
+        print(cmd)
         subprocess.Popen(cmd, shell=True).wait()
 
 
@@ -79,8 +78,8 @@ class RenderScene(Piece):
                     shutil.copy2(src, dst)
                 except:
                     import traceback
-                    print traceback.format_exc()
-                    print "copy failed: {} > {}".format(src, dst)
+                    print(traceback.format_exc())
+                    print("copy failed: {} > {}".format(src, dst))
 
             if os.path.exists(self.data["movie_path"]):
                 try:

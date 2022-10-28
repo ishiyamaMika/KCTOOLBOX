@@ -2,10 +2,10 @@ import os
 import sys
 import MaxPlus
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-
-if mod not in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 os.environ["QT_PREFERRED_BINDING"] = os.pathsep.join(["PySide", "PySide2"])
 from pyside2uic import compileUi
@@ -35,4 +35,4 @@ def start_app(tool_instance, **kwargs):
 
 if __name__ == "__main__":
     path = "F:/works/keica/KcToolBox/source/python/KcTools/multi/KcSceneManager/form/ui/main.ui"
-    print "------------->", compile_ui(path)
+    print("------------->", compile_ui(path))

@@ -2,10 +2,10 @@
 import os
 import sys
 
-mod = "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])
-
-if not mod in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import logging
 from logging import getLogger
@@ -18,7 +18,7 @@ def load():
     debug = os.environ.get("KEICA_DEV")
     if debug is not None:
         return
-    print debug
+    print(debug)
     sentry_logging = LoggingIntegration(
         level=logging.INFO,        # Capture info and above as breadcrumbs
         event_level=logging.ERROR  # Send errors as events

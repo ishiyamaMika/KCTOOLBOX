@@ -189,12 +189,12 @@ class KcBlendShapeSlider(QtWidgets.QWidget):
         try:
             js = json.load(open(path, "r"), "utf8")
         except:
-            print "load file failed: {}".format(path)
+            print("load file failed: {}".format(path))
             return
         info, datas = js["info"], js["data"]
         ver = info.get("ver", 1.0)
         if ver < 2.0:
-            print "config version 2.0　or higher is required. (current: {})".format(ver)
+            print("config version 2.0　or higher is required. (current: {})".format(ver))
             return
 
         if namespace:
@@ -336,8 +336,8 @@ class KcBlendShapeSlider(QtWidgets.QWidget):
                 root, parent = self.cmd.create_constraint(each, size=6, index=i)
                 roots.append({"root": root, "index": i, "parent": parent})
             except:
-                print "create failed: {}".format(each["name"])
-                print traceback.format_exc()
+                print("create failed: {}".format(each["name"]))
+                print(traceback.format_exc())
 
         self.cmd.set_pos_to_model(model, roots)
         QtWidgets.QMessageBox.information(self, "info", u"作成しました", QtWidgets.QMessageBox.Ok)
@@ -494,7 +494,7 @@ class KcBlendShapeSlider(QtWidgets.QWidget):
         for r in range(self.ui.create_table.rowCount()):
             btn = self.ui.create_table.cellWidget(r, self.get_create_table_index("center"))
             if btn == pushed_btn:
-                print btn, "pass", r
+                print(btn, "pass", r)
             else:
                 btn.setIcon(btn.off_icon)
                 btn.is_active = False
@@ -1028,10 +1028,10 @@ class KcBlendShapeSliderCmd(object):
         return False
 
     def _delete_tmp(self):
-        print "delete action"
+        print("delete action")
         for c in FBSystem().Scene.Constraints[::-1]:
             if c.Name.find("__TMP_NAV_MODULE_DELETE__") != -1:
-                print "%s > delete" % c.Name
+                print("%s > delete" % c.Name)
                 c.FBDelete()
 
     def get_scene_namespace(self):
@@ -1079,7 +1079,7 @@ if __name__ == "__builtin__":
 
         path = "H:/works/keica/data/BlendShapeSlider/_info/tools/KcBlendShapeSlider_test.json"
         js = json.load(open(path, "r"), "utf8")
-        print js
+        print(js)
         x.update_config("Lily", js["data"])
 
     def test_ui():

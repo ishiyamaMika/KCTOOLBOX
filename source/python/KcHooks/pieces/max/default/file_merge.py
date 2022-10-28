@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import pprint
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:
@@ -61,4 +60,4 @@ if __name__ == "__main__":
     piece_data = {}
     data = {"path": "X:/Project/_942_ZIZ/3D/s99/c999/3D/import/ZIM_s99c999_anim_CH_tsukikoQuad.max"}
     x = FileMerge(piece_data=piece_data, data=data)
-    print  x.execute()
+    print(x.execute())

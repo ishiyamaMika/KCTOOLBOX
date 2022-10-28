@@ -122,20 +122,20 @@ class AssetExport(Piece):
             return True, self.pass_data, u"[error] metaモデルがアセットに設定されていません: {}".format(self.data["namespace"]), ""
 
         take_versions = []
-        print "::::", asset_directory
+        print("::::", asset_directory)
         for each in os.listdir(asset_directory):
             if not each.lower().endswith(".max"):
                 continue
 
             asset_path = "{}/{}".format(asset_directory, each)
-            print asset_path
+            print(asset_path)
 
             if self.data["category"] in paths:
                 template = paths[self.data["category"]]["rig"]
             else:
                 template = paths["default"]["rig"]
             
-            print template
+            print(template)
 
             fields = self.pass_data["project"].path_split(template, asset_path)
             if "<take>" in fields:
@@ -266,5 +266,5 @@ if __name__ == "__builtin__":
     
     piece_data, data = master_varidate()
     y = AssetExport(piece_data=piece_data, data=data, pass_data={"project": x})
-    print y.execute()
-    print 111
+    print(y.execute())
+    print(111)

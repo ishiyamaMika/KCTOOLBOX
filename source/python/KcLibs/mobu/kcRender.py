@@ -5,11 +5,10 @@ import sys
 
 from pyfbsdk import *
 
-
-
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if mod not in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.mobu.kc_model as kc_model    
 import KcLibs.mobu.kc_transport_time as kc_transport_time    
@@ -35,7 +34,7 @@ class KcRender(object):
         for k, v in kwargs.items():
             if hasattr(self, k):
                 setattr(self, k, v)
-                print "options:", k, v
+                print("options:", k, v)
 
     def execute(self, cam, path, dialog=False):
         def _set_start_end_fps():
@@ -78,13 +77,13 @@ class KcRender(object):
             cam.ResolutionHeight = int(float(cam.ResolutionHeight) * float(scale))
             cam.ResolutionWidth = int(float(cam.ResolutionWidth) * float(scale))
 
-            print "change cam to:", cam.ResolutionWidth, cam.ResolutionHeight
+            print("change cam to:", cam.ResolutionWidth, cam.ResolutionHeight)
             return width, height
 
         def _revert_resolution(cam, width, height):
             cam.ResolutionWidth = width
             cam.ResolutionHeight = height
-            print "revert cam to:", width, height
+            print("revert cam to:", width, height)
 
         if path == "":
             return False
@@ -114,10 +113,10 @@ class KcRender(object):
 
         app = FBApplication()
 
-        if isinstance(cam, (str, unicode)):
+        if isinstance(cam, str):
             cam = kc_model.find_model_by_name(cam)
             if not cam:
-                print ""
+                print("")
                 return False
 
         

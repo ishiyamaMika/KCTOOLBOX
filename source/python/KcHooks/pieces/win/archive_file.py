@@ -71,7 +71,7 @@ class AchiveFile(Piece):
                 else:
                     source_path = self.data["path"]
                     destination_path = "{}/{}_{}{}".format(archive_path, file_time, f_, ext)
-                    print destination_path, f, ext, fs
+                    print(destination_path, f, ext, fs)
                 source_f = os.path.basename(source_path)
                 
                 source_f_name = os.path.basename(source_path)
@@ -119,11 +119,11 @@ if __name__ in ["__main__", "__builtin__"]:
         piece_data = {}
         path = "F:/works/keica/junk/test_.py"
         data = {"path": path, "max": 10}
-        print 234
+        print(234)
         x = AchiveFile(piece_data=piece_data, data=data)
         x.execute()
 
-        print x.pass_data
+        print(x.pass_data)
     
     def is_directory():
         piece_data = {"is_directory": True}
@@ -133,7 +133,7 @@ if __name__ in ["__main__", "__builtin__"]:
         x = AchiveFile(piece_data=piece_data, data=data)
         x.execute()
 
-        print x.pass_data
+        print(x.pass_data)
     
     is_file()
 

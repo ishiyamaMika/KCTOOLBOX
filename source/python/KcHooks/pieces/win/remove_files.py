@@ -56,4 +56,4 @@ if __name__ == "__builtin__":
     x = RemoveFiles(piece_data=piece_data, data=data)
     x.execute()
 
-    print x.pass_data
+    print(x.pass_data)

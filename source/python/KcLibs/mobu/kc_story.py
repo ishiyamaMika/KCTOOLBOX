@@ -4,9 +4,11 @@ import os
 
 from pyfbsdk import *
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if mod not in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
+
 
 
 import KcLibs.mobu.kc_model as kc_model
@@ -73,7 +75,7 @@ def create_clip(track, path, **kwargs):
 
 if __name__ == "__builtin__":
     a = create_story_track("AAA", ["CH_tsukikoQuad:spineB_jt", "CH_tsukikoQuad:spineA_jt"])
-    print create_clip(a, r"E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_LO_ABCDE_asasad_03.fbx", offset=19)
+    print(create_clip(a, r"E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_LO_ABCDE_asasad_03.fbx", offset=19))
 
 
 

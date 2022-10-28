@@ -253,9 +253,6 @@ data = {'common': {},
              'fps': 24,
              'path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c001/edit/ZIM_s01c001_anim_t1_01_amek.fbx',
              'start': 0}}
-import pprint
-pprint.pprint(x.tool_config["puzzle"]["mobu_edit_export"])
-
 
 
 data = {'common': {},
@@ -417,4 +414,4 @@ results = x.puzzle_play(x.tool_config["puzzle"][piece],
                     ["primary", "main", "post_primary", "post_main", "post_end"])
 
 for result in results[1]:
-    print result
+    print(result)

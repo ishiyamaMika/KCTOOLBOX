@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import pprint
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if not mod in sys.path:

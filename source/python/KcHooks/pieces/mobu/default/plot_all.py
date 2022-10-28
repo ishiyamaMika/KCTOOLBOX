@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-import pprint
 
 from pyfbsdk import *
 
@@ -73,8 +72,8 @@ class PlotAll(Piece):
 
         kc_model.select(model_names)
 
-        print "select camera models"
-        print "plot"
+        print("select camera models")
+        print("plot")
         header = u"plotしました: {}".format(len(model_names))
         detail = "plot:\n" + "\n".join(model_names)
         kc_key.plot_selected()

@@ -90,7 +90,6 @@ def get_element_names():
 if __name__ == "__main__":
     # rps_import("X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_Tool/rps/CH_usagizakiSS_RenderElements.rps")
     # remove_render_elements(["_mask"])
-    # print dir(pymxs.runtime)
     # print(get_element_names())
     # root_directory = "E:/aaaaa/bbbbb/cccc"
     # rename_element_paths(root_directory, "TEST")

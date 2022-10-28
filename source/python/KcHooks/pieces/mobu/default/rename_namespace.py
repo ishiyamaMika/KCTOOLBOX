@@ -77,4 +77,4 @@ if __name__ == "__builtin__":
             }
 
     x = RenameNamespace(piece_data=piece_data, data=data)
-    print x.execute()
+    print(x.execute())

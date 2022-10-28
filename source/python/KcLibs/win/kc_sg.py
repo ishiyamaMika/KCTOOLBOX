@@ -3,9 +3,11 @@
 import os
 import sys
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if mod not in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
+
 
 import KcLibs.core.kc_env as kc_env
 kc_env.append_sys_paths()
@@ -78,6 +80,6 @@ def get_scene_info(shot_name, script_name="centrum"):
     return dic_info
 
 if __name__ == "__main__":
-    print get_scene_info("ep00s01c001")
+    print(get_scene_info("ep00s01c001"))
 if __name__ == "__main__":
-    print connect_by_script("deamon_login")
+    print(connect_by_script("deamon_login"))

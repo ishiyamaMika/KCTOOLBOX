@@ -9,7 +9,7 @@ import re
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if mod not in sys.path:
     sys.path.append(mod)
-print mod
+print(mod)
 
 import KcLibs.core.kc_env as kc_env
 import KcLibs.win.kc_qt as kc_qt
@@ -194,7 +194,7 @@ class KcReferenceReplacer(kc_qt.ROOT_WIDGET):
             d = "{}/fbx".format(d.replace("/ma", ""))
             f = f.replace(".ma", ".fbx")
             fbx_path = "{}/{}".format(d, f)
-            print fbx_path, os.path.exists(fbx_path)
+            print(fbx_path, os.path.exists(fbx_path))
 
             kc_file_io.remove_reference(info["node"], delete=True)
             kc_file_io.file_import(fbx_path)
@@ -232,11 +232,11 @@ def start_app():
 if __name__ == "__main__":
     def get_root_mesh__TEST():
         x = KcReferenceReplacerCommand()
-        print x.get_root()
+        print(x.get_root())
 
     def set_poly_smooth__TEST():
         x = KcReferenceReplacerCommand()
-        print x.set_poly_smooth(2)
+        print(x.set_poly_smooth(2))
     #cmds.file(r"H:\works\keica\data\material\Rollei_Pencil_08.ma", o=True, f=True)
 
     start_app()

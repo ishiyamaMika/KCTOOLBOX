@@ -339,7 +339,7 @@ class KcSetupper(QtWidgets.QWidget):
                 elif isinstance(widget, QtWidgets.QComboBox):
                     index = widget.findText(v)
                     for i in range(widget.count()):
-                        print widget.itemText(i), widget.itemText(i) == v
+                        print(widget.itemText(i), widget.itemText(i) == v)
                     if index != -1:
                         widget.setCurrentIndex(index)
 

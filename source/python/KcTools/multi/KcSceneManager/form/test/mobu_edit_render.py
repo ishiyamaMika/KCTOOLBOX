@@ -49,4 +49,4 @@ results = x.puzzle_play(x.tool_config["puzzle"]["mobu_edit_render"],
                     ["primary"])
 
 for result in results[1]:
-    print result
+    print(result)

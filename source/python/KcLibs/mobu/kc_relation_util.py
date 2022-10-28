@@ -24,7 +24,7 @@ def get_fcurve_box_value(box):
     values = []
     if node:
         for key in node.FCurve.Keys:
-            print 
+            print("")
             values.append(kc_key.get_key_attrs(key))
     return values
 
@@ -151,7 +151,7 @@ def src_connected_list(const, box, channel):
         if node.Name == channel:
             arr = []
             for i in range(node.GetSrcCount()):
-                print get_src_owner(node, i)
+                print(get_src_owner(node, i))
                 arr.append(get_src_owner(node, i))
     return arr
 
@@ -192,7 +192,7 @@ if __name__ == "__builtin__":
             for box in const.Boxes:
                 break
 
-        print get_fcurve_box_value(box)
+        print(get_fcurve_box_value(box))
 
     def set_fcurve_values__TEST():
         """

@@ -54,5 +54,5 @@ def set_zoom_time(start, stop, fps=-1):
 
 if __name__ == "__builtin__":
     set_scene_time(10, 40, 20, 30, 24)
-    print get_scene_time()
+    print(get_scene_time())
 

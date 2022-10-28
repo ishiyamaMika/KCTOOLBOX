@@ -9,8 +9,8 @@ import re
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 if mod not in sys.path:
     sys.path.append(mod)
-print mod
-print sys.path
+print(mod)
+print(sys.path)
 import KcLibs.core.kc_env as kc_env
 import KcLibs.win.kc_qt as kc_qt
 from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
@@ -64,7 +64,7 @@ class KcConvert(kc_qt.ROOT_WIDGET):
 
         new_path = "{}/{}_convert{}".format(current_d, current_f, current_ext)
 
-        print "=========", new_path
+        print("=========", new_path)
 
         sx = cmds.getAttr("Reference.sx")
         sy = cmds.getAttr("Reference.sy")
@@ -95,11 +95,11 @@ class KcConvert(kc_qt.ROOT_WIDGET):
             temp = "|".join(["TEMP:{}".format(l) for l in mesh.split("|") if l != ""])
             try:
                 kc_mesh.copy_weight(temp, mesh)
-                print temp, mesh, "---done"
+                print(temp, mesh, "---done")
             except:
                 import traceback
-                print traceback.format_exc()
-                print temp, mesh, "---failed"
+                print(traceback.format_exc())
+                print(temp, mesh, "---failed")
 
         cmds.file(removeReference=True, referenceNode=cmds.ls(type="reference")[0])
         kc_mesh.remove_unused_influences(mesh_list)
@@ -118,13 +118,13 @@ def start_app():
 if __name__ == "__main__":
     def get_root_mesh__TEST():
         x = KcConvertCommand()
-        print x.get_root()
+        print(x.get_root())
 
     def set_poly_smooth__TEST():
         x = KcConvertCommand()
-        print x.set_poly_smooth(2)
+        print(x.set_poly_smooth(2))
     #cmds.file(r"H:\works\keica\data\material\Rollei_Pencil_08.ma", o=True, f=True)
 
     start_app()
     # set_poly_smooth__TEST()
-print 1
+print(1)

@@ -22,9 +22,6 @@ if not mod in sys.path:
 import KcLibs.maya.kc_material as kc_material
 import KcLibs.maya.kc_light as kc_light
 import KcLibs.maya.kc_mesh as kc_mesh
-reload(kc_material)
-reload(kc_light)
-reload(kc_mesh)
 
 _RENDER_SETUP_ = None
 
@@ -41,8 +38,8 @@ def get_layer_list():
 
 def get_master_layer():
     for each in get_layer_list():
-        print dir(_RENDER_SETUP_)
-        print each.name()
+        print(dir(_RENDER_SETUP_))
+        print(each.name())
 
 def _append_namespace(value, namespace, key=None):
     def _split_and_merge(value_, namespace):
@@ -78,7 +75,7 @@ def _append_namespace(value, namespace, key=None):
             dic[k] = _append_namespace(v, namespace, k)
         return dic
 
-    elif isinstance(value, (str, unicode)):
+    elif isinstance(value, str):
         if "defaultRenderGlobals" in value:
             pass
         elif key == "staticSelection":
@@ -87,7 +84,7 @@ def _append_namespace(value, namespace, key=None):
                 value_s = value.split("|")
                 return "|{}".format("|".join(["{}:{}".format(namespace, l) for l in value_s][1:]))
         elif key == "connectionStr":
-            print key, value
+            print(key, value)
             if ".message" in value:
                 return _split_and_merge(value, namespace)[1:]
             else:
@@ -242,7 +239,7 @@ def get_layer_info(layer_name, namespace=""):
                     li_info["light_type_combo"] = cmds.objectType(li_name)
                     li_info["light_group"] = True
                     for ov in c.getOverrides():
-                        print ov.kTypeName
+                        print(ov.kTypeName)
                         if "intensity" in ov.name():
                             li_info["light_intensity_spin"] = ov.getAttrValue()
             continue
@@ -319,7 +316,7 @@ def create_render_collection(layer):
     # col = collection.create("RenderSettingsCollection", collection.RenderSettingsCollection.kTypeId)
     col = layer.renderSettingsCollectionInstance()
     # layer.attachCollection(0, col)
-    # print dir(layer)
+    # print(dir(layer))
     col.getSelector().setStaticSelection("defaultRenderGlobals\ndefaultResolution\ndefaultRenderQuality")
     return col
 
@@ -353,7 +350,7 @@ def set_connection_override(layer, override):
             if cmds.objectType(root) == "mesh":
                 pass
             else:
-                print cmds.listRelatives(root, type="shape")
+                print(cmds.listRelatives(root, type="shape"))
                 root = cmds.listRelatives(root, type="shape")[0]
 
             ov.finalize("{}.{}".format(root, override["attribute"]))
@@ -373,7 +370,7 @@ def create_collection(layer, name, static_models=None, pattern=None, force=False
     col = layer.createCollection(name)
     if static_models is not None:
         model_list = []
-        if isinstance(static_models, (str, unicode)):
+        if isinstance(static_models, str):
             static_models = [static_models]
         for model in static_models:
             if not cmds.objExists(model):
@@ -449,7 +446,7 @@ def set_render_settings_override(layer, override):
         # renderSettingsの場合はnodeを省略できるが仕様の統一のために冗長な書き方をしている
         ov.finalize("{}.{}".format(override.get("node", "defaultRenderGlobals"), override["attribute"]))
 
-    if isinstance(override["value"], (str, unicode)):
+    if isinstance(override["value"], str):
         cmds.setAttr("{}.attrValue".format(ov.name()), override["value"], type="string")
     else:
         cmds.setAttr("{}.attrValue".format(ov.name()), override["value"])
@@ -481,7 +478,7 @@ if __name__ == "__main__":
     def create_collection02__TEST():
         layer = create_layer("test")
         meshes = cmds.ls(type="mesh", l=True)
-        print meshes
+        print(meshes)
         overrides = []
         # overrides.append({"type": "material", "name": "color", "color": [255, 255, 255], "material_type": "surfaceShader"})
         overrides.append({"type": "render_setting", "name": "start_frame", "attribute": "defaultRenderGlobals.startFrame", "value": 30})
@@ -491,14 +488,14 @@ if __name__ == "__main__":
     def create_light_collection__TEST():
         layer = create_layer("test")
         l = cmds.ls(type="light", l=True)
-        print l[0]
+        print(l[0])
         create_light_collection(layer, "amb_light", l[0], "intensity", 0.4)
 
     def create_layer_with_collections__TEST():
         # (name, static_models, ** kwargs)
         file_path = u"X:\\images\\icon\\CheckBack.png"
         meshes = cmds.ls(type="mesh", l=True)
-        print "--", meshes
+        print("--", meshes)
         l = cmds.ls(type="light", l=True)
         overrides = []
         overrides.append({"type": "material", "collection_name": "Ikon_texture_collection", "name": "Ikon_texture_ov", "file_path": file_path, "material_type": "surfaceShader", "static_models": meshes})
@@ -526,8 +523,8 @@ if __name__ == "__main__":
         path = "X:/Project/_952_SA/03_asset/00_master/maya/_info/render_preset/Ikon_renderSet_.json"
         import_layer(path)
 
-    #print create_layer_with_collections__TEST()
-    #print 1
+    #print(create_layer_with_collections__TEST())
+    #print(1)
 
     get_master_layer()
 

@@ -26,9 +26,9 @@ class KcResultDialog(QtWidgets.QDialog):
         self.tool_directory = kc_env.get_tool_config("multi", self.NAME)
         self.icon_directory = "{}/form/icon".format(self.tool_directory)
 
-        print os.path.exists("{}/circle-regular.png".format(self.icon_directory))
+        print(os.path.exists("{}/circle-regular.png".format(self.icon_directory)))
 
-        print "{}/circle-regular.png".format(self.icon_directory)
+        print("{}/circle-regular.png".format(self.icon_directory))
         self.o_icon = QtGui.QPixmap("{}/circle-regular.png".format(self.icon_directory))
         self.o_icon.scaled(QtCore.QSize(24, 24),  QtCore.Qt.KeepAspectRatio)
         

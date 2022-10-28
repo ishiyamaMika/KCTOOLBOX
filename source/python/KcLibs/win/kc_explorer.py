@@ -42,6 +42,6 @@ def open(path, inside=False):
         cmd = "%s /select,%s" % (explorer, path)
         #os.popen("explorer /select," + path)
     #os.popen(cmd)
-    print cmd
+    print(cmd)
     subprocess.Popen(cmd, shell=True)
 

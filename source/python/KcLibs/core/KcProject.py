@@ -212,27 +212,25 @@ if __name__ in ["__main__", "__builtin__"]:
     x.set("ZIM", "home")
     x.set_tool_config("multi", "KcSceneManager")
 
-    import pprint
-    pprint.pprint(x.config)
-    print
-    print
-    pprint.pprint(x.tool_config)
+    print("")
+    print("")
+
     template = "<asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx"
-    print x.path_generate(template, 
+    print(x.path_generate(template, 
                           {"category": "CH", 
                            "asset_name": "hanakoQuad", 
                            "take": 1, 
-                           "version": 1})
+                           "version": 1}))
 
-    print x.get_cameras()
+    print(x.get_cameras())
 
     
     assets = x.get_assets() + x.get_cameras()
 
-    print
-    print 
-    print 
-    print 
+    print("")
+    print("") 
+    print("") 
+    print("") 
 
 
     config_assets =  [
@@ -259,8 +257,7 @@ if __name__ in ["__main__", "__builtin__"]:
             }
         ]
 
-    pprint.pprint(assets)
-    print
+    print("")
 
     a = set([l["namespace"] for l in assets])
     b = set([l["namespace"] for l in config_assets])
@@ -300,9 +297,8 @@ if __name__ in ["__main__", "__builtin__"]:
         datas = merge_assets[key]
         sorted(datas, key=lambda x: x["namespace"])
         list_assets.extend(datas)
-    print 
-    print 
-    pprint.pprint(list_assets)
+    print("")
+    print("")
 
     fields = {u'category': u'CH',
                'config': {'export': False, 'plot': False},
@@ -318,10 +314,10 @@ if __name__ in ["__main__", "__builtin__"]:
                u'update_at': u'2021/11/18 01:17:16',
                u'update_by': u'amek'}
     template = "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
-    print "________", x.path_generate(template, fields)
+    print("________", x.path_generate(template, fields))
 
 
-    print "________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad")
+    print("________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad"))
 
-    print x.get_cameras()
+    print(x.get_cameras())
     x.change_camera("cam_s99c999", 0, 100, 24)

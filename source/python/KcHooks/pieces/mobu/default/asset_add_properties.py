@@ -35,7 +35,7 @@ class AssetAddProperties(Piece):
         detail = ""
         category = self.data["properties"]["category"]
         if not "namespace" in self.data:
-            print "namespace is not exists"
+            print("namespace is not exists")
             return flg, self.pass_data, u"namespaceが設定されていません", detail
 
         if category in self.piece_data["parent_name"]:
@@ -80,7 +80,7 @@ class AssetAddProperties(Piece):
                 value = str(value)
 
             if prop in property_list:
-                print "update property", prop, ":", value
+                print("update property", prop, ":", value)
                 property_list[prop].Data = value
             else:
                 if meta_model.PropertyList.Find(str(prop)):
@@ -112,7 +112,7 @@ class AssetAddProperties(Piece):
                 try:
                     prop.Data = FBColor(*color)
                 except:
-                    print "set color failed:", color
+                    print("set color failed:", color)
        
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         if "update_at" in property_list:
@@ -163,4 +163,4 @@ if __name__ == "__builtin__":
             }
 
     x = AssetAddProperties(piece_data=piece_data, data=data)
-    print x.execute()
+    print(x.execute())

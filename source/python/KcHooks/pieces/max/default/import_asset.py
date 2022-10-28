@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import pprint
 import pymxs
 
 mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])

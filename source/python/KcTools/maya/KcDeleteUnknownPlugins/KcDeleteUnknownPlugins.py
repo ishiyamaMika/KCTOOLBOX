@@ -9,8 +9,8 @@ except:
 for plugin in unknown:
     try:
         cmds.unknownPlugin(plugin, remove=True)
-        print "removed: ", plugin
+        print("removed: ", plugin)
     except:
-        print "failed:", plugin
+        print("failed:", plugin)
 
-print "done"
+print("done")

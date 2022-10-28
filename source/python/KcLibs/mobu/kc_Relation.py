@@ -3,10 +3,18 @@
 import os
 import sys
 
-tool_path = "%s\\python" % os.environ["KEICA_TOOL_PATH"]
-if not tool_path in sys.path:
-    sys.path.append(tool_path)
+try:
+    reload  # Python 2.7
+except NameError:
+    try:
+        from importlib import reload  # Python 3.4+
+    except ImportError:
+        from imp import reload  # Python 3.0 - 3.3
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 
 import KcLibs.mobu.kc_relation_util as kc_relation_util
