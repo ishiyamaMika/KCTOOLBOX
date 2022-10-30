@@ -5,166 +5,165 @@ import sys
 
 from pyfbsdk import *
 
-
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
-kc_env.append_sys_paths()
-
-from puzzle.Piece import Piece
 import KcLibs.mobu.kc_model as kc_model
-_PIECE_NAME_ = "GetKoma"
 
-class GetKoma(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(GetKoma, self).__init__(**args)
-        self.name = _PIECE_NAME_
+from puzzle2.PzLog import PzLog
 
-    def get_frame(self, fb_time):
-        if FBSystem().Version >= 13000.0:
-            return fb_time.GetFrame()
-        else:
-            return fb_time.GetFrame(True)   
+TASK_NAME = "get_koma"
+DATA_KEY_REQUIRED = [""]
 
-    def get_all_keys(self, model):
-        def _get_each_keys(anim_node, i):
-            if anim_node is None:
-                return [], {}
-            all_keys = {}
-            temp_key = None
-            modified_list = []
-            for ii, k in enumerate(anim_node.Keys):
-                frame = self.get_frame(k.Time)
-                # print(frame, "----", self.data["start"], self.data["end"])
-                keyframe = {}
+def get_frame(fb_time):
+    if FBSystem().Version >= 13000.0:
+        return fb_time.GetFrame()
+    else:
+        return fb_time.GetFrame(True)   
 
-                if frame < self.data["start"]:
-                    keyframe["frame"] = k.Time.GetFrame()
-                    keyframe["value"] = k.Value
-                    temp_key = keyframe
-                    continue
-                elif frame > self.data["end"]:
-                    continue
+def get_all_keys(data, model):
+    def _get_each_keys(anim_node, i):
+        if anim_node is None:
+            return [], {}
+        all_keys = {}
+        temp_key = None
+        modified_list = []
+        for ii, k in enumerate(anim_node.Keys):
+            frame = get_frame(k.Time)
+            # print(frame, "----", data["start"], data["end"])
+            keyframe = {}
 
-                all_keys.setdefault(frame, {})
-                # keyframe["type"] = "{}{}".format(trs[0], ["x", "y", "z"][i])
-                # keyframe["axis"] = i
+            if frame < data["start"]:
                 keyframe["frame"] = k.Time.GetFrame()
-                # keyframe["frame"] = get_frame(k.Time)
                 keyframe["value"] = k.Value
-                if "e-" in str(keyframe):
-                    keyframe["value"] = 0
-                keyframe["value"] = round(keyframe["value"], 4)
-                if ii == 0:
-                    keyframe["changed"] = True
-                else:
-                    keyframe["changed"] = temp_key["value"] != keyframe["value"]
-
-                if keyframe["changed"]:
-                    modified_list.append(frame)
-
-                all_keys[frame][i] = keyframe
                 temp_key = keyframe
+                continue
+            elif frame > data["end"]:
+                continue
 
-            return modified_list, all_keys            
+            all_keys.setdefault(frame, {})
+            # keyframe["type"] = "{}{}".format(trs[0], ["x", "y", "z"][i])
+            # keyframe["axis"] = i
+            keyframe["frame"] = k.Time.GetFrame()
+            # keyframe["frame"] = get_frame(k.Time)
+            keyframe["value"] = k.Value
+            if "e-" in str(keyframe):
+                keyframe["value"] = 0
+            keyframe["value"] = round(keyframe["value"], 4)
+            if ii == 0:
+                keyframe["changed"] = True
+            else:
+                keyframe["changed"] = temp_key["value"] != keyframe["value"]
 
-        if isinstance(model, (list, FBModelList)):
-            results = []
-            for m in model:
-                results.extend(self.get_all_keys(m))
+            if keyframe["changed"]:
+                modified_list.append(frame)
 
-            return results
+            all_keys[frame][i] = keyframe
+            temp_key = keyframe
 
-        else:
-            all_keys = {}
-            modified = []
-            for each in model.PropertyList:
-                if each.IsAnimatable() and each.IsAnimated():
-                    if not each.GetAnimationNode():
-                        continue
-                
-                    if each.GetAnimationNode().FCurve is not None:
-                        # print(each.Name)
-                        all_keys[each.Name], modified_list_ = _get_each_keys(each.GetAnimationNode().FCurve, each.Name)
-                        modified.extend(modified_list_)                    
-                        # print("*****", modified_list_)
+        return modified_list, all_keys            
 
-                    elif len(each.GetAnimationNode().Nodes) > 0:
-                        for i in range(len(each.GetAnimationNode().Nodes)):
-                            anim_node = each.GetAnimationNode().Nodes[i].FCurve
-                            name = "{}_{}".format(each.Name, i)
-                            all_keys.setdefault(name, [])
-                            all_keys[name], modified_list_ = _get_each_keys(anim_node, name)
-                      
-                        modified.extend(modified_list_)
-            mix = []
-            for ls in all_keys.values():
-                if len(ls) == 0:
+    if isinstance(model, (list, FBModelList)):
+        results = []
+        for m in model:
+            results.extend(get_all_keys(data, m))
+
+        return results
+
+    else:
+        all_keys = {}
+        modified = []
+        for each in model.PropertyList:
+            if each.IsAnimatable() and each.IsAnimated():
+                if not each.GetAnimationNode():
                     continue
-
-                mix.extend(ls)
             
-            if len(mix) in [0, 1]:
-                return []
+                if each.GetAnimationNode().FCurve is not None:
+                    # print(each.Name)
+                    all_keys[each.Name], modified_list_ = _get_each_keys(each.GetAnimationNode().FCurve, each.Name)
+                    modified.extend(modified_list_)                    
+                    # print("*****", modified_list_)
 
-            """
-            TRSすべてをマージして移動したフレームの取得
-            """
-            x = list(set(mix))
-            x.sort()
-            if x[0] > self.data["start"]:
-                x.insert(0, self.data["start"])
+                elif len(each.GetAnimationNode().Nodes) > 0:
+                    for i in range(len(each.GetAnimationNode().Nodes)):
+                        anim_node = each.GetAnimationNode().Nodes[i].FCurve
+                        name = "{}_{}".format(each.Name, i)
+                        all_keys.setdefault(name, [])
+                        all_keys[name], modified_list_ = _get_each_keys(anim_node, name)
+                    
+                    modified.extend(modified_list_)
+        mix = []
+        for ls in all_keys.values():
+            if len(ls) == 0:
+                continue
 
-            return x
+            mix.extend(ls)
+        
+        if len(mix) in [0, 1]:
+            return []
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
-        def _ignore(model_name):
-            ignores = ["_ctrlSpace", "_jtSpace"]
-            for ignore in ignores:
-                if ignore in model_name:
-                    return False
-            return True
+        """
+        TRSすべてをマージして移動したフレームの取得
+        """
+        x = list(set(mix))
+        x.sort()
+        if x[0] > data["start"]:
+            x.insert(0, data["start"])
 
-        kc_model.unselected_all()
-        flg = True
+        return x
 
-        info, models = self.pass_data["project"].sticky.read(self.data["config"]["export"])
+def main(event={}, context={}):
+    def _ignore(model_name):
+        ignores = ["_ctrlSpace", "_jtSpace"]
+        for ignore in ignores:
+            if ignore in model_name:
+                return False
+        return True
 
-        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models if _ignore(l)]
+    data = event.get("data", {})
 
-        models = kc_model.to_object(model_names)
-        keys = self.get_all_keys(models)
-        keys = list(set(keys))
-        keys.sort()
-        d, f = os.path.split(self.data["path"])
-        f, ext = os.path.splitext(f)
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        koma_path = "{}/{}_koma.json".format(d, f)
+    return_code = 0
 
-        if not os.path.exists(os.path.dirname(koma_path)):
-            os.makedirs(os.path.dirname(koma_path))
+    kc_model.unselected_all()
 
-        kc_env.save_config(koma_path, "KcSceneManager", "koma data", {"modified": keys})
+    info, models = data["project"].sticky.read(data["config"]["export"])
 
-        header = u"コマファイルをエクスポートしました: {}".format(self.data["namespace"])
-        detail = u"path: \n{}\n\n".format(koma_path)
-        detail += u"start: {}\n".format(self.data["start"])
-        detail += u"end  : {}\n".format(self.data["end"])
-        detail += u"fps  : {}\n".format(FBPlayerControl().GetTransportFpsValue())
-        detail += u", ".join([str(l) for l in keys]) + "\n\n"
-        detail += u"\n".join(model_names)
-        detail += u"\n"
+    model_names = ["{}:{}".format(data["namespace"], l["name"]) for l in models if _ignore(l)]
 
-        return flg, self.pass_data, header, detail
+    models = kc_model.to_object(model_names)
+    keys = get_all_keys(models)
+    keys = list(set(keys))
+    keys.sort()
+    d, f = os.path.split(data["path"])
+    f, ext = os.path.splitext(f)
+
+    koma_path = "{}/{}_koma.json".format(d, f)
+
+    if not os.path.exists(os.path.dirname(koma_path)):
+        os.makedirs(os.path.dirname(koma_path))
+
+    kc_env.save_config(koma_path, "KcSceneManager", "koma data", {"modified": keys})
+
+    header = u"コマファイルをエクスポートしました: {}".format(data["namespace"])
+    detail = u"path: \n{}\n\n".format(koma_path)
+    detail += u"start: {}\n".format(data["start"])
+    detail += u"end  : {}\n".format(data["end"])
+    detail += u"fps  : {}\n".format(FBPlayerControl().GetTransportFpsValue())
+    detail += u", ".join([str(l) for l in keys]) + "\n\n"
+    detail += u"\n".join(model_names)
+    detail += u"\n"
+
+    logger.details.set_header(header)
+    logger.details.set_detail(detail)
+    return {"return_code": return_code}
+
 
 if __name__ == "__builtin__":
     from KcLibs.core.KcProject import *
@@ -201,10 +200,12 @@ if __name__ == "__builtin__":
 
     piece_data = {}
 
-    x = GetKoma(piece_data=piece_data, data=data, pass_data=pass_data)
-    # x.execute()
+    data.update(pass_data)
+
     m_list = FBModelList()
     FBGetSelectedModels(m_list)
     keys = list(set(x.get_all_keys(m_list)))
     keys.sort()
     print(keys)
+
+    main({"data": data})

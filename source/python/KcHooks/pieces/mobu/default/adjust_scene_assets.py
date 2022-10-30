@@ -6,94 +6,90 @@ import sys
 from pyfbsdk import *
 
 
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_story as kc_story
 
-_PIECE_NAME_ = "AdJustSceneAssets"
 
-class AdJustSceneAssets(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(AdJustSceneAssets, self).__init__(**args)
-        self.name = _PIECE_NAME_
+from puzzle2.PzLog import PzLog
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+TASK_NAME = "adjust_scene_assets"
+DATA_KEY_REQUIRED = ["project"]
 
-        assets = self.pass_data["project"].get_assets()
-        scene_assets = set([l["namespace"] for l in assets if not l["category"] == "camera"])
-        config_assets = set([l["namespace"] for l in self.data["assets"] if not l["category"] == "camera"])
+def main(event={}, context={}):
+    """
+    project(KcProject): 
+    """
+    data = event.get("data", {})
 
-        tracks = {l.Name: l for l in kc_story.get_tracks()}
-        models = {}
-        for each in FBSystem().Scene.RootModel.Children:
-            m_list = FBModelList()
-            FBGetSelectedModels(m_list, each, False)
-            if ":" in each.LongName:
-                each_s = each.LongName.split(":")
-                namespace = ":".join(each_s[:-1])
-            else:
-                continue
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-            models[namespace] = [l for l in m_list]
-            if namespace in tracks:
-                models[namespace].append(tracks[namespace])
+    return_code = 0
 
-        for each in FBSystem().Scene.Characters:
-            for i in range(each.PropertyList.Find("HipsLink").GetSrcCount()):
-                skl = each.PropertyList.Find("HipsLink").GetSrc(i)
-                namespace = ":".join(skl.LongName.split(":")[:-1])
-                models.setdefault(namespace, [])
-                models[namespace].append(each)
+    assets = data["project"].get_assets()
+    scene_assets = set([l["namespace"] for l in assets if not l["category"] == "camera"])
+    config_assets = set([l["namespace"] for l in data["assets"] if not l["category"] == "camera"])
 
-        i = 0
-
-        keep = scene_assets & config_assets
-        keep = []
-        if self.logger:
-            self.logger.debug("keep assets: {}".format(",".join(keep)))
-
-        for namespace in scene_assets:
-            if namespace in keep:
-                continue
-
-            if namespace in models:
-                detail += "delete namespace: {}\n".format(namespace)
-                for model in models[namespace][::-1]:
-                    name = model.LongName
-                    type_name = model.ClassName()
-                    try:
-                        model.FBDelete()
-                        i += 1
-                        detail += "({}){}\n".format(type_name, name)
-
-                    except:
-                        import traceback
-                        if self.logger: 
-                            self.logger.warning(traceback.format_exc())
-
-        if i == 0:
-            header = u"削除するものはありません"
-
+    tracks = {l.Name: l for l in kc_story.get_tracks()}
+    models = {}
+    for each in FBSystem().Scene.RootModel.Children:
+        m_list = FBModelList()
+        FBGetSelectedModels(m_list, each, False)
+        if ":" in each.LongName:
+            each_s = each.LongName.split(":")
+            namespace = ":".join(each_s[:-1])
         else:
-            header = u"不要なアセットを削除しました: {}".format(i)
+            continue
 
-        return flg, self.pass_data, header, detail
+        models[namespace] = [l for l in m_list]
+        if namespace in tracks:
+            models[namespace].append(tracks[namespace])
+
+    for each in FBSystem().Scene.Characters:
+        for i in range(each.PropertyList.Find("HipsLink").GetSrcCount()):
+            skl = each.PropertyList.Find("HipsLink").GetSrc(i)
+            namespace = ":".join(skl.LongName.split(":")[:-1])
+            models.setdefault(namespace, [])
+            models[namespace].append(each)
+
+    i = 0
+
+    keep = scene_assets & config_assets
+    keep = []
+    logger.debug("keep assets: {}".format(",".join(keep)))
+
+    for namespace in scene_assets:
+        if namespace in keep:
+            continue
+
+        if namespace in models:
+            logger.details.add_detail("delete namespace: {}\n".format(namespace))
+            for model in models[namespace][::-1]:
+                name = model.LongName
+                type_name = model.ClassName()
+                try:
+                    model.FBDelete()
+                    i += 1
+                    logger.details.add_detail("({}){}\n".format(type_name, name))
+
+                except:
+                    import traceback
+                    logger.warning(traceback.format_exc())
+                    logger.details.add_detail("delete failed: {}".format(model.LongName))
+
+    if i == 0:
+        logger.details.set_header(u"削除するものはありません")
+
+    else:
+        logger.details.set_header(u"不要なアセットを削除しました: {}".format(i))
+
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
     piece_data = {'path': "E:/works/client/keica/data/assets"}
@@ -139,6 +135,5 @@ if __name__ == "__builtin__":
     x.set("ZIZ", "default")
 
     pass_data = {"project": x}
-
-    x = AdJustSceneAssets(piece_data=piece_data, data=data, pass_data=pass_data)
-    x.execute()
+    data.update(pass_data)
+    print(main({"data": data, "task": piece_data}))

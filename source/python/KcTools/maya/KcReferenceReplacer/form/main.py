@@ -17,16 +17,13 @@ from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
 
 import KcLibs.maya.kc_mesh as kc_mesh
 
-reload(kc_qt)
-
 kc_env.append_sys_paths()
 
 import maya.cmds as cmds
 from functools import wraps
-from puzzle.PzLog import PzLog
+from puzzle2.PzLog import PzLog
 import KcLibs.maya.kc_file_io as kc_file_io
 import shutil
-reload(kc_file_io)
 _LOG_ = PzLog("KcReferenceReplacer", log_directory=kc_env.get_log_directory("KcReferenceReplacer"))
 _LOGGER_ = _LOG_.logger
 

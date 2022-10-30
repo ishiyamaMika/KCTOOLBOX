@@ -5,55 +5,58 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
+import KcLibs.core.kc_env as kc_env
 
-from puzzle.Piece import Piece
+from puzzle2.PzLog import PzLog
 
-_PIECE_NAME_ = "GetCameras"
+TASK_NAME = "get_cameras"
+DATA_KEY_REQUIRED = [""]
 
-class GetCameras(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(GetCameras, self).__init__(**args)
-        self.name = _PIECE_NAME_
+def main(event={}, context={}):
+    """
+    piece_data: include_model
+    """
+    data = event.get("data", {})
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
+    return_code = 0
 
-        cameras = []
-        for each in FBSystem().Scene.Cameras:
-            if each.SystemCamera:
-                continue
-            cam_s = each.LongName.split(":")
-            if len(cam_s) == 1:
-                namespace = False
-            else:
-                namespace = cam_s[0]
+    cameras = []
+    for each in FBSystem().Scene.Cameras:
+        if each.SystemCamera:
+            continue
+        cam_s = each.LongName.split(":")
+        if len(cam_s) == 1:
+            namespace = False
+        else:
+            namespace = cam_s[0]
 
-            if not namespace:
-                continue
+        if not namespace:
+            continue
 
-            name = each.Name
-            if self.piece_data.get("include_model"):
-                cameras.append({"namespace": namespace, "name": name, "model": each, "category": "camera"})
-            else:
-                cameras.append({"namespace": namespace, "name": name, "category": "camera"})
+        name = each.Name
+        if data.get("include_model"):
+            cameras.append({"namespace": namespace, "name": name, "model": each, "category": "camera"})
+        else:
+            cameras.append({"namespace": namespace, "name": name, "category": "camera"})
 
-        self.pass_data["cameras"] = cameras
-        return flg, self.pass_data, header, detail
+    update_context = {}
+    update_context["{}.cameras".format(TASK_NAME)] = cameras
+    return {"return_code": return_code}
+
 
 if __name__ == "__builtin__":
     piece_data = {"include_model": True}
     data = {}
+    data.update(piece_data)
 
-    x = GetCameras(piece_data=piece_data, data=data)
-    x.execute()
+    main({"data": data})
+

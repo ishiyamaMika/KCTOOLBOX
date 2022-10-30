@@ -11,7 +11,6 @@ import KcLibs.core.kc_env as kc_env
 import KcLibs.win.kc_qt as kc_qt
 from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
 
-reload(kc_qt)
 
 class KcResultDialog(QtWidgets.QDialog):
     NAME = "KcResultDialog"

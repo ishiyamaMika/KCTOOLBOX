@@ -5,54 +5,44 @@ import sys
 
 from pyfbsdk import *
 
-
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
+
 import KcLibs.mobu.kc_transport_time as kc_transport_time
 
-_PIECE_NAME_ = "FileMasterSceneCreate"
+from puzzle2.PzLog import PzLog
 
-class FileMasterSceneCreate(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(FileMasterSceneCreate, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "file_master_create"
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    data = event.get("data", {})
 
-        if not os.path.exists(self.data["master_path"]):
-            FBApplication().FileNew()
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        else:
-            kc_file_io.file_open(self.data["master_path"])
+    return_code = 0
 
-        kc_transport_time.set_scene_time(self.data["start"], 
-                                         self.data["end"], 
-                                         self.data["start"], 
-                                         self.data["end"], 
-                                         self.data["fps"])
+    if not os.path.exists(data["master_path"]):
+        FBApplication().FileNew()
 
-        return flg, self.pass_data, header, detail
+    else:
+        kc_file_io.file_open(data["master_path"])
+
+    kc_transport_time.set_scene_time(data["start"], 
+                                        data["end"], 
+                                        data["start"], 
+                                        data["end"], 
+                                        data["fps"])
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
 
     piece_data = {'path': "E:/works/client/keica/data/assets"}
-
 
     data = {
             "start": 0,
@@ -61,5 +51,6 @@ if __name__ == "__builtin__":
                        {"namespace": "", "name": "", "category": "cam", "sotai_path": ""}]
             }
 
-    x = FileMasterSceneCreate(piece_data=piece_data, data=data)
-    x.execute()
+    data.update(piece_data)
+    data["master_path"] = "{}/test.fbx".format(piece_data)
+    main({"data": data})

@@ -19,7 +19,6 @@ if sys_path not in sys.path:
 
 import KcLibs.mobu.kc_relation_util as kc_relation_util
 from pyfbsdk import FBConstraintRelation, FBSystem, FBModelPlaceHolder, FBCharacterFace, FBConnect, FBModel, FBCamera, FBConstraint, FBMaterial, FBLight
-reload(kc_relation_util)
 class kcRelation:
     def __init__(self, obj, force=False):
         if isinstance(obj, FBConstraintRelation):

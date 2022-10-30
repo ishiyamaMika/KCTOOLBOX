@@ -108,18 +108,22 @@ data:
 
   puzzle:
     get_cameras:
-      main:
-        - name: get cameras
-          piece: KcHooks.pieces.<app>.default.get_cameras
-          description: get camera from scene
+      - step: main
+        tasks:
+          - name: get cameras
+            module: KcHooks.pieces.<app>.default.get_cameras
+            comment: get camera from scene
+
     change_camera:
-      main:
-        - name: change camera
-          piece: KcHooks.pieces.<app>.default.change_camera
-          description: change camera to
+      - step: main
+        tasks:
+          - name: change camera
+            module: KcHooks.pieces.<app>.default.change_camera
+            comment: change camera to
 
     get_assets:
-      main:
-        - name: get assets
-          piece: KcHooks.pieces.<app>.default.get_assets
-          description: get asset from scene
+      - step: main
+        tasks:
+          - name: get assets
+            module: KcHooks.pieces.<app>.default.get_assets
+            comment: get asset from scene

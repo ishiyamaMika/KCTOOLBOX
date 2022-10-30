@@ -6,61 +6,52 @@ import sys
 from pyfbsdk import *
 
 
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
+
 import KcLibs.mobu.kc_model as kc_model
 
-_PIECE_NAME_ = "CameraSetup"
+from puzzle2.PzLog import PzLog
 
-class CameraSetup(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(CameraSetup, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "camera_setup"
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    data = event.get("data", {})
 
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
+    return_code = 0
+    detail = ""
+    if "camera" in data:
+        camera = kc_model.to_object(str(data["camera"]))
 
-        if "camera" in self.data:
-            camera = kc_model.to_object(str(self.data["camera"]))
+        if camera:
+            camera.ResolutionWidth = data["width"]
+            camera.ResolutionHeight = data["height"]
+            header = u"カメラの解像度を設定しました: {}x{}".format(data["width"], 
+                                                                data["height"])
 
-            if camera:
-                camera.ResolutionWidth = self.data["width"]
-                camera.ResolutionHeight = self.data["height"]
-                header = u"カメラの解像度を設定しました: {}x{}".format(self.data["width"], 
-                                                                    self.data["height"])
-
-                # camera.ApertureMode = FBCameraApertureMode.kFBApertureHorizontal
-                camera.FilmAspectRatio = float(self.data["width"])/self.data["height"]
-                FBSystem().Scene.Evaluate()
-            else:
-                header = u"カメラがありませんでした: {}".format(self.data["camera"])
-
+            # camera.ApertureMode = FBCameraApertureMode.kFBApertureHorizontal
+            camera.FilmAspectRatio = float(data["width"])/data["height"]
+            FBSystem().Scene.Evaluate()
         else:
-            header = u"カメラの解像度を設定できませんでした"
-            detail = self.data
+            header = u"カメラがありませんでした: {}".format(data["camera"])
 
+    else:
+        header = u"カメラの解像度を設定できませんでした"
+        detail = data
 
-        print("select camera")
-        print("set size")
-
-        return flg, self.pass_data, header, detail
+    print("select camera")
+    print("set size")
+    logger.details.set_header(header)
+    logger.details.add_detail(detail)
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
 
@@ -73,5 +64,4 @@ if __name__ == "__builtin__":
            "camera": "cam_s00c000:Merge_Camera"
             }
 
-    x = CameraSetup(piece_data=piece_data, data=data)
-    print(x.execute())
+    print(main({"data": data}))

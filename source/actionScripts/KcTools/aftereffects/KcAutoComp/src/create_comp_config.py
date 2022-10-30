@@ -17,7 +17,7 @@ for mod in mods:
         sys.path.append(mod)
 
 import KcLibs.win.kc_sg as kc_sg
-
+import KcLibs.core.kc_env as kc_env
 
 def split_by(path):
     dic = {}
@@ -176,8 +176,9 @@ if debug:
 
 else:
     data_path = "{}/{}_{}.json".format(root_directory, shot_name, now)
-json.dump(data, open(data_path, "w"), "utf8", indent=4)
 
+# json.dump(data, open(data_path, "w"), "utf8", indent=4)
+kc_env.save_config(data_path, "create_comp_config", "ae", data)
 env_copy = os.environ.copy()
 env_copy["__AUTOCOMP_DATA_PATH__"] = data_path.replace("/", "\\")
 env_copy["__AUTOCOMP_SAVE_PATH__"] = data_path.replace("/", "\\").replace(".json", ".aep")

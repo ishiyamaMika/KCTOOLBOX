@@ -6,59 +6,65 @@ import sys
 from pyfbsdk import *
 
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-from puzzle.Piece import Piece
+import KcLibs.core.kc_env as kc_env
 
-_PIECE_NAME_ = "AddNamespace"
+from puzzle2.PzLog import PzLog
 
-class AddNamespace(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(AddNamespace, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "add_namespace"
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    """
+    pice_data: force
+    """
 
-        if not "namespace" in self.data:
-            return False, self.pass_data, u"ネームスペースが設定されていません", detail
+    data = event.get("data", {})
 
-        if self.data["namespace"] == "":
-            return False, self.pass_data, u"ネームスペースが設定されていません", detail
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
+
+    return_code = 0
+
+    if "namespace" not in data:
+        logger.details.set_header(u"ネームスペースが設定されていません")
+        return {"return_code": 1}
+
+    if data["namespace"] == "":
+        logger.details.set_header(u"ネームスペースが設定されていません")
+        return {"return_code": 1}
+
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    for m in m_list:
+        m.Selected = False
+
+    for each in FBSystem().Scene.RootModel.Children:
+        if each.Name == "Reference":
+            continue
 
         m_list = FBModelList()
-        FBGetSelectedModels(m_list)
+        FBGetSelectedModels(m_list, each, False, False)
         for m in m_list:
-            m.Selected = False
-
-        for each in FBSystem().Scene.RootModel.Children:
-            if each.Name == "Reference":
-                continue
-
-            m_list = FBModelList()
-            FBGetSelectedModels(m_list, each, False, False)
-            for m in m_list:
-                if self.piece_data.get("force", False):
-                    m.LongName = "{}:{}".format(self.data["namespace"], m.Name)
+            if data.get("force", False):
+                m.LongName = "{}:{}".format(data["namespace"], m.Name)
+                logger.debug("append: {}".format(m.LongName))
+            else:
+                if ":" in m.LongName:
+                    continue
                 else:
-                    if ":" in m.LongName:
-                        continue
-                    else:
-                        m.LongName = "{}:{}".format(self.data["namespace"], m.Name)
+                    m.LongName = "{}:{}".format(data["namespace"], m.Name)
+                    logger.debug("append: {}".format(m.LongName))
 
-        return flg, self.pass_data, header, detail
+    return {"return_code": return_code}
 
-if __name__ == "__builtin__":
+
+if __name__ in ["builtins", "__builtin__"]:
     piece_data = {"force": True}
     data = {"namespace": "Mia"}
-
-    x = AddNamespace(piece_data=piece_data, data=data)
-    x.execute()
+    data.update(piece_data)
+    print(main(event={"data": data}))

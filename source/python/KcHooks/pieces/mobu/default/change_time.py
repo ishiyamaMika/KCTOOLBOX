@@ -5,84 +5,88 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
-from puzzle.Piece import Piece
+import KcLibs.core.kc_env as kc_env
 
 import KcLibs.mobu.kc_transport_time as kc_transport_time
 
-_PIECE_NAME_ = "ChangeTime"
+from puzzle2.PzLog import PzLog
 
-class ChangeTime(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(ChangeTime, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "change_time"
 
-    def execute(self):
-        flg = True
-        header = str(self.piece_data)
-        detail = ""
+def main(event={}, context={}):
+    """
+    puece_data: mode, fps
+    pass_data: @start, @end, @fps, TASK_NAME
+    """
+    data = event.get("data", {})
 
-        if self.piece_data["mode"] == "change":
-            self.pass_data[_PIECE_NAME_] = kc_transport_time.get_scene_time()
-            
-            if self.piece_data["fps"] != self.data["fps"]:
-                if self.piece_data["fps"] > self.data["fps"]:
-                    value = self.piece_data["fps"] / self.data["fps"]
-                    start = self.data["start"] * value
-                    end = self.data["end"] * value + (value-1)
-                else:
-                    value = self.data["fps"] / self.piece_data["fps"]
-                    start = self.data["start"] / value
-                    end = self.data["end"] / value
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-                fps = self.piece_data["fps"]
+    return_code = 0
+    update_context = {}
+
+    header = str(data)
+    detail = ""
+
+    if "revert_time" in data:
+        header = "revert scene time"
+        detail = "revert time to: {loop_start} {zoom_start}-{zoom_stop} {loop_stop}({fps})".format(**data["revert_time"])
+
+        header = u"シーンのフレームを戻しました"
+        kc_transport_time.set_scene_time(**data["revert_time"])
+        logger.debug(detail)
+
+    else:
+        scene_time = kc_transport_time.get_scene_time()
+        update_context["{}.scene_times".format(TASK_NAME)] = scene_time
+
+        if scene_time["fps"] != data["fps"]:
+            if data["fps"] > data["fps"]:
+                value = data["fps"] / data["fps"]
+                start = data["start"] * value
+                end = data["end"] * value + (value-1)
             else:
-                start = self.data["start"]
-                end = self.data["end"]
-                fps = self.piece_data["fps"]
+                value = data["fps"] / data["fps"]
+                start = data["start"] / value
+                end = data["end"] / value
 
-            kc_transport_time.set_scene_time(loop_start=start, 
-                                             loop_stop=end, 
-                                             zoom_start=start, 
-                                             zoom_stop=end, 
-                                             fps=fps)
+            fps = data["fps"]
+        else:
+            start = data["start"]
+            end = data["end"]
+            fps = data["fps"]
 
-            new_time = kc_transport_time.get_scene_time()
+        kc_transport_time.set_scene_time(loop_start=start,
+                                         loop_stop=end,
+                                         zoom_start=start,
+                                         zoom_stop=end,
+                                         fps=fps)
 
-            detail = "change time to: {}-{}({}) -> {}-{}({})".format(self.data["start"],
-                                                                     self.data["end"],
-                                                                     self.data["fps"],
-                                                                     new_time["loop_start"], 
-                                                                     new_time["loop_stop"], 
-                                                                     new_time["fps"])
-            self.pass_data["@start"] = start
-            self.pass_data["@end"] = end
-            self.pass_data["@fps"] = fps
+        new_time = kc_transport_time.get_scene_time()
 
-            header = u"シーンのフレームを変更しました"
-            if self.logger: self.logger.debug(detail)
-            
-        elif self.piece_data["mode"] == "revert":
-            header = "revert scene time"
-            if _PIECE_NAME_ in self.pass_data:
-                detail = "revert time to: {}-{}({})".format(self.pass_data[_PIECE_NAME_]["loop_start"], 
-                                                            self.pass_data[_PIECE_NAME_]["loop_stop"], 
-                                                            self.pass_data[_PIECE_NAME_]["fps"])
+        detail = "change time to: {}-{}({}) -> {}-{}({})".format(data["start"],
+                                                                 data["end"],
+                                                                 data["fps"],
+                                                                 new_time["loop_start"], 
+                                                                 new_time["loop_stop"], 
+                                                                 new_time["fps"])
 
-                header = u"シーンのフレームを戻しました"
-                kc_transport_time.set_scene_time(**self.pass_data[_PIECE_NAME_])
-                if self.logger: self.logger.debug(detail)
-            else:
-                header = u"シーンのフレームは変更されていませんでした"
+        header = u"シーンのフレームを変更しました"
+        logger.debug(detail)
 
-        return flg, self.pass_data, header, detail
+
+
+    logger.details.set_header(header)
+    logger.details.add_detail(detail)
+
+    return {"return_code": return_code, "update_context": update_context}
 
 from KcLibs.core.KcProject import *
 import KcLibs.core.kc_env as kc_env
@@ -92,7 +96,7 @@ if __name__ == "__builtin__":
     
     data ={u'cut': u'005',
            'start': 0,
-           'end': 8,
+           'end': 20,
            'fps': 8,
            'movie_path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c005/edit/mov_edit/ZIM_s01c005_anim_t01_02_amek.fbx',
            'path': u'E:/works/client/keica/_942_ZIZ/3D/s01/c005/edit/ZIM_s01c005_anim_t01_02_amek_ANIM.fbx',
@@ -106,16 +110,15 @@ if __name__ == "__builtin__":
            "render_fps": 24,
            u'version': u'02'}
 
-    pass_data = {"ChangeTime": {
+    pass_data = {"revert_time": {
                             "loop_start": 10,
-                            "loop_stop": 100,
+                            "loop_stop": 200,
                             "zoom_start": 10,
                             "zoom_stop": 100,
-                            "fps": 8
+                            "fps": 24
                             }
                      }
 
-    piece_data["mode"] = "change"
+    # data.update(pass_data)
 
-    x = ChangeTime(piece_data=piece_data, data=data, pass_data=pass_data)
-    x.execute()
+    main({"data": data})

@@ -1,0 +1,25 @@
+info:
+    name: project
+    parent: ../_base_.yml
+
+data:
+    extra_fields: 
+      root_directory: K:/DTN
+      asset_root: <root_directory>/LO/Asset_keica/
+
+    asset:
+      mobu:
+        paths:
+          default:
+            rig: <asset_root>/<category>/<category>_<asset_name>_t<take>_<version>.fbx
+            sotai: <asset_root>/<category>/sotai/<category>_<asset_name>_sotai_t<take>.fbx
+            config: <asset_root>/<category>/models/<category>_<asset_name>_<config_type>.json
+            edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+            master_export: "<root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
+
+          camera:
+            rig: <asset_root>/<category>/MB/cam_t<take>_<version>.FBX
+            sotai: <asset_root>/<category>/MB/sotai/cam_sotai_t<take>.FBX
+            config: <asset_root>/<category>/MB/models/cam_s00c000_<config_type>.json
+            edit_export: "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_<namespace>.fbx"
+            master_export: "<root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/s<scene>/c<cut>/3D/master/import/<project>_s<scene>c<cut>_<namespace>.fbx"

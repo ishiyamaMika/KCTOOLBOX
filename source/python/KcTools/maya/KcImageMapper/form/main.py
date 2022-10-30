@@ -15,14 +15,13 @@ import KcLibs.core.kc_env as kc_env
 import KcLibs.win.kc_qt as kc_qt
 import KcLibs.maya.kc_material as kc_material
 from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
-from puzzle.PzLog import PzLog
+from puzzle2.PzLog import PzLog
 
 _LOG_ = PzLog("KcImageMapper", log_directory=kc_env.get_log_directory("KcImageMapper"))
 _LOGGER_ = _LOG_.logger
 
 kc_env.append_sys_paths()
-reload(kc_qt)
-reload(kc_material)
+
 if kc_env.mode == "maya":
     import maya.cmds as cmds
 

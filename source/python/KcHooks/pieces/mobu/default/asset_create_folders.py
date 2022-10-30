@@ -5,82 +5,77 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
-
-from puzzle.Piece import Piece
-
+import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_group as kc_group
 
-_PIECE_NAME_ = "AssetCreateFolder"
+from puzzle2.PzLog import PzLog
 
-class AssetCreateFolder(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(AssetCreateFolder, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "asset_create_folders"
 
-        self.categories = {
-            "Constraints": "<asset_name>_con",
-            "Materials": "<asset_name>_mat",
-            "VideoClips": "<asset_name>_vid",
-            "Textures": "<asset_name>_tx",
-            "Shaders": "<asset_name>_sha"
-        }
+def main(event={}, context={}):
+    def _is_in_folder(item):
+        if len([i for i in range(item.GetDstCount()) if isinstance(item.GetDst(i), FBFolder) and item.GetDst(i).Name != "Constraints"]) == 0:
+            return False
+        return True
 
-    def execute(self):
-        def _is_in_folder(item):
-            if len([i for i in range(item.GetDstCount()) if isinstance(item.GetDst(i), FBFolder) and item.GetDst(i).Name != "Constraints"]) == 0:
-                return False
-            return True
+    def _create_folder(name, item):
+        return FBFolder(str(name), item)
 
-        def _create_folder(name, item):
-            return FBFolder(str(name), item)
+    data = event.get("data", {})
 
-        folders = {l.Name: l for l in FBSystem().Scene.Folders}
-        flg = True
-        header = ""
-        detail = ""
-        ignore_type = ["ORCharacterSolver_HIK", "FBCharacter"]
-        ignore_name = ["Default Shader"]
-        for category in self.categories.keys():
-            name = self.categories[category].replace("<asset_name>", self.data["asset_name"])
-            items = []
-            for each in getattr(FBSystem().Scene, category):
-                if each.ClassName() in ignore_type:
-                    continue
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-                if each.LongName in ignore_name:
-                    continue
+    return_code = 0
 
-                if _is_in_folder(each):
-                    continue
+    categories = {
+        "Constraints": "<asset_name>_con",
+        "Materials": "<asset_name>_mat",
+        "VideoClips": "<asset_name>_vid",
+        "Textures": "<asset_name>_tx",
+        "Shaders": "<asset_name>_sha"
+    }
 
-                items.append(each)
+    folders = {l.Name: l for l in FBSystem().Scene.Folders}
 
-            if len(items) > 0:
-                if name in folders:
-                    folder = folders[name]
-                else:
-                    item = items.pop(0)
-                    folder = _create_folder(name, item)
+    ignore_type = ["ORCharacterSolver_HIK", "FBCharacter"]
+    ignore_name = ["Default Shader"]
+    for category in categories.keys():
+        name = categories[category].replace("<asset_name>", data["asset_name"])
+        items = []
 
-                for item in items:
-                    folder.ConnectSrc(item)
+        for each in getattr(FBSystem().Scene, category):
+            if each.ClassName() in ignore_type:
+                continue
 
+            if each.LongName in ignore_name:
+                continue
 
+            if _is_in_folder(each):
+                continue
 
+            items.append(each)
 
+        if len(items) > 0:
+            if name in folders:
+                folder = folders[name]
+            else:
+                item = items.pop(0)
+                folder = _create_folder(name, item)
 
-        return flg, self.pass_data, header, detail
+            for item in items:
+                folder.ConnectSrc(item)
+
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
-    data = {"asset_name": "tsukikoQuad"}
+    data = {"asset_name": "Mia"}
     piece_data = {
           "groups": [
                 {"template": "<asset_name>_top"},
@@ -94,6 +89,6 @@ if __name__ == "__builtin__":
                  "category": "others"}
                 ]
             }
-
-    x = AssetCreateFolder(piece_data=piece_data, data=data)
-    x.execute()
+    
+    data.update(piece_data)
+    print(main({"data": data}))

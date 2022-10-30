@@ -12,20 +12,10 @@ data:
                 widget: QComboBox
                 items: 
                     - CH
-                    - PP
-                    - LO
-                    - VC
+                    - PROPS
                     - BG
                     - camera
                 function: filter_combo_changed
-
-              - name: variation
-                widget: QLineEdit
-                view: variation (LO only)
-
-                category_filter: 
-                  - LO
-                enabled: false
 
               - name: take
                 widget: QSpinBox
@@ -124,6 +114,8 @@ data:
           module: KcHooks.pieces.mobu.default.asset_create_json
           view: "create json(_plot, _export)"
           data_defaults:
+            root: K:/DTN/LO/Asset_keica/json
+
             groups: 
                 - name: <asset_name>_plot
                   file_name: <category>_<namespace>_plot.json
@@ -133,7 +125,7 @@ data:
 
           widgets:
             - name: label
-              view: plotグループとexportグループをupdateしてください
+              view: "update 'plot' & 'export' group then reload"
 
             - name: plot
               widget: QComboBox
@@ -158,12 +150,11 @@ data:
           view: "save sotai"
           module: KcHooks.pieces.mobu.default.asset_save_sotai
           data_defaults:
-            path: E:/works/client/keica/data/sotai
+            path: K:/DTN/LO/Asset_keica/sotai
 
         - name: file_save
           view: save
           function: save_btn_clicked
           module: KcHooks.pieces.mobu.default.file_save
-
           data_key_replace:
               path: rig_path

@@ -409,9 +409,7 @@ piece = "mobu_edit_export"
 piece = "mobu_edit_export_varidate"
 
 results = x.puzzle_play(x.tool_config["puzzle"][piece], 
-                    data, 
-                    {}, 
-                    ["primary", "main", "post_primary", "post_main", "post_end"])
+                    data)
 
 for result in results[1]:
     print(result)

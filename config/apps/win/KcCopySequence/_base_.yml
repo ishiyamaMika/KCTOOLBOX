@@ -3,25 +3,18 @@ info:
 
 data:
   puzzle:
-    orders:
-      default:
-        - primary
-        - main
-        - post
-
-      copySequence:
-        - main
-
     copySequence:
-      main:
-        - name: archive
-          piece: KcHooks.pieces.win.archive_file
-          description: archive edit file
-          is_directory: true
-          paint:
-            path: source_directory
+      - step: main
+        tasks:
+          - name: archive
+            module: KcHooks.pieces.win.archive_file
+            comment: archive edit file
+            is_directory: true
+            data_key_replace:
+              path: source_directory
 
-        - name: copy and rename files
-          piece: KcHooks.pieces.win.renumber_files
-          description: copy sequence
-          frame_offset: true
+          - name: copy and rename files
+            module: KcHooks.pieces.win.renumber_files
+            comment: copy sequence
+            data_defaults:
+              frame_offset: true

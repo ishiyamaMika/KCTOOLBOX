@@ -34,9 +34,7 @@ kc_file_io = importlib.import_module("KcLibs.{}.kc_file_io".format(kc_env.mode))
 if kc_env.mode == "mobu":
     import KcLibs.mobu.kc_model as kc_model
     import KcLibs.mobu.kc_transport_time as kc_transport_time
-    reload(kc_model)
 
-reload(kc_file_io)
 import traceback
 kc_env.append_sys_paths()
 from Sticky.Sticky import FieldValueGenerator
@@ -1521,9 +1519,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             data["render_scale"] = render_scale
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_render"], 
-                                                          {"primary": data}, 
-                                                          {}, 
-                                                          orders.get("mobu_edit_render", orders["default"]))
+                                                          {"primary": data})
 
             results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
             results_all.extend(results)
@@ -1708,9 +1704,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 continue
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_master_export_varidate"], 
-                                                          data, 
-                                                          {}, 
-                                                          orders.get("mobu_master_export_varidate", orders["default"]))
+                                                          data)
             errors_ = []
             for result in results:
                 if result[3].startswith("[error]"):
@@ -1731,9 +1725,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 continue
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_master_export"], 
-                                     data, 
-                                     {}, 
-                                     orders.get("mobu_master_export", orders["default"]))
+                                     data)
             
 
             results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
@@ -1780,8 +1772,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 convert_app_data["order"] = orders["convert"]
             results_all.append([-1, {}, u"max処理", u"max処理", ""])
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["convert"], 
-                                     {"main": convert_app_data}, 
-                                     {}
+                                     {"main": convert_app_data}
                                      )
             if os.path.exists(convert_app_data["result"]):
                 js = json.load(open(convert_app_data["result"], "r"), "utf8")
@@ -1896,9 +1887,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 continue
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export_varidate"], 
-                                                          data, 
-                                                          {}, 
-                                                          orders.get("mobu_edit_export_varidate", orders["default"]))
+                                                          data)
             errors_ = []
 
             for result in results:
@@ -1920,9 +1909,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 continue
 
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_export"], 
-                                     data, 
-                                     {}, 
-                                     orders.get("mobu_edit_export", orders["default"]))
+                                     data)
             
             results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
             results_all.extend(results)

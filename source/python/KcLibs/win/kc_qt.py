@@ -20,7 +20,6 @@ kc_env.append_sys_paths()
 
 
 kc_app = importlib.import_module("KcLibs.{}.kc_app".format(kc_env.mode))
-reload(kc_app)
 
 from Qt import QtWidgets, QtCore, QtGui
 if not kc_env.mode == "max":

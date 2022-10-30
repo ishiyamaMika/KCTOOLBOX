@@ -5,74 +5,73 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
-
-from puzzle.Piece import Piece
+import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_model as kc_model
 
 from KcLibs.mobu.KcRender import *
 
-_PIECE_NAME_ = "RenderScene"
+from puzzle2.PzLog import PzLog
 
-class RenderScene(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(RenderScene, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "render_scene"
+DATA_KEY_REQUIRED = [""]
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    data = event.get("data", {})
 
-        render = KcRender()
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        cam = False
-        namespace = ""
-        for camera in FBSystem().Scene.Cameras:
-            long_name = camera.LongName
-            if not ":" in long_name:
-                continue
+    return_code = 0
 
-            namespace = long_name.split(":")[0]
+    render = KcRender()
 
-            if "cam_{}".format(self.data["shot_name"]) ==  namespace:
-                cam = camera
-                break
+    cam = False
+    namespace = ""
+    for camera in FBSystem().Scene.Cameras:
+        long_name = camera.LongName
+        if not ":" in long_name:
+            continue
 
-        if not cam:
-            self.logger.debug("cam is not exists: {}".format("cam_{}".format(self.data["shot_name"])))
-            flg = False
-            header = u"render シーンにカメラがありませんでした: {}".format(namespace)
-            detail = ""
-            return flg, self.pass_data, header, detail    
+        namespace = long_name.split(":")[0]
 
-        if self.data["fps"] != 24:
-            pass
+        if "cam_{}".format(data["shot_name"]) ==  namespace:
+            cam = camera
+            break
 
-        render.start = self.data["start"]
-        render.end = self.data["end"]
-        render.fps = self.data["fps"]
-        if self.data["render_scale"] != 1:
-          render.render_scale = self.data["render_scale"]
+    if not cam:
+        logger.debug("cam is not exists: {}".format("cam_{}".format(data["shot_name"])))
+        flg = False
+        header = u"render シーンにカメラがありませんでした: {}".format(namespace)
+        logger.details.set_header(header)
+        return {"return_code": 1}
 
-        render.execute(cam, str(self.data["movie_path"]))
+    if data["fps"] != 24:
+        pass
 
-        self.logger.debug("render to: {}".format(self.data["movie_path"]))
-        header = u"renderしました"
-        detail = u"path: \n{}\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(self.data["movie_path"], 
-                                                                                  self.data["start"],
-                                                                                  self.data["end"],
-                                                                                  self.data["fps"], 
-                                                                                  self.data["render_scale"])
+    render.start = data["start"]
+    render.end = data["end"]
+    render.fps = data["fps"]
+    if data["render_scale"] != 1:
+        render.render_scale = data["render_scale"]
 
-        return flg, self.pass_data, header, detail
+    render.execute(cam, str(data["movie_path"]))
+
+    logger.debug("render to: {}".format(data["movie_path"]))
+    header = u"renderしました"
+    detail = u"path: \n{}\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(data["movie_path"], 
+                                                                                data["start"],
+                                                                                data["end"],
+                                                                                data["fps"], 
+                                                                                data["render_scale"])
+    logger.details.set_header(header)
+    logger.details.set_detail(detail)
+    return {"return_code": return_code}
 
 from KcLibs.core.KcProject import *
 import KcLibs.core.kc_env as kc_env
@@ -96,11 +95,7 @@ if __name__ == "__builtin__":
            "render_fps": 24,
            u'version': u'02'}
 
-    x = RenderScene(piece_data=piece_data, data=data)
-    x.execute()
-
-    print(x.pass_data)
-
+    main({"data": data})
 
     start = 4
     end = 8

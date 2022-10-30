@@ -17,16 +17,14 @@ from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
 
 import KcLibs.maya.kc_mesh as kc_mesh
 
-reload(kc_qt)
 
 kc_env.append_sys_paths()
 
 import maya.cmds as cmds
 from functools import wraps
-from puzzle.PzLog import PzLog
+from puzzle2.PzLog import PzLog
 import KcLibs.maya.kc_file_io as kc_file_io
 import shutil
-reload(kc_file_io)
 _LOG_ = PzLog("KcConvert", log_directory=kc_env.get_log_directory("KcConvert"))
 _LOGGER_ = _LOG_.logger
 
@@ -78,7 +76,6 @@ class KcConvert(kc_qt.ROOT_WIDGET):
         mesh_list = cmds.listRelatives("Mesh", ad=True)
         joint_list = [l for l in cmds.listRelatives("Hips", ad=True)]
 
-        reload(kc_file_io)
         kc_mesh.detach_bind(mesh_list)
         kc_mesh.set_poly_smooth(1, mesh_list)
         cmds.bakePartialHistory(all=True)

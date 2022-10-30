@@ -5,96 +5,93 @@ import sys
 
 from pyfbsdk import *
 
-
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
+
 import KcLibs.mobu.kc_story as kc_story
 import KcLibs.mobu.kc_file_io as kc_file_io
 
-_PIECE_NAME_ = "StoryCreate"
 
-class StoryCreate(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(StoryCreate, self).__init__(**args)
-        self.name = _PIECE_NAME_
+from puzzle2.PzLog import PzLog
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+TASK_NAME = "story_create"
+DATA_KEY_REQUIRED = [""]
 
+def main(event={}, context={}):
+    data = event.get("data", {})
 
-        asset_path = str(self.data["asset_path"])
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        exists = False
-        if self.data["category"] == "camera":
-          cameras = self.pass_data["project"].get_cameras()
-          for camera in cameras:
-              if self.data["namespace"] == camera["namespace"]:
-                  exists = True
-        else:
-          assets = self.pass_data["project"].get_assets()
-          for asset in assets:
-              if self.data["namespace"] == asset["namespace"]:
-                  exists = True
+    return_code = 0
 
-        current_constraints = [l for l in FBSystem().Scene.Constraints]
+    asset_path = str(data["asset_path"])
 
-        if not exists:
-            detail += u"assetを追加しました\n{}\n".format(asset_path)
-            kc_file_io.file_merge(asset_path, str(self.data["namespace"]))
-        else:
-            detail += u"アセットはすでにシーンに存在します\n"
+    exists = False
+    if data["category"] == "camera":
+        cameras = data["project"].get_cameras()
+        for camera in cameras:
+            if data["namespace"] == camera["namespace"]:
+                exists = True
+    else:
+        assets = data["project"].get_assets()
+        for asset in assets:
+            if data["namespace"] == asset["namespace"]:
+                exists = True
+
+    current_constraints = [l for l in FBSystem().Scene.Constraints]
+
+    if not exists:
+        detail += u"assetを追加しました\n{}\n".format(asset_path)
+        kc_file_io.file_merge(asset_path, str(data["namespace"]))
+    else:
+        detail += u"アセットはすでにシーンに存在します\n"
+    
+    now_constraints = [l for l in FBSystem().Scene.Constraints]
+
+    """
+    # 追加されたコンストレインのチェックを外す
+    for const in now_constraints:
+        if not const in current_constraints:
+            if const.ClassName() in ["FBStoryTrack", "FBCharacter"]:
+                continue
         
-        now_constraints = [l for l in FBSystem().Scene.Constraints]
-
-        """
-        # 追加されたコンストレインのチェックを外す
-        for const in now_constraints:
-            if not const in current_constraints:
-                if const.ClassName() in ["FBStoryTrack", "FBCharacter"]:
-                    continue
+            if "CharacterSolver" in const.ClassName():
+                continue
             
-                if "CharacterSolver" in const.ClassName():
-                    continue
-                
-                const.Active = False
-                self.logger.debug("constraint off: {}".format(const.LongName))
-        """
+            const.Active = False
+            self.logger.debug("constraint off: {}".format(const.LongName))
+    """
 
-        for each in FBSystem().Scene.Characters:
-            if each.Active:
-              each.Active = False
+    for each in FBSystem().Scene.Characters:
+        if each.Active:
+            each.Active = False
 
-        plot_config_path = self.data["config"]["plot"]
-        if not plot_config_path:
-            header = u"設定ファイルがありませんでした: {}".format(self.data["namespace"])
-            detail = u"path: {}".format(plot_config_path)
-            self.logger.debug(header)
-            return True, self.pass_data, header, detail
+    plot_config_path = data["config"]["plot"]
+    if not plot_config_path:
+        header = u"設定ファイルがありませんでした: {}".format(data["namespace"])
+        detail = u"path: {}".format(plot_config_path)
+        logger.debug(header)
+        logger.details.set_header(header)
+        logger.details.set_detail(detail)
+        return {"return_code": 1}
 
-        info, models = self.pass_data["project"].sticky.read(plot_config_path)
-        model_names = ["{}:{}".format(self.data["namespace"], l["name"]) for l in models]
-        track = kc_story.create_story_track(str(self.data["namespace"]), model_names)
+    info, models = data["project"].sticky.read(plot_config_path)
+    model_names = ["{}:{}".format(data["namespace"], l["name"]) for l in models]
+    track = kc_story.create_story_track(str(data["namespace"]), model_names)
 
-        kc_story.create_clip(track, str(self.data["export_path"]), offset=self.data["start"])
+    kc_story.create_clip(track, str(data["export_path"]), offset=data["start"])
 
-        if self.logger: self.logger.debug("update: {}".format(self.data["namespace"]))
+    logger.debug("update: {}".format(data["namespace"]))
 
-        return flg, self.pass_data, u"storyのクリップを作成しました: {}".format(self.data["namespace"]), detail
+    logger.details.set_header(u"storyのクリップを作成しました: {}".format(data["namespace"]))
+    logger.details.set_detail(detail)
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
     piece_data = {"paint": {
@@ -137,5 +134,5 @@ if __name__ == "__builtin__":
 
     pass_data = {"project": kc_project}
 
-    x = StoryCreate(piece_data=piece_data, data=data, pass_data=pass_data)
-    x.execute()
+    data.update(pass_data)
+    main({"data": data})

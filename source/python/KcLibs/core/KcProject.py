@@ -17,11 +17,10 @@ if not mod in sys.path:
 import KcLibs.core.kc_env as kc_env
 kc_env.append_sys_paths()
 
-reload(kc_env)
 import yaml
 
 from Sticky.Sticky import FieldValueGenerator, StickyConfig
-from puzzle.Puzzle import Puzzle
+from puzzle2.Puzzle import Puzzle
 
 import logging
 from logging import getLogger, StreamHandler, FileHandler
@@ -97,24 +96,24 @@ class KcProject(object):
             "fps": fps
             }
 
-        piece_data = self.config["puzzle"]["change_camera"]["main"][0]
-        piece_data["piece"] = piece_data["piece"].replace("<app>", kc_env.mode)
+        task_set = self.config["puzzle"]["change_camera"]["main"][0]
+        task_set["module"] = task_set["module"].replace("<app>", kc_env.mode)
 
-        pass_data, results = self.puzzle_play(piece_data, {"main": data}, {})
+        context, results = self.puzzle_play(task_set, {"main": data})
 
 
     def get_cameras(self, include_model=False):
         if not "puzzle" in self.config:
             return []
 
-        piece_data = copy.deepcopy(self.config["puzzle"]["get_cameras"])
+        task_set = copy.deepcopy(self.config["puzzle"]["get_cameras"])
 
-        for piece_data_ in piece_data["main"]:
-            for each in piece_data["main"]:
-                each["piece"] = each["piece"].replace("<app>", kc_env.mode)
+        for task_set_ in task_set["main"]:
+            for each in task_set["main"]:
+                each["module"] = each["module"].replace("<app>", kc_env.mode)
 
-        piece_data["include_model"] = include_model
-        pass_data, results = self.puzzle_play(piece_data, {}, {})
+        task_set["include_model"] = include_model
+        context, results = self.puzzle_play(task_set, {})
 
         return pass_data.get("cameras", [])
 
@@ -143,18 +142,20 @@ class KcProject(object):
 
     def get_assets(self):
 
-        if not "puzzle" in self.config:
+        if "puzzle" not in self.config:
             return []
 
-        piece_data = copy.deepcopy(self.config["puzzle"]["get_assets"])
-        for piece_data_ in piece_data["main"]:
-            for each in piece_data["main"]:
-                each["piece"] = each["piece"].replace("<app>", kc_env.mode)
+        task_set = copy.deepcopy(self.config["puzzle"]["get_assets"])
+        for tasks in task_set:
+            if tasks["step"] != "main":
+                continue
 
+            for each in tasks["tasks"]:
+                each["module"] = each["module"].replace("<app>", kc_env.mode)
 
-        pass_data, results = self.puzzle_play(piece_data, {"main": {"meta": self.config["asset"]["meta"]}}, {})
+        context, results = self.puzzle_play(task_set, {"main": {"meta": self.config["asset"]["meta"]}})
 
-        return pass_data.get("assets", [])
+        return context.get("get_assets.assets", [])
 
     def path_generate(self, template, fields, force=False):
         fields_ = {} #copy.deepcopy(fields)
@@ -186,25 +187,22 @@ class KcProject(object):
     def path_split(self, template, path):
         return self.field_generator.get_field_value(template, path)
 
-    def puzzle_play(self, piece_data, data, pass_data={}, order=["primary", "main", "post"]):
-        self.puzzle.order = order
-        pass_data["project"] = self
-
-        self.puzzle.pass_data = pass_data
-
-
-        results = self.puzzle.play(piece_data, data, pass_data)
+    def puzzle_play(self, task_set, data):
+        data["project"] = self
+        self.puzzle.play(task_set, data)
         error = []
+        results = self.puzzle.logger.details.get_all()
         for result in results:
-            if not result[0]:
-                error.append("\n".join(result[1:]))
+            if result["return_code"] != 0:
+                error.append("{}\n{}".format(u"{}".format(result["header"]), u"\n".join(result["details"])))
 
         if len(error) > 0:
             try:
                 self.logger.error(u"\n".join(error))
             except:
                 self.logger.error(traceback.format_exc())
-        return self.puzzle.pass_data, results
+
+        return self.puzzle.context, results
 
 
 if __name__ in ["__main__", "__builtin__"]:

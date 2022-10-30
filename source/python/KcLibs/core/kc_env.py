@@ -48,9 +48,31 @@ if mode is None:
 def get_python_version():
     return sys.version_info
 
+def get_root_directory():
+    return os.path.normpath(os.environ["KEICA_TOOL_PATH"]).replace("\\", "/")
+
+def append_sys_paths():
+    if get_python_version().major == 2:
+        sys_paths = ["{}/source/python/site-packages/py2".format(get_root_directory())]
+    else:
+        sys_paths = ["{}/source/python/site-packages/py3".format(get_root_directory())]
+
+    for sys_path in sys_paths:
+        print(sys_path in sys.path, sys_path)
+        if sys_path not in sys.path:
+            sys.path.append(sys_path)
+            print("append: {}".format(sys_path))
+
+    return sys_paths
+
+print("append sys path:")
+append_sys_paths()
+
+from puzzle2.PzLog import PzLog
 
 def get_platform():
     return sys.platform
+
 
 def get_logger(name="KcToolBox", level="DEBUG"):
     logger = getLogger(name)
@@ -82,24 +104,9 @@ def get_logger(name="KcToolBox", level="DEBUG"):
     return logger
 
 
-def get_root_directory():
-    return os.environ["KEICA_TOOL_PATH"].replace("\\", "/")
-
-def append_sys_paths():
-    if get_python_version().major == 2:
-        sys_paths = ["{}/source/python/site-packages/py2".format(get_root_directory())]
-    else:
-        sys_paths = ["{}/source/python/site-packages/py3".format(get_root_directory())]
-
-    sys_paths = [os.path.normpath(l).replace("\\", "/") for l in sys_paths]
-    for sys_path in sys_paths:
-        if sys_path not in sys.path:
-            sys.path.append(sys_path)
-
-    return sys_paths
-
 def get_user():
     return os.environ.get("KEICA_USERNAME", os.environ["USERNAME"]).replace("_", "")
+
 
 def get_app_config(*args):
     joined = "/".join(args)
@@ -130,19 +137,30 @@ def get_info(**kwargs):
     info.update(kwargs)
     return info
 
-def load_config(path, defaults={}):
-    if os.path.lexists(path):
-        try:
-            js = json.load(open(path, "r"), "utf8")
-            data = js["data"]
-        except:
-            data = {}
-    else:
-        data = {}
+
+def load_config(config_path, defaults={}):
+    import yaml
+    info, data = {}, {}
+    if os.path.exists(config_path):
+        with open(config_path, "r") as f:
+            if config_path.endswith(".json"):
+                try:
+                    js = json.load(f)
+                    info, data = js["info"], js["data"]
+                except ValueError:
+                    raise Exception("json load error: {}".format(config_path))
+            else:
+                try:
+                    yml_data = yaml.load(f, Loader=yaml.SafeLoader)
+                    info, data = yml_data["info"], yml_data["data"]
+                except ValueError:
+                    raise Exception("yaml load error: {}".format(config_path))
 
     for k, v in defaults.items():
         data.setdefault(k, v)
-    return data
+
+    return info, data
+
 
 def save_config(path, name, category, data, **kwargs):
     info = {
@@ -154,11 +172,23 @@ def save_config(path, name, category, data, **kwargs):
     info.update(kwargs)
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
+
+    saved = True
     try:
-        json.dump({"info": info, "data": data}, open(path, "w"), "utf8", indent=4)
-        return True, info, data
-    except:
-        return False, info, data
+        json.dump({"info": info, "data": data}, open(path, "w", encoding="utf8"), ensure_ascii=False, indent=4)
+
+    except BaseException:
+        try:
+            json.dump({"info": info, "data": data}, open(path, "w"), "utf8", indent=4)
+        except:
+            saved = False
+    return saved, info, data
+
+
+
+
+
+
 
 
 if __name__ in ["__builtin__", "__main__"]:

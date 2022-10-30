@@ -20,7 +20,6 @@ import KcLibs.mobu.kc_model as kc_model
 from KcLibs.mobu.kc_Relation import kcRelation
 
 kc_env.append_sys_paths()
-reload(kc_qt)
 
 from pyfbsdk import *
 

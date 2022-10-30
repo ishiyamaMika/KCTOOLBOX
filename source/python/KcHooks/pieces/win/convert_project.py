@@ -1,41 +1,49 @@
 import os
 import sys
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-from puzzle.Piece import Piece
+import KcLibs.core.kc_env as kc_env
 
 from KcLibs.core.KcProject import KcProject
-_PIECE_NAME_ = "ConvertProject"
 
-class ConvertProject(Piece):
-    def __init__(self, **args):
-        super(ConvertProject, self).__init__(**args)
-        self.name = _PIECE_NAME_
+from puzzle2.PzLog import PzLog
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+TASK_NAME = "convert_project"
+DATA_KEY_REQUIRED = [""]
 
-        if "project_info" in self.pass_data:
-            project = KcProject()
-            project.set(self.pass_data["project_info"]["name"], 
-                        self.pass_data["project_info"]["variation"])
-            
-            self.pass_data["project"] = project
-            del self.pass_data["project_info"]
-            self.logger.debug("cast project object")
+def main(event={}, context={}):
+    """
+    pass_data: project_info, project
+    """
+    data = event.get("data", {})
 
-        return flg, self.pass_data, header, detail
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
+
+    return_code = 0
+
+    flg = True
+
+    if "project_info" in data:
+        project = KcProject()
+        project.set(data["project_info"]["name"], 
+                    data["project_info"]["variation"])
+        
+
+        data["{}.project".format(TASK_NAME)] = project
+        del data["project_info"]
+        logger.debug("cast project object")
+   
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
     piece_data = {"include_model": True}
     data = {"namespace": "cam_s01c006A", "start": 10, "stop": 30, "fps": 8}
 
-    x = ConvertProject(piece_data=piece_data, data=data)
-    x.execute()
-
-    print(x.pass_data)
+    data.update(piece_data)
+    main({"data": data})

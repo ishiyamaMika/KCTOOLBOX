@@ -5,25 +5,24 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
-
-from puzzle.Piece import Piece
-
+import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_group as kc_group
 
-_PIECE_NAME_ = "AssetCreateGroups"
+from puzzle2.PzLog import PzLog
 
-class AssetCreateGroups(Piece):
+TASK_NAME = "asset_create_groups"
+
+class AssetCreateGroups(object):
     def __init__(self, **args):
         """
         description:
             open_path - open path
         """
-        super(AssetCreateGroups, self).__init__(**args)
-        self.name = _PIECE_NAME_
 
     def get_all_models(self):
         self.models = []
@@ -66,50 +65,57 @@ class AssetCreateGroups(Piece):
                 items.append(each)
         return items
 
+def main(event={}, context={}):
+    """
+    from someware: piece_data: groups
+    """
+    data = event.get("data", {})
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        self.scene_groups = {}
+    return_code = 0
 
-        self.get_all_models()
+    asset_create_groups = AssetCreateGroups()
+    scene_groups = {}
 
-        for group in FBSystem().Scene.Groups:
-            name = "/".join([l.LongName for l in kc_group.get_group_hierachy(group)])
-            self.scene_groups[name] = group
+    asset_create_groups.get_all_models()
 
-        def _create(name):
-            name_s = name.split("/")
-            parent = None
-            for i in range(len(name_s)):
-                group_name = "/".join(name_s[:i+1])
-                if not group_name in self.scene_groups:
-                    name = group_name.split("/")[-1]
-                    parent = False
-                    parent_name = "/".join(group_name.split("/")[:-1])
-                    if parent_name in self.scene_groups:
-                        parent = self.scene_groups[parent_name]
+    for group in FBSystem().Scene.Groups:
+        name = "/".join([l.LongName for l in kc_group.get_group_hierachy(group)])
+        scene_groups[name] = group
 
-                    group = FBGroup(name)
-                    if parent:
-                        parent.ConnectSrc(group)
-                        
-                    self.scene_groups[group_name] = group
+    def _create(name):
+        name_s = name.split("/")
+        parent = None
+        for i in range(len(name_s)):
+            group_name = "/".join(name_s[:i+1])
+            if not group_name in scene_groups:
+                name = group_name.split("/")[-1]
+                parent = False
+                parent_name = "/".join(group_name.split("/")[:-1])
+                if parent_name in scene_groups:
+                    parent = scene_groups[parent_name]
 
-        for group_setting in self.piece_data["groups"]:
-            group_name = group_setting["template"].replace("<asset_name>", self.data["asset_name"])
-            _create(group_name)
+                group = FBGroup(name)
+                if parent:
+                    parent.ConnectSrc(group)
+                    
+                scene_groups[group_name] = group
 
-            group = self.scene_groups[group_name]
+    for group_setting in data["groups"]:
+        group_name = group_setting["template"].replace("<asset_name>", data["asset_name"])
+        _create(group_name)
 
-            if "category" in group_setting:
-                items = getattr(self, group_setting["category"])()
-                for item in items:
-                    group.ConnectSrc(item)
+        group = scene_groups[group_name]
 
-        return flg, self.pass_data, header, detail
+        if "category" in group_setting:
+            items = getattr(asset_create_groups, group_setting["category"])()
+            for item in items:
+                group.ConnectSrc(item)
+
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
     data = {"asset_name": "tsukikoQuad"}
@@ -127,5 +133,5 @@ if __name__ == "__builtin__":
                 ]
             }
 
-    x = AssetCreateGroups(piece_data=piece_data, data=data)
-    x.execute()
+    data.update(piece_data)
+    main({"data": data})

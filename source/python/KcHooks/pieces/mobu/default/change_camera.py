@@ -5,51 +5,44 @@ import sys
 
 from pyfbsdk import *
 
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
-mod = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-if not mod in sys.path:
-    sys.path.append(mod)
-
-from puzzle.Piece import Piece
-
+import KcLibs.core.kc_env as kc_env
 import KcLibs.mobu.kc_transport_time as kc_transport_time
-reload(kc_transport_time)
-_PIECE_NAME_ = "ChangeCamera"
 
-class ChangeCamera(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(ChangeCamera, self).__init__(**args)
-        self.name = _PIECE_NAME_
+from puzzle2.PzLog import PzLog
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+TASK_NAME = "change_camera"
 
-        cameras = []
-        for cam in FBSystem().Scene.Cameras:
-            if cam.SystemCamera:
-                continue
-            if cam.LongName.startswith("{}:".format(self.data["namespace"])):
-                app = FBApplication()
-                app.SwitchViewerCamera(cam)
-                kc_transport_time.set_zoom_time(self.data["start"], 
-                                                self.data["stop"],
-                                                self.data["fps"])
-                FBSystem().Scene.Evaluate()
+def main(event={}, context={}):
+    data = event.get("data", {})
 
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
+    return_code = 0
 
-        return flg, self.pass_data, header, detail
+    cameras = []
+    for cam in FBSystem().Scene.Cameras:
+        if cam.SystemCamera:
+            continue
+        if cam.LongName.startswith("{}:".format(self.data["namespace"])):
+            app = FBApplication()
+            app.SwitchViewerCamera(cam)
+            kc_transport_time.set_zoom_time(self.data["start"], 
+                                            self.data["stop"],
+                                            self.data["fps"])
+            FBSystem().Scene.Evaluate()
+
+    return {"return_code": return_code}
+
 
 if __name__ == "__builtin__":
     piece_data = {"include_model": True}
     data = {"namespace": "cam_s01c006A", "start": 10, "stop": 30, "fps": 8}
-
-    x = ChangeCamera(piece_data=piece_data, data=data)
-    x.execute()
+    print(main({"data": data}))
 

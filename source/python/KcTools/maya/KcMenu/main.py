@@ -11,7 +11,7 @@ mod = "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH
 if mod not in sys.path:
     sys.path.append(mod)
 import KcLibs.core.kc_env as kc_env
-import puzzle.pz_config as pz_config
+import puzzle2.pz_config as pz_config
 
 import maya.cmds as cmds
 from functools import partial

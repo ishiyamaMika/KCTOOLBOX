@@ -6,44 +6,34 @@ import sys
 from pyfbsdk import *
 
 
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
 
-_PIECE_NAME_ = "CameraExport"
+from puzzle2.PzLog import PzLog
 
-class CameraExport(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(CameraExport, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "camera_export"
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    data = event.get("data", {})
 
-        if not self.data["category"] == "camera":
-            return flg, self.pass_data, header, detail
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        return flg, self.pass_data, header, detail
+    return_code = 0
+
+    if not data["category"] == "camera":
+        return {"return_code": 0}
+
+    return {"return_code": 0}
+
 
 if __name__ == "__builtin__":
-
     piece_data = {'path': "E:/works/client/keica/data/assets"}
-
-
     data = {
             "namespace": "", 
             "name": "", 
@@ -51,5 +41,5 @@ if __name__ == "__builtin__":
             "number": 1
             }
 
-    x = CameraExport(piece_data=piece_data, data=data)
-    x.execute()
+    data.update(piece_data)
+    main({"data": data})

@@ -6,7 +6,7 @@ import pymxs
 import MaxPlus
 
 sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
-sys_path = os.path.normpath(sys_path).replace("\", "/")
+sys_path = os.path.normpath(sys_path).replace("\\", "/")
 if sys_path not in sys.path: 
     sys.path.append(sys_path)
 

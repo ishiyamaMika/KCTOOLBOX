@@ -40,13 +40,14 @@ data = {'primary':
            'start': 10,
            u'take': u'01',
            'user': 'amek',
-           u'version': u'02'}
+           u'version': u'02'}, 
+         "common": {
+             "project": x
+         }
         }
 
 results = x.puzzle_play(x.tool_config["puzzle"]["mobu_edit_render"], 
-                    data, 
-                    {"project": x}, 
-                    ["primary"])
+                    data)
 
 for result in results[1]:
     print(result)

@@ -32,10 +32,10 @@ class JobThread(QtCore.QThread):
 
     def run(self):
         self.message_signal.emit("start")
+        self.data.setdefault("common", {})
+        self.data["common"]["signal"] = self.message_signal
         pass_data, results = self.project.puzzle_play(self.piece_data, 
-                                                     self.data, 
-                                                     {"signal": self.message_signal}, 
-                                                     self.order)
+                                                     self.data)
         self.message_signal.emit("done")
         self.done_signal.emit(results)                                                     
     

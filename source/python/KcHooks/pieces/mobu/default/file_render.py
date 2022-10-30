@@ -5,39 +5,30 @@ import sys
 
 from pyfbsdk import *
 
-
-mods = ["{}/source/python".format(os.environ["KEICA_TOOL_PATH"]), 
-       "{}/source/python/KcLibs/site-packages".format(os.environ["KEICA_TOOL_PATH"])]
-
-for mod in mods:
-    if not mod in sys.path:
-        sys.path.append(mod)
-
-
-from puzzle.Piece import Piece
+sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
+sys_path = os.path.normpath(sys_path).replace("\", "/")
+if sys_path not in sys.path: 
+    sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
 
-_PIECE_NAME_ = "FileRender"
+from puzzle2.PzLog import PzLog
 
-class FileRender(Piece):
-    def __init__(self, **args):
-        """
-        description:
-            open_path - open path
-        """
-        super(FileRender, self).__init__(**args)
-        self.name = _PIECE_NAME_
+TASK_NAME = "file_render"
 
-    def execute(self):
-        flg = True
-        header = ""
-        detail = ""
+def main(event={}, context={}):
+    data = event.get("data", {})
 
-        print("select camera")
-        print("set size")
+    logger = context.get("logger")
+    if not logger:
+        logger = PzLog().logger
 
-        return flg, self.pass_data, header, detail
+    return_code = 0
+
+    print("select camera")
+    print("set size")
+
+    return {"return_code": return_code}
 
 if __name__ == "__builtin__":
 
@@ -51,5 +42,4 @@ if __name__ == "__builtin__":
            "end": 100
             }
 
-    x = FileRender(piece_data=piece_data, data=data)
-    x.execute()
+    main({"data": data})
