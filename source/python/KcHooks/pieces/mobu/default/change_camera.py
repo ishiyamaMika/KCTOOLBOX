@@ -27,15 +27,24 @@ def main(event={}, context={}):
     return_code = 0
 
     cameras = []
+    selected_pane = FBSystem().Scene.Renderer.GetSelectedPaneIndex()
+    app = FBApplication()
     for cam in FBSystem().Scene.Cameras:
         if cam.SystemCamera:
             continue
-        if cam.LongName.startswith("{}:".format(self.data["namespace"])):
-            app = FBApplication()
-            app.SwitchViewerCamera(cam)
-            kc_transport_time.set_zoom_time(self.data["start"], 
-                                            self.data["stop"],
-                                            self.data["fps"])
+        if cam.LongName.startswith("{}:".format(data["namespace"])):
+            try:
+                app.SwitchViewerCamera(cam)
+
+            except BaseException:
+                try:
+                    FBSystem().Scene.Renderer.SetCameraInPane(cam, selected_pane)
+                except BaseException:
+                    continue
+
+            kc_transport_time.set_zoom_time(data["start"],
+                                            data["stop"],
+                                            data["fps"])
             FBSystem().Scene.Evaluate()
 
     return {"return_code": return_code}

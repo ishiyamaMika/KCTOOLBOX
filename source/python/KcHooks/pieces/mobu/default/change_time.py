@@ -28,19 +28,18 @@ def main(event={}, context={}):
     logger = context.get("logger")
     if not logger:
         logger = PzLog().logger
-
+    logger.details.get_all()
     return_code = 0
     update_context = {}
 
     header = str(data)
     detail = ""
-
-    if "revert_time" in data:
+    if "revert_times" in data:
         header = "revert scene time"
-        detail = "revert time to: {loop_start} {zoom_start}-{zoom_stop} {loop_stop}({fps})".format(**data["revert_time"])
+        detail = "revert time to: {loop_start} {zoom_start}-{zoom_stop} {loop_stop}({fps})".format(**data["revert_times"])
 
         header = u"シーンのフレームを戻しました"
-        kc_transport_time.set_scene_time(**data["revert_time"])
+        kc_transport_time.set_scene_time(**data["revert_times"])
         logger.debug(detail)
 
     else:
@@ -62,11 +61,11 @@ def main(event={}, context={}):
             start = data["start"]
             end = data["end"]
             fps = data["fps"]
-
-        kc_transport_time.set_scene_time(loop_start=start,
-                                         loop_stop=end,
-                                         zoom_start=start,
-                                         zoom_stop=end,
+      
+        kc_transport_time.set_scene_time(loop_start=int(start),
+                                         loop_stop=int(end),
+                                         zoom_start=int(start),
+                                         zoom_stop=int(end),
                                          fps=fps)
 
         new_time = kc_transport_time.get_scene_time()
@@ -81,7 +80,9 @@ def main(event={}, context={}):
         header = u"シーンのフレームを変更しました"
         logger.debug(detail)
 
-
+        update_context["start"] = start
+        update_context["end"] = end
+        update_context["fps"] = fps
 
     logger.details.set_header(header)
     logger.details.add_detail(detail)
@@ -91,7 +92,7 @@ def main(event={}, context={}):
 from KcLibs.core.KcProject import *
 import KcLibs.core.kc_env as kc_env
 
-if __name__ == "__builtin__":
+if __name__ == "builtins":
     piece_data = {"fps": 24}
     
     data ={u'cut': u'005',
@@ -110,7 +111,7 @@ if __name__ == "__builtin__":
            "render_fps": 24,
            u'version': u'02'}
 
-    pass_data = {"revert_time": {
+    pass_data = {"revert_times": {
                             "loop_start": 10,
                             "loop_stop": 200,
                             "zoom_start": 10,

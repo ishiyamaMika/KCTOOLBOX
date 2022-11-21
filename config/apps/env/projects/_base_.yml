@@ -4,6 +4,7 @@ info:
 data:
   extra_fields:
     asset_root: <root_directory>/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets
+    shot_root: <root_directory>/LO
 
   general:
     root_directory: "X:/Project/_942_ZIZ"
@@ -26,6 +27,7 @@ data:
       - LO
       - POSE
       - PP
+      - PROPS
 
     namespaces:
       default: "<category>_<asset_name>"
@@ -80,6 +82,10 @@ data:
 
     name_pattern: "s<scene>c<cut>"
 
+    sequence_name_settings: 
+        template: <scene>
+        prefix: S
+
     progress:
       - anim
 
@@ -127,3 +133,10 @@ data:
           - name: get assets
             module: KcHooks.pieces.<app>.default.get_assets
             comment: get asset from scene
+
+    mobu_merge_asset:
+      - step: main
+        tasks:
+          - name: merge asset
+            module: KcHooks.pieces.mobu.default.merge_asset
+          

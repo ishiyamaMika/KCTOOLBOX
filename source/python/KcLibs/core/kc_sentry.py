@@ -18,7 +18,6 @@ def load():
     debug = os.environ.get("KEICA_DEV")
     if debug is not None:
         return
-    print(debug)
     sentry_logging = LoggingIntegration(
         level=logging.INFO,        # Capture info and above as breadcrumbs
         event_level=logging.ERROR  # Send errors as events

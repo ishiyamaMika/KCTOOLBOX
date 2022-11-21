@@ -25,9 +25,6 @@ def main(event={}, context={}):
 
     return_code = 0
 
-    print("select camera")
-    print("set size")
-
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":

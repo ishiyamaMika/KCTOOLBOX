@@ -53,45 +53,46 @@ def file_merge(file_path, namespace=None, padding=2):
     options.TransportSettings = False
 
     if FBApplication().FileAppend(file_path, False, options):
-        if not namespace:
-            return
+        if namespace:
+            pattern = "(.*)_([0-9]*)$"
+            namespaces = {}
+            for b in before:
+                search = re.search(pattern, b)
+                if search:
+                    current_namespace, number = search.groups()
+                    number = int(number)
+                    namespaces.setdefault(current_namespace, []).append(number)
+                else:
+                    namespaces.setdefault(b, []).append(1)
+                
+            after = _get_namespaces()
 
-        pattern = "(.*)_([0-9]*)$"
-        namespaces = {}
-        for b in before:
-            search = re.search(pattern, b)
-            if search:
-                current_namespace, number = search.groups()
-                number = int(number)
-                namespaces.setdefault(current_namespace, []).append(number)
-            else:
-                namespaces.setdefault(b, []).append(1)
-            
-        after = _get_namespaces()
+            a = set(before)
+            b = set(after)
 
-        a = set(before)
-        b = set(after)
+            current = list(b - a)
+            if len(current) > 0:
+                current = current[0]
 
-        current = list(b - a)
-        if len(current) > 0:
-            current = current[0]
+                if namespace in namespaces:
+                    number = namespaces[namespace]
+                    number.sort()
+                    number = number[-1] + 1
+                    pattern = "{}_" + "{{:0{}d}}".format(padding)
+                    namespace = pattern.format(namespace, number)
 
-            if namespace in namespaces:
-                number = namespaces[namespace]
-                number.sort()
-                number = number[-1] + 1
-                pattern = "{}_" + "{{:0{}d}}".format(padding)
-                namespace = pattern.format(namespace, number)
+                for comp in FBSystem().Scene.Components:
+                    try:
+                        comp_s = comp.LongName.split(":")
+                    except BaseException:
+                        continue
+                    if len(comp_s) == 1:
+                        continue
 
-            for comp in FBSystem().Scene.Components:
-                comp_s = comp.LongName.split(":")
-                if len(comp_s) == 1:
-                    continue
+                    if comp_s[0] != current:
+                        continue
 
-                if comp_s[0] != current:
-                    continue
-
-                comp.ProcessNamespaceHierarchy(FBNamespaceAction.kFBReplaceNamespace, current, namespace, False)  
+                    comp.ProcessNamespaceHierarchy(FBNamespaceAction.kFBReplaceNamespace, current, namespace, False)  
 
         delete_takes = [l for l in FBSystem().Scene.Takes if not l in current_takes]
         for d in delete_takes:

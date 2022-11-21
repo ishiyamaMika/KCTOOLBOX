@@ -22,7 +22,7 @@ import yaml
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "execute_command"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     """
@@ -36,10 +36,6 @@ def main(event={}, context={}):
 
     return_code = 0
 
-    flg = True
-    header = ""
-    detail = ""
-    
     if "app_environ" in data:
         app = os.environ[data["app_environ"]]
     else:

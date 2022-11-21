@@ -16,7 +16,7 @@ import KcLibs.mobu.kc_model as kc_model
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "setup_scene"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     data = event.get("data", {})
@@ -44,7 +44,7 @@ def main(event={}, context={}):
                 for m in m_list:
                     m.Show = False
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":

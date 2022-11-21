@@ -17,6 +17,21 @@ data:
                     - camera
                 function: filter_combo_changed
 
+              - name: sub_category
+                widget: QComboBox
+                items:
+                  - CH_main
+                  - CH_mob
+                  - CH_other
+                  - CH_sub
+
+                view: sub_category (CH only)
+
+                category_filter: 
+                  - CH
+
+                enabled: true
+
               - name: take
                 widget: QSpinBox
 
@@ -85,6 +100,8 @@ data:
         - name: add_namespace
           view: "add namespace"
           module: KcHooks.pieces.mobu.default.add_namespace
+          data_defaults:
+            force: true
 
         - name: add_folder
           view: "create/update folder"

@@ -16,7 +16,7 @@ import KcLibs.mobu.kc_model as kc_model
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "get_koma"
-DATA_KEY_REQUIRED = [""]
+
 
 def get_frame(fb_time):
     if FBSystem().Version >= 13000.0:
@@ -33,7 +33,6 @@ def get_all_keys(data, model):
         modified_list = []
         for ii, k in enumerate(anim_node.Keys):
             frame = get_frame(k.Time)
-            # print(frame, "----", data["start"], data["end"])
             keyframe = {}
 
             if frame < data["start"]:
@@ -82,10 +81,8 @@ def get_all_keys(data, model):
                     continue
             
                 if each.GetAnimationNode().FCurve is not None:
-                    # print(each.Name)
                     all_keys[each.Name], modified_list_ = _get_each_keys(each.GetAnimationNode().FCurve, each.Name)
                     modified.extend(modified_list_)                    
-                    # print("*****", modified_list_)
 
                 elif len(each.GetAnimationNode().Nodes) > 0:
                     for i in range(len(each.GetAnimationNode().Nodes)):
@@ -161,7 +158,7 @@ def main(event={}, context={}):
     detail += u"\n"
 
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 

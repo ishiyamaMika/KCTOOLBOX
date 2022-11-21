@@ -51,7 +51,6 @@ def main(event={}, context={}):
         FBGetSelectedModels(m_list)
         for m in m_list:
             m.Selected = False
-        print(">>", value)
         group = kc_group.get_group(value)
         if not group:
             return_code = 1

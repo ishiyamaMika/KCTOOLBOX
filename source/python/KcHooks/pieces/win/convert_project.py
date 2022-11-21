@@ -13,7 +13,7 @@ from KcLibs.core.KcProject import KcProject
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "convert_project"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     """

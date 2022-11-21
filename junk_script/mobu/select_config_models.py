@@ -7,7 +7,6 @@ path = r"X:\Project\_942_ZIZ\2020_ikimono_movie\_work\14_partC_Japan\26_animatio
 
 current = FBApplication().FBXFileName
 res = FBMessageBox("info", "type?", "plot", "export")
-print res
 
 d, f = os.path.split(current)
 
@@ -22,10 +21,7 @@ if path_:
     paths = glob.glob(path_)    
     if len(paths) > 0:
         js = json.load(open(paths[0], "r"))
-        
-        # print js
-        
-        
+
         for each in js["data"]:
             name = "{}:{}".format(each["namespace"], each["name"])
             comps = FBComponentList()

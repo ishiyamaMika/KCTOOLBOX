@@ -60,7 +60,7 @@ def main(event={}, context={}):
     kc_file_io.file_save(data["path"])
 
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":

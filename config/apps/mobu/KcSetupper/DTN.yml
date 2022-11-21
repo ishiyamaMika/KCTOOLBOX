@@ -1,0 +1,157 @@
+info:
+    name: KcSetupper
+
+data: 
+    preset:
+        - name: add_properties
+          view: "create/update meta"
+          piece: KcHooks.pieces.mobu.default.asset_add_properties
+
+          widgets: 
+              - name: category
+                widget: QComboBox
+                items: 
+                    - CH
+                    - PP
+                    - LO
+                    - VC
+                    - BG
+                    - camera
+                function: filter_combo_changed
+
+              - name: take
+                widget: QSpinBox
+
+              - name: version
+                widget: QSpinBox
+
+          parent_name: 
+            default: "<namespace>:root"
+            camera: "<namespace>:cam_root"
+          meta_model_name: <namespace>:meta
+          color: 
+                1: 
+                  - 255
+                  - 0
+                  - 0
+                2: 
+                  - 0
+                  - 255
+                  - 0
+                3: 
+                  - 0
+                  - 0
+                  - 255
+                4: 
+                  - 255
+                  - 255
+                  - 0
+                5: 
+                  - 0 
+                  - 255
+                  - 255
+                6: 
+                  - 255
+                  - 0
+                  - 255
+                7: 
+                  - 255
+                  - 127
+                  - 0
+                8: 
+                  - 255
+                  - 0
+                  - 127
+                9: 
+                  - 127
+                  - 255
+                  - 0
+                10: 
+                  - 0
+                  - 255
+                  - 127
+                11: 
+                  - 127
+                  - 0
+                  - 255
+                12: 
+                  - 127
+                  - 127
+                  - 255
+                13: 
+                  - 225
+                  - 255
+                  - 225
+
+        - name: add_namespace
+          view: "add namespace"
+          piece: KcHooks.pieces.mobu.default.add_namespace
+
+        - name: add_folder
+          view: "create/update folder"
+          piece: KcHooks.pieces.mobu.default.asset_create_folders
+
+        - name: create_groups
+          view: "create/update groups"
+          piece: KcHooks.pieces.mobu.default.asset_create_groups
+          groups: 
+              - template: <asset_name>_top
+              - template: <asset_name>_top/<asset_name>_geo
+                category: geometry
+              - template: <asset_name>_top/<asset_name>_anim
+              - template: <asset_name>_top/<asset_name>_anim/<asset_name>_body
+              - template: <asset_name>_top/<asset_name>_anim/<asset_name>_skl
+                category: skeleton
+
+              - template: <asset_name>_top/<asset_name>_etc
+                category: others
+
+              - template: <asset_name>_top/<asset_name>_plot
+              - template: <asset_name>_top/<asset_name>_export
+
+
+        - name: create_json
+          piece: KcHooks.pieces.mobu.default.asset_create_json
+          view: "create json(_plot, _export)"
+
+          groups: 
+              - name: <asset_name>_plot
+                file_name: <category>_<namespace>_plot.json
+
+              - name: <asset_name>_export
+                file_name: <category>_<namespace>_export.json
+
+          widgets:
+            - name: label
+              view: plotグループとexportグループをupdateしてください
+
+            - name: plot
+              widget: QComboBox
+
+              btn: 
+                function: set_group_btn_clicked
+                init: get_groups
+                icon: reload.png
+                find: plot
+
+            - name: export
+              widget: QComboBox
+              btn:
+                function: set_group_btn_clicked
+                init: get_groups
+                icon: reload.png
+                find: 
+                    - export
+                    - plot
+
+        - name: save_sotai
+          view: "save sotai"
+          piece: KcHooks.pieces.mobu.default.asset_save_sotai
+          path: E:/works/client/keica/data/sotai
+
+        - name: file_save
+          view: save
+          function: save_btn_clicked
+          piece: KcHooks.pieces.mobu.default.file_save
+          paint:
+              path: rig_path

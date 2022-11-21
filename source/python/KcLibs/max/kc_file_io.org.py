@@ -27,7 +27,6 @@ def get_file_path():
     return MaxPlus.FileManager.GetFileNameAndPath()
 
 def file_merge(file_path="", namespace=None, padding=2, force=False):
-    print(111)
     # MaxPlus.FileManager.import(file_path)
     if namespace is not None and not force:
         root_node = MaxPlus.Core.GetRootNode()

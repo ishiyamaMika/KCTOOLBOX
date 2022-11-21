@@ -1,0 +1,404 @@
+info:
+  name: tool
+  parent: ../_base_.yml
+
+data:
+  directory: "K:/DTN/tools"
+  shot_directory: "K:/DTN"
+  schema:
+    shot:
+      shot_name: ""
+      paths:
+        mobu:
+          edit: ""
+          master: ""
+        max:
+          edit: ""
+          master: ""
+
+      fields:
+        scene: 0
+        cut: 0
+        take: 0
+        version: 0
+        progress: anim
+        project: ""
+        project_variation: ""
+
+      frame:
+        start: 0
+        end: 0
+        fps: 0
+
+      assets: []
+
+  default_shot_name:
+    "<project>": "DTN"
+    "<scene>": "01"
+    "<cut>": "Axxxx"
+    "<take>": "01"
+    "<version>": "01"
+    "<progress>": "anim"
+  
+  columns: 
+    asset_table: 
+      - check
+      - name
+  
+  view:
+    split_check: false
+    render_check: false
+
+  convert_to: null
+  master_export_action: export
+  puzzle:
+    mobu_edit_export_varidate:
+      - step: primary
+        tasks:
+          - name: open_file
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: open file
+
+      - step: main
+        tasks:
+          - name: export asset
+            module: KcHooks.pieces.mobu.default.asset_export
+            comment: export asset
+            data_defaults:
+              mode: varidate
+
+            conditions:
+              - category: ["CH", "BG", "PROPS", "LO"]
+            
+            data_key_replace:
+              export_path: mobu_edit_export_path
+
+          - name: export multi camera asset
+            module: KcHooks.pieces.mobu.default.multi_cameras_export
+            comment: export camera
+            data_defaults:
+              key_name: plot
+              mode: varidate
+              
+
+            data_key_replace:
+              export_path: mobu_edit_export_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            conditions:
+              - category: camera
+
+    mobu_edit_export:
+      - step: primary
+        tasks:
+          - name: archive
+            module: KcHooks.pieces.win.archive_file
+            comment: archive edit file
+
+          - name: open_file
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: open file
+            data_defaults:
+              force: true
+
+          - name: plot_all
+            module: KcHooks.pieces.mobu.projects.DTN.plot_all
+            comment: plot all
+            # interpolate: Stepped
+
+          - name: change scene time
+            module: KcHooks.pieces.mobu.default.change_time
+            comment: "change scene time. result set to pass_data"
+            data_defaults:
+              fps: 24
+              mode: change
+
+      - step: main
+        tasks:
+            - name: export asset
+              module: KcHooks.pieces.mobu.default.asset_export
+              comment: export
+              data_defaults:
+                key_name: plot
+
+              data_key_replace:
+                export_path: mobu_edit_export_path
+                start: "context.start"
+                end: "context.end"
+                fps: "context.fps"
+              
+              conditions:
+                - category: 
+                    - CH
+                    - PROPS
+                    - BG
+
+            - name: export multi camera asset
+              module: KcHooks.pieces.mobu.default.multi_cameras_export
+              comment: export camera
+              data_defaults:
+                key_name: plot
+                save_switcher: true
+                mode: export
+
+              data_key_replace:
+                export_path: mobu_edit_export_path
+                start: "context.start"
+                end: "context.end"
+                fps: "context.fps"
+              
+              conditions:
+                - category: camera
+
+      - step: post_primary
+        tasks:
+          - name: create
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: ""
+
+            data_defaults:
+              new: true
+
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+
+          # - name: adject assets
+          #   module: KcHooks.pieces.mobu.default.adjust_scene_assets
+          #   comment: check assets and adject them. delete if not exists in asset list
+
+      - step: post_main
+        tasks:
+          - name: story clip create
+            module: KcHooks.pieces.mobu.default.story_create
+            comment: create story clip
+
+            data_defaults:
+              key_name: plot
+
+            data_key_replace:
+              export_path: mobu_edit_export_path
+              asset_path: mobu_sotai_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            conditions:
+              - category: 
+                  - CH
+                  - PROPS
+                  - BG
+
+          - name: import camera
+            module: KcHooks.pieces.mobu.default.merge_asset
+            comment: merge camera export file.
+            conditions:
+              - category: camera
+            
+            data_key_replace:
+              asset_path: mobu_edit_export_path
+            
+            data_override:
+              namespace: null
+          
+          - name: create switcher
+            module: KcHooks.pieces.mobu.default.create_switcher
+            conditions:
+              - category: camera
+            data_key_replace:
+              switcher_path: context.camera_export.switcher_path
+
+      - step: post_end
+        tasks:
+          - name: file_save
+            module: KcHooks.pieces.mobu.default.file_save
+            comment: ""
+            data_key_replace:
+              path: mobu_master_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+
+          - name: render_scene
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: ""
+            data_defaults:
+              render_type: switcher
+
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+
+    mobu_master_export:
+      - step: primary
+        tasks:
+          - name: open
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: ""
+
+
+          - name: plot_all
+            module: KcHooks.pieces.mobu.projects.DTN.plot_all
+            comment: "plot all. note: export BG models"
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+          
+          - name: render scene
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: ""
+            data_defaults:
+              render_type: switcher
+              render_scale: 1
+
+            data_key_replace:
+              movie_path: publish_movie_path
+
+          - name: render scene
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: ""
+            data_defaults:
+              camera_name: BirdsView
+              render_scale: 1
+              rename_movie_file: 
+                "_LO": "_BV"
+
+            data_key_replace:
+              movie_path: publish_movie_path
+
+          - name: publish file
+            module: KcHooks.pieces.mobu.default.file_publish
+            comment: delete story items and save to publish path
+            break_on_exceptions: true
+
+          - name: note
+            module: KcHooks.pieces.mobu.projects.DTN.write_note
+            data_key_replace:
+              BG_models: "context.plot_all.BG_models"
+
+      - step: main
+        tasks:
+          - name: export asset
+            module: KcHooks.pieces.mobu.default.asset_export
+            comment: export asset
+            data_key_replace:
+              export_path: mobu_master_export_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            conditions:
+                - category: ["CH", "BG", "PROPS"]
+
+          - name: export multi camera asset
+            module: KcHooks.pieces.mobu.default.multi_cameras_export
+            comment: export camera
+            data_defaults:
+              key_name: plot
+              mode: master_export
+              save_switcher: false
+            data_key_replace:
+              export_path: mobu_master_export_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            conditions:
+              - category: camera
+
+      - step: post_main
+        tasks:
+          - name: open file
+            module: KcHooks.pieces.mobu.default.file_open
+            data_key_replace:
+              path: mobu_master_export_path
+
+          - name: remove namespace
+            module: KcHooks.pieces.mobu.default.remove_namespace
+            comment: remove namespace numbers
+            
+          - name: save file
+            module: KcHooks.pieces.mobu.default.file_save
+            data_key_replace:
+              path: mobu_master_export_path
+
+          - name: convert prop model to skl and save
+            module: KcHooks.pieces.mobu.projects.DTN.convert_null_to_skl
+            conditions:
+              - category: PROPS
+
+    convert: []
+
+    mobu_master_export_varidate:
+      - step: primary
+        tasks:
+          - name: open_file
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: open file
+
+      - step: main
+        tasks:
+          - name: export asset
+            module: KcHooks.pieces.mobu.default.asset_export
+            comment: export asset
+            data_defaults:
+              mode: varidate
+            conditions:
+                - category: ["CH", "BG", "PROPS"]
+
+            data_key_replace:
+              export_path: mobu_master_export_path
+
+          - name: export multi camera asset
+            module: KcHooks.pieces.mobu.default.multi_cameras_export
+            comment: export camera
+            data_defaults:
+              key_name: plot
+              mode: varidate
+              
+
+            data_key_replace:
+              export_path: mobu_master_export_path
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            conditions:
+              - category: camera
+
+
+    mobu_edit_render:
+      - step: primary
+        tasks:
+          - name: open
+            module: KcHooks.pieces.mobu.default.file_open
+            comment: "set scene time to context"
+
+          # - name: change scene time
+          #   module: KcHooks.pieces.mobu.default.change_time
+          #   comment: "change scene time. result set to pass_data"
+          #   fps: 24
+          #   mode: change
+
+          - name: render
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: "render scene"
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            data_defaults:
+              render_type: switcher
+
+      - step: closure
+        tasks:
+          - name: revert scene time
+            module: KcHooks.pieces.mobu.default.change_time
+            comment: "revert scene time"
+            mode: revert
+            data_key_replace:
+              revert_times: context.file_open.scene_times

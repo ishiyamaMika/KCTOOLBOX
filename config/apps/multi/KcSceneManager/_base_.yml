@@ -1,4 +1,10 @@
 info: {}
 
 data: 
-    directory: ""
+  directory: ""
+
+  columns: 
+    asset_table: 
+      - check
+      - name
+      - group

@@ -19,9 +19,8 @@ def get_scene_time():
 def set_fps(fps):
     FBPlayerControl().SetTransportFps(FBTimeMode.kFBTimeModeCustom, float(fps))
 
-
 def set_scene_time(loop_start, loop_stop, zoom_start=-1, zoom_stop=-1, fps=-1):
-    if fps is not -1:
+    if fps != -1:
         set_fps(fps)
 
     FBPlayerControl().LoopStop = FBTime(0, 0, 0, loop_stop)
@@ -38,7 +37,7 @@ def set_scene_time(loop_start, loop_stop, zoom_start=-1, zoom_stop=-1, fps=-1):
         FBPlayerControl().ZoomWindowStop = FBTime(0, 0, 0, zoom_stop)
 
 def set_zoom_time(start, stop, fps=-1):
-    if fps is not -1:
+    if fps != -1:
         set_fps(fps)
 
     scene_time = get_scene_time()

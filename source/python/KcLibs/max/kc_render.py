@@ -44,7 +44,6 @@ def remove_render_elements(ignore):
         element = manager.getRenderElement(i)
         name = element.elementname
         if True not in [l in name for l in ignore]:
-            print("remove: {}".format(name))
             manager.RemoveRenderElement(element)
 
 
@@ -98,5 +97,5 @@ if __name__ == "__main__":
     path = "E:/aaasadwffa/bbbb/ccsdsdcc_0000.png"
     # cmd = 'rendOutputFilename = "{}"'.format(path)
     # MaxPlus.Core.EvalMAXScript(cmd)
-    print(234234)
+
     setup(0, 10, 720, 360, output_path=path)

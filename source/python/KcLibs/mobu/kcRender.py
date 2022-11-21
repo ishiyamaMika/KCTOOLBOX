@@ -12,6 +12,7 @@ if sys_path not in sys.path:
 
 import KcLibs.mobu.kc_model as kc_model    
 import KcLibs.mobu.kc_transport_time as kc_transport_time    
+import KcLibs.mobu.kc_camera as kc_camera    
 
 class KcRender(object):
     def __init__(self):
@@ -34,7 +35,6 @@ class KcRender(object):
         for k, v in kwargs.items():
             if hasattr(self, k):
                 setattr(self, k, v)
-                print("options:", k, v)
 
     def execute(self, cam, path, dialog=False):
         def _set_start_end_fps():
@@ -77,13 +77,11 @@ class KcRender(object):
             cam.ResolutionHeight = int(float(cam.ResolutionHeight) * float(scale))
             cam.ResolutionWidth = int(float(cam.ResolutionWidth) * float(scale))
 
-            print("change cam to:", cam.ResolutionWidth, cam.ResolutionHeight)
             return width, height
 
         def _revert_resolution(cam, width, height):
             cam.ResolutionWidth = width
             cam.ResolutionHeight = height
-            print("revert cam to:", width, height)
 
         if path == "":
             return False
@@ -113,33 +111,43 @@ class KcRender(object):
 
         app = FBApplication()
 
-        if isinstance(cam, str):
-            cam = kc_model.find_model_by_name(cam)
-            if not cam:
-                print("")
+        selected_pane = FBSystem().Scene.Renderer.GetSelectedPaneIndex()
+        if cam == "switcher":
+            kc_camera.change_cam("switcher", pane=selected_pane)
+        else:
+            if isinstance(cam, str):
+                cam = kc_model.find_model_by_name(cam)
+                if not cam:
+                    return False
+                kc_camera.change_cam(cam, selected_pane)
+            
+            if self.render_scale != 1:
+                width, height = _change_resolution(cam, self.render_scale)
+
+            kc_camera.change_cam(cam, pane=selected_pane)
+        """
+        try:
+            app.SwitchViewerCamera(cam)
+        except:
+            try:
+                FBSystem().Scene.Renderer.SetCameraInPane(cam, selected_pane)
+            except:
                 return False
+        """
 
-        
-        if self.render_scale != 1:
-            width, height = _change_resolution(cam, self.render_scale)
-
-        app.SwitchViewerCamera(cam)
         FBSystem().Scene.Evaluate()
 
         app.FileRender(grabber_options)
-        if self.render_scale != 1:
+        if self.render_scale != 1 and cam != "switcher":
             _revert_resolution(cam, width, height)
 
         return True
 
-if __name__ == "__builtin__":
-    cam = "cam_s01c006A:Merge_Camera"
-    path = "E:/works/client/keica/data/test.mov"
+if __name__ in ["__builtin__", "builtins"]:
+    cam = "switcher"
+    path = "K:/DTN/LO/LO/movie/master/test.mov"
     render = KcRender()
     render.render_scale = 0.5
-    render.execute(cam, path)
-
-
-
-
-
+    render.start = 0
+    render.end = 200
+    print(render.execute(cam, path))

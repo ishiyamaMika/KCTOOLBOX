@@ -11,14 +11,13 @@ if sys_path not in sys.path:
     sys.path.append(sys_path)
 
 import KcLibs.core.kc_env as kc_env
-import KcLibs.mobu.kc_model as kc_model
 
-from KcLibs.mobu.KcRender import *
+from KcLibs.mobu.KcRender import KcRender
 
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "render_scene"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     data = event.get("data", {})
@@ -28,26 +27,37 @@ def main(event={}, context={}):
         logger = PzLog().logger
 
     return_code = 0
-
     render = KcRender()
 
     cam = False
     namespace = ""
-    for camera in FBSystem().Scene.Cameras:
-        long_name = camera.LongName
-        if not ":" in long_name:
-            continue
 
-        namespace = long_name.split(":")[0]
+    if data.get("render_type") == "switcher":
+        cam = "switcher"
 
-        if "cam_{}".format(data["shot_name"]) ==  namespace:
-            cam = camera
-            break
+    else:
+        for camera in FBSystem().Scene.Cameras:
+            long_name = camera.LongName
+            # if ":" not in long_name:
+            #     continue
+            if "camera_name" in data:
+                if data["camera_name"] in long_name:
+                    cam = camera
+                    break
+            else:
+                namespace = long_name.split(":")[0]
+
+                if "cam_{}".format(data["shot_name"]) == namespace:
+                    cam = camera
+                    break
 
     if not cam:
-        logger.debug("cam is not exists: {}".format("cam_{}".format(data["shot_name"])))
-        flg = False
-        header = u"render シーンにカメラがありませんでした: {}".format(namespace)
+        if "camera_name" in data:
+            logger.debug("cam is not exists: {}".format("cam_{}".format(data["camera_name"])))
+            header = u"render シーンにカメラがありませんでした: {}".format(data["camera_name"])
+        else:
+            logger.debug("cam is not exists: {}".format("cam_{}".format(data["shot_name"])))
+            header = u"render シーンにカメラがありませんでした: {}".format(namespace)
         logger.details.set_header(header)
         return {"return_code": 1}
 
@@ -59,24 +69,30 @@ def main(event={}, context={}):
     render.fps = data["fps"]
     if data["render_scale"] != 1:
         render.render_scale = data["render_scale"]
+    movie_path = str(data["movie_path"])
+    if "rename_movie_file" in data:
+        for k, v in data["rename_movie_file"].items():
+            logger.debug("rename_movie_file: {} -> {}".format(k, v))
+            logger.details.add_detail("rename_movie_file: {} -> {}".format(k, v))
+            movie_path = movie_path.replace(k, v)
 
-    render.execute(cam, str(data["movie_path"]))
+    result = render.execute(cam, movie_path)
+    logger.debug(result)
+    logger.debug("render to: {}".format(movie_path))
+    logger.details.add_detail("render to: {}".format(movie_path))
 
-    logger.debug("render to: {}".format(data["movie_path"]))
-    header = u"renderしました"
-    detail = u"path: \n{}\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(data["movie_path"], 
-                                                                                data["start"],
-                                                                                data["end"],
-                                                                                data["fps"], 
-                                                                                data["render_scale"])
+    header = u"renderしました: {}".format(os.path.basename(movie_path))
+    detail = u"path: \n{}\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(data["movie_path"],
+                                                                              data["start"],
+                                                                              data["end"],
+                                                                              data["fps"],
+                                                                              data["render_scale"])
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
-from KcLibs.core.KcProject import *
-import KcLibs.core.kc_env as kc_env
 
-if __name__ == "__builtin__":
+if __name__ in ["__builtin__", "builtins"]:
     piece_data = {"include_model": True}
     
     data ={u'cut': u'005',

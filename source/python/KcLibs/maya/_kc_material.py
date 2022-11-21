@@ -14,7 +14,6 @@ def set_material_color(material, value):
             print("attr was locked: pass")
             return True
         connections = cmds.listConnections(attr, s=True, d=False)
-        print(connections)
         if len(connections) > 0:
             print("attr was connected: pass")
             return True
@@ -47,7 +46,6 @@ def replace_material_type(material_dict):
             replace_node = cmds.shadingNode(material_dict["type"], asShader=True)
         else:
             replace_node = material_dict["replace_node"]
-        print("-----------", replace_node)
 
         #cmds.replaceNode(material_dict["name"], replace_node)
         mm.eval(r'replaceNode "{}" "{}";'.format(material_dict["name"], replace_node))

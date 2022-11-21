@@ -16,7 +16,7 @@ def comp_property_list(function):
         a = _get_property_list_data()
         res = function(*args, **kwargs)
         _comp_property(a, _get_property_list_data(False))
-
+ 
         return res
 
     return _deco
@@ -263,6 +263,9 @@ def get_all(node, gbl):
 def remove_trs(node, time_range):
     for i in range(len(time_range)):
         time_range[i] = _change_to_FBTime(time_range[i], i)
+    if not hasattr(node.Translation.GetAnimationNode(), "Nodes"):
+        return
+
     for i in range(3):
         try:
             node.Translation.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
@@ -275,6 +278,10 @@ def remove_trs(node, time_range):
 def remove_rot(node, time_range):
     for i in range(len(time_range)):
         time_range[i] = _change_to_FBTime(time_range[i], i)
+
+    if not hasattr(node.Rotation.GetAnimationNode(), "Nodes"):
+        return
+
     for i in range(3):
         try:
             node.Rotation.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
@@ -286,6 +293,9 @@ def remove_rot(node, time_range):
 def remove_scl(node, time_range):
     for i in range(len(time_range)):
         time_range[i] = _change_to_FBTime(time_range[i], i)
+
+    if not hasattr(node.Scaling.GetAnimationNode(), "Nodes"):
+        return
     for i in range(3):
         try:
             node.Scaling.GetAnimationNode().Nodes[i].FCurve.KeyDeleteByTimeRange(*time_range)
@@ -471,6 +481,7 @@ def scl_key_infos(model):
 
 class KeyInfo:
     def __init__(self, trs, xyz, frame, fb_time, value=None):
+
         self.frame = frame
         self.value = value
         self.trs = trs
@@ -514,34 +525,66 @@ def get_frame(fb_time):
         return fb_time.GetFrame(True)
 
 def copy_local_animation(src, dst, trs=[True, True, True], delete_base=False):
-    if trs[0]:
-        copy_local_translation(src, dst, delete_base)
-    if trs[1]:
-        copy_local_rotation(src, dst, delete_base)
-    if trs[2]:
-        copy_local_scaling(src, dst, delete_base)
+    for i, transform in enumerate(trs):
+        if not transform:
+            continue
 
+        if i == 0:
+            if delete_base:
+                remove_trs(dst, [_get_start(), "infinity", True])
+            anim_node = src.Translation.GetAnimationNode()
+            if anim_node is None:
+                trans = get_trs(src, False)
+                set_trs(dst, trans, False)
+                return
+        elif i == 1:
+            if delete_base:
+                remove_rot(dst, [_get_start(), "infinity", True])
+            anim_node = src.Rotation.GetAnimationNode()
+            if anim_node is None:
+                trans = get_rot(src, False)
+                set_rot(dst, trans, False)
+                return            
+        else:
+            if delete_base:
+                remove_scl(dst, [_get_start(), "infinity", True])
+            anim_node = src.Scaling.GetAnimationNode()
+            if anim_node is None:
+                trans = get_scl(src, False)
+                set_scl(dst, trans, False)
+                return
+        
+        if i == 0:
+            dst.Translation.SetAnimated(True)
+            dst_anim_node = dst.Translation.GetAnimationNode()
+        elif i == 1:
+            dst.Rotation.SetAnimated(True)
+            dst_anim_node = dst.Rotation.GetAnimationNode()
+        else:
+            dst.Scaling.SetAnimated(True)
+            dst_anim_node = dst.Scaling.GetAnimationNode()
+        for i in range(3):
+            other_attrs = {}
+            if anim_node.Nodes[i] is None:
+                continue
+            dst_anim_node.Nodes[i].FCurve.EditBegin()
+            for k in anim_node.Nodes[i].FCurve.Keys:
+                values = get_key_attrs(k)
+                index = dst_anim_node.Nodes[i].FCurve.KeyAdd(FBTime(0, 0, 0, values["frame"]), values["value"])
+                other_attrs[values["frame"]] = values
 
+                # dst.Translation.GetAnimationNode().Nodes[i].FCurve.Keys.append(k)
+            dst_anim_node.Nodes[i].FCurve.EditEnd()
+            frames = list(other_attrs.keys())
+            frames.sort()
 
-def copy_local_translation(src, dst, delete_base=False):
-    remove_trs(dst, [_get_start(), "infinity", True])
-    if src.Translation.GetAnimationNode() is None:
-        return
-       
-    mx = max_len(src.Translation.GetAnimationNode())
-    xyz_keys = trs_key_infos(src)
+            dst_anim_node.Nodes[i].FCurve.EditBegin()
+            for k in dst_anim_node.Nodes[i].FCurve.Keys:
+                if k.Time.GetFrame() in frames:
+                    values = other_attrs[k.Time.GetFrame()]
+                    set_key_attrs(k, values)
 
-    dst.Translation.SetAnimated(True)
-    for i in range(mx):
-        if len(xyz_keys[0]) > i:
-            dst.Translation.GetAnimationNode().Nodes[xyz_keys[0][i].xyz].FCurve.KeyAdd(xyz_keys[0][i].fb_time, xyz_keys[0][i].value)
-        if len(xyz_keys[1]) > i:
-            dst.Translation.GetAnimationNode().Nodes[xyz_keys[1][i].xyz].FCurve.KeyAdd(xyz_keys[1][i].fb_time, xyz_keys[1][i].value)
-        if len(xyz_keys[2]) > i:
-            dst.Translation.GetAnimationNode().Nodes[xyz_keys[2][i].xyz].FCurve.KeyAdd(xyz_keys[2][i].fb_time, xyz_keys[2][i].value)
-    if delete_base:
-        remove_trs(src, [_get_start(), "infinity", True])
-        src.Translation = FBVector3d(0, 0, 0)
+            dst_anim_node.Nodes[i].FCurve.EditEnd()
 
 def copy_local_rotation(src, dst, delete_base=False):
     if src.Rotation.GetAnimationNode() is None:
@@ -597,7 +640,6 @@ def get_key_attrs(key):
             dic[attr] = {"type": class_name, "value": value.name}
         else:
             dic[attr] = value
-
     return dic
 
 def set_key_attrs(key, attrs):
@@ -693,15 +735,21 @@ def change_key_to_stepped(model):
         
         return curve_names
 
-if __name__ == "__builtin__":
+if __name__ in ["__builtin__", "__main__", "builtins"]:
     from pyfbsdk import*
+
     #model = FBFindModelByName("src")
     #y = FBFindModelByName("dst")    
     #copy_local_animation(model, y, [True, True, False])
     #plot_selected(30.0)
-
+    """
     m_list = FBModelList()
     FBGetSelectedModels(m_list)
     print(change_key_to_stepped([l for l in m_list]))
     print("DONE")
+    """
 
+    m_list = FBModelList()
+    FBGetSelectedModels(m_list)
+    print(m_list[0].LongName, m_list[1].LongName)
+    copy_local_animation(m_list[0], m_list[1])

@@ -20,7 +20,7 @@ import KcLibs.mobu.kc_model as kc_model
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "plot_all"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     """
@@ -60,16 +60,14 @@ def main(event={}, context={}):
         if not os.path.lexists(config):
             continue
         
-        info, data = data["project"].sticky.read(config)
-        for d in data:
+        info, data_ = data["project"].sticky.read(config)
+        for d in data_:
             if not _ignore(d):
                 continue
             model_names.append("{}:{}".format(asset["namespace"], d["name"]))
 
     kc_model.select(model_names)
 
-    print("select camera models")
-    print("plot")
     header = u"plotしました: {}".format(len(model_names))
     detail = "plot:\n" + "\n".join(model_names)
     kc_key.plot_selected()
@@ -82,7 +80,7 @@ def main(event={}, context={}):
         detail += u"\n".join(stepped)
         logger.debug("change key to stepped")
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
 
     return {"return_code": return_code}
 

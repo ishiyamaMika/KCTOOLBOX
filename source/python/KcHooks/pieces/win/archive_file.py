@@ -16,7 +16,7 @@ from KcLibs.core.KcProject import KcProject
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "archive_file"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     """
@@ -31,7 +31,7 @@ def main(event={}, context={}):
 
     return_code = 0
 
-    header = "noting to archive"
+    header = u"バックアップするものがありません"
     detail = ""
     path = data["path"]
 
@@ -89,7 +89,7 @@ def main(event={}, context={}):
                 successed.append(destination_f_name)
                 if signal:
                     signal.emit("archive successed: {} > {}".format(source_f_name, destination_f_name))                    
-            except:
+            except BaseException:
                 logger.debug("copy failed: {}".format(destination_f_name))
                 error.append(destination_f_name)
                 if signal:
@@ -104,18 +104,19 @@ def main(event={}, context={}):
                         try:
                             os.remove("{}/{}".format(archive_path, each))
                             logger.debug("file remove successed: {}".format(each))
-                        except:
+                        except BaseException:
                             logger.debug("file remove failed: {}".format(each))
 
             detail = u"successed:\n"
             detail += u"\n".join(successed)
             if len(error) == 0:
-                header = u"archived: {}".format(archive_path)
+                header = u"バックアップしました: {}".format(archive_path)
             else:
-                header = u"archive failed: {}".format(archive_path)
+                header = u"バックアップに失敗しました: {}".format(archive_path)
                 detail += u"\n".join(error)
+
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 

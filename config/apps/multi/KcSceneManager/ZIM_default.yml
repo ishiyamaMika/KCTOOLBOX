@@ -38,6 +38,9 @@ data:
     "<cut>": "001"
     "<take>": "01"
     "<version>": "01"
+  
+  convert_to: max
+  master_export_action: convert
 
   puzzle:
     mobu_edit_export_varidate:
@@ -56,7 +59,7 @@ data:
               mode: varidate
 
             # conditions:
-            #     - category: ["CH", "BG", "PR", "LO"]
+            #     - category: ["CH", "BG", "PROPS", "LO"]
             data_key_replace:
               export_path: mobu_edit_export_path
 
@@ -273,7 +276,7 @@ data:
             data_defaults:
               mode: master_varidate
             # conditions:
-            #     - category: ["CH", "BG", "PR", "LO"]
+            #     - category: ["CH", "BG", "PROPS", "LO"]
             data_key_replace:
               export_path: mobu_master_export_path
 

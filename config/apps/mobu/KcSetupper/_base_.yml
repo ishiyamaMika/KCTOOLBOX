@@ -95,6 +95,8 @@ data:
         - name: add_namespace
           view: "add namespace"
           module: KcHooks.pieces.mobu.default.add_namespace
+          data_defaults:
+            force: true
 
         - name: add_folder
           view: "create/update folder"

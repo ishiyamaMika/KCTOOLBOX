@@ -55,7 +55,7 @@ def main(event={}, context={}):
     else:
         header = u"既存のkomaファイルを削除しました"
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":

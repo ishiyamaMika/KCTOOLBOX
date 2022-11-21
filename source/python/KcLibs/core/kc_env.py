@@ -58,14 +58,12 @@ def append_sys_paths():
         sys_paths = ["{}/source/python/site-packages/py3".format(get_root_directory())]
 
     for sys_path in sys_paths:
-        print(sys_path in sys.path, sys_path)
         if sys_path not in sys.path:
             sys.path.append(sys_path)
             print("append: {}".format(sys_path))
 
     return sys_paths
 
-print("append sys path:")
 append_sys_paths()
 
 from puzzle2.PzLog import PzLog
@@ -92,7 +90,6 @@ def get_logger(name="KcToolBox", level="DEBUG"):
         os.makedirs(path)
 
     log_path = "{}/{}.log".format(path, name)
-    print(log_path)
     file_handler = TimedRotatingFileHandler(log_path, when="W0")
     file_handler.setFormatter(formatter)
 

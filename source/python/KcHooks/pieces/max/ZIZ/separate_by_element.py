@@ -18,7 +18,7 @@ import KcLibs.max.kc_render as kc_render
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "separate_by_element"
-DATA_KEY_REQUIRED = [""]
+
 
 def change_shell_state(type_):
     if type_ == "col":

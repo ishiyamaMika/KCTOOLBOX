@@ -32,12 +32,10 @@ def main(event={}, context={}):
         logger = PzLog().logger
 
     return_code = 0
-    print("data: {}".format(data))
 
 
     category = data["properties"]["category"]
     if not "namespace" in data:
-        print("namespace is not exists")
         logger.details.set_header(u"namespaceが設定されていません")
         return {"return_code": 1}
 
@@ -88,7 +86,6 @@ def main(event={}, context={}):
             value = str(value)
 
         if prop in property_list:
-            print("update property", prop, ":", value)
             property_list[prop].Data = value
         else:
             if meta_model.PropertyList.Find(str(prop)):

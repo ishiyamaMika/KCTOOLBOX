@@ -216,9 +216,6 @@ class KcSetupper(QtWidgets.QWidget):
             btn.setText(preset.get("view", preset["name"]))
 
             btn.row_data = preset
-            import pprint
-            print(preset.get("view", preset["name"]))
-            pprint.pprint(preset.get("widgets"))
 
             if "widgets" in preset:
                 for widget_set in preset["widgets"]:
@@ -475,13 +472,6 @@ class KcSetupper(QtWidgets.QWidget):
         reload(mod)
         # data.update(piece_data)
         # response = mod.main({"data": data})
-        import pprint
-        print("")
-        print("tasks")
-        pprint.pprint(piece_data)
-        print("")
-        print("data")
-        pprint.pprint(data)
         task = PzTask(module=mod, task=piece_data, data=data)
         response = task.execute()
         

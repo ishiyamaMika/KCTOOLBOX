@@ -15,7 +15,7 @@ from KcLibs.core.KcProject import KcProject
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "create_directories"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     data = event.get("data", {})
@@ -56,7 +56,7 @@ def main(event={}, context={}):
                     logger.debug(u"create failed   : {}".format(directory))
 
     logger.details.set_header(header)
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
 
     return {"return_code": return_code}
 

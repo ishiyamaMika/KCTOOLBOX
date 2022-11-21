@@ -19,7 +19,7 @@ import KcLibs.mobu.kc_file_io as kc_file_io
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "story_create"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     data = event.get("data", {})
@@ -29,6 +29,7 @@ def main(event={}, context={}):
         logger = PzLog().logger
 
     return_code = 0
+    detail = ""
 
     asset_path = str(data["asset_path"])
 
@@ -47,10 +48,10 @@ def main(event={}, context={}):
     current_constraints = [l for l in FBSystem().Scene.Constraints]
 
     if not exists:
-        detail += u"assetを追加しました\n{}\n".format(asset_path)
+        logger.details.add_detail(u"assetを追加しました\n{}".format(asset_path))
         kc_file_io.file_merge(asset_path, str(data["namespace"]))
     else:
-        detail += u"アセットはすでにシーンに存在します\n"
+        logger.details.add_detail(u"アセットはすでにシーンに存在します")
     
     now_constraints = [l for l in FBSystem().Scene.Constraints]
 
@@ -78,7 +79,7 @@ def main(event={}, context={}):
         detail = u"path: {}".format(plot_config_path)
         logger.debug(header)
         logger.details.set_header(header)
-        logger.details.set_detail(detail)
+        logger.details.add_detail(detail)
         return {"return_code": 1}
 
     info, models = data["project"].sticky.read(plot_config_path)
@@ -90,7 +91,7 @@ def main(event={}, context={}):
     logger.debug("update: {}".format(data["namespace"]))
 
     logger.details.set_header(u"storyのクリップを作成しました: {}".format(data["namespace"]))
-    logger.details.set_detail(detail)
+    logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":

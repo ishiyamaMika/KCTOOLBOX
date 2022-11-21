@@ -73,11 +73,16 @@ def create_clip(track, path, **kwargs):
     FBSystem().Scene.Evaluate()
     return clip
 
-if __name__ == "__builtin__":
-    a = create_story_track("AAA", ["CH_tsukikoQuad:spineB_jt", "CH_tsukikoQuad:spineA_jt"])
-    print(create_clip(a, r"E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_LO_ABCDE_asasad_03.fbx", offset=19))
+def delete_tracks():
+    tracks = get_tracks()
+    for track in tracks[::-1]:
+        track.FBDelete()
 
+if __name__ in ["__builtin__", "builtins"]:
+    # a = create_story_track("AAA", ["CH_tsukikoQuad:spineB_jt", "CH_tsukikoQuad:spineA_jt"])
+    # print(create_clip(a, r"E:/works/client/keica/_942_ZIZ/3D/s01/c001/master/export/ZIM_s01c001_anim_LO_ABCDE_asasad_03.fbx", offset=19))
 
+    delete_tracks()
 
     
 

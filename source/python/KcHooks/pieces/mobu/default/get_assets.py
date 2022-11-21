@@ -30,7 +30,6 @@ def main(event={}, context={}):
                 return int(groups[0])
         return 1
 
-
     data = event.get("data", {})
 
     logger = context.get("logger")

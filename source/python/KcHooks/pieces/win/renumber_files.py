@@ -17,7 +17,7 @@ from KcLibs.core.KcProject import KcProject
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "renumber_files"
-DATA_KEY_REQUIRED = [""]
+
 
 def main(event={}, context={}):
     """
@@ -78,7 +78,7 @@ def main(event={}, context={}):
         if match:
             number = match.groups()[0]
             if start_frame_offset == -1:
-                print("frame_offset: True: {}".format(number))
+                logger.details.add_detail("frame_offset: True: {}".format(number))
                 start_frame_offset = int(number)
 
             padding = "{:0" + str(len(number)) + "d}"
@@ -88,10 +88,10 @@ def main(event={}, context={}):
 
             logger.debug("old: {}".format(f))
             logger.debug("new: {}".format(new_f))
-            print("old   : {}".format(f))
-            print("new   : {}".format(new_f))
-            print("frame : {}".format(int(number)))
-            print("offset: -{}".format(start_frame_offset))
+            logger.details.add_detail("old   : {}".format(f))
+            logger.details.add_detail("new   : {}".format(new_f))
+            logger.details.add_detail("frame : {}".format(int(number)))
+            logger.details.add_detail("offset: -{}".format(start_frame_offset))
 
             renumber.append("{}@{}".format(frame, int(number) - start_frame_offset))
             destination_path = "{}/{}".format(data["destination_directory"], new_f)

@@ -26,12 +26,12 @@ import logging
 from logging import getLogger, StreamHandler, FileHandler
 
 class KcProject(object):
-    def __init__(self, logger=None):
+    def __init__(self, logger=None, logger_name="KcToolBox"):
         if logger is None:
-            self.logger = kc_env.get_logger("KcToolBox")
+            self.logger = kc_env.get_logger(logger_name)
         else:
             self.logger = logger
-        self.puzzle = Puzzle(logger=self.logger)
+        self.puzzle = Puzzle(logger=self.logger, new=True)
         self.field_generator = FieldValueGenerator()
         self.sticky = StickyConfig()
         self.config = {}
@@ -96,26 +96,25 @@ class KcProject(object):
             "fps": fps
             }
 
-        task_set = self.config["puzzle"]["change_camera"]["main"][0]
-        task_set["module"] = task_set["module"].replace("<app>", kc_env.mode)
-
+        task_set = copy.deepcopy(self.config["puzzle"]["change_camera"])
+        for task_set_ in task_set:
+            for task in task_set_["tasks"]:
+                task["module"] = task["module"].replace("<app>", kc_env.mode)
         context, results = self.puzzle_play(task_set, {"main": data})
 
-
     def get_cameras(self, include_model=False):
-        if not "puzzle" in self.config:
+        if "puzzle" not in self.config:
             return []
 
         task_set = copy.deepcopy(self.config["puzzle"]["get_cameras"])
+        for task_set_ in task_set:
+            for task in task_set_["tasks"]:
+                task["module"] = task["module"].replace("<app>", kc_env.mode)
 
-        for task_set_ in task_set["main"]:
-            for each in task_set["main"]:
-                each["module"] = each["module"].replace("<app>", kc_env.mode)
-
-        task_set["include_model"] = include_model
+        # task_set["include_model"] = include_model
         context, results = self.puzzle_play(task_set, {})
 
-        return pass_data.get("cameras", [])
+        return context.get("get_cameras.cameras", [])
 
     def get_latest_camera_path(self, mode="mobu"):
         rig_path = self.config["asset"][mode]["paths"]["camera"]["rig"]
@@ -141,7 +140,7 @@ class KcProject(object):
         return assets[0]
 
     def get_assets(self):
-
+     
         if "puzzle" not in self.config:
             return []
 
@@ -165,18 +164,20 @@ class KcProject(object):
             if isinstance(v, dict):
                 continue
 
-            if not "<" in k:
+            key = k
+            if "<" not in key:
                 key = "<{}>".format(k)
-                if key in self.config["general"]["padding"]:
-                    padding = "{{:0{}d}}".format(self.config["general"]["padding"][key])
-                    if isinstance(v, (int, float)):
+            if key in self.config["general"]["padding"]:
+                padding = "{{:0{}d}}".format(self.config["general"]["padding"][key])
+                if isinstance(v, (int, float)):
+                    try:
                         fields_[key] = padding.format(int(v))
-                    else:
+                    except BaseException:
                         fields_[key] = v
                 else:
-                    fields_[key] = str(v)
+                    fields_[key] = v
             else:
-                fields_[k] = str(v)
+                fields_[key] = str(v)
    
         fields_["<project>"] = self.name
         fields_["<root_directory>"] = self.config["general"]["root_directory"]
@@ -187,31 +188,46 @@ class KcProject(object):
     def path_split(self, template, path):
         return self.field_generator.get_field_value(template, path)
 
-    def puzzle_play(self, task_set, data):
+    def puzzle_play(self, task_set, data, logger_name=None):
+        def _set(result):
+            return [result.get("return_code", 2), result["header"], u"\n".join(result.get("details", []))]
+        
         data["project"] = self
-        self.puzzle.play(task_set, data)
+        if logger_name:
+            puzzle_ = Puzzle(logger_name, new=True)
+            puzzle_.play(task_set, data)
+            results = [_set(l) for l in puzzle_.logger.details.get_all()]
+        else:
+            self.puzzle.play(task_set, data)
+            results = [_set(l) for l in self.puzzle.logger.details.get_all()]
         error = []
-        results = self.puzzle.logger.details.get_all()
+
         for result in results:
-            if result["return_code"] != 0:
-                error.append("{}\n{}".format(u"{}".format(result["header"]), u"\n".join(result["details"])))
+            if result[0] != 0:
+                error.append("{}\n{}".format(u"{}".format(result[1]), result[2]))
 
         if len(error) > 0:
             try:
                 self.logger.error(u"\n".join(error))
-            except:
+            except BaseException:
                 self.logger.error(traceback.format_exc())
+        if logger_name:
+            return puzzle_.context, results
+        else:
+            return self.puzzle.context, results
 
-        return self.puzzle.context, results
 
-
-if __name__ in ["__main__", "__builtin__"]:
+if __name__ in ["__main__", "__builtin__", "builtins"]:
+    print("xxx")
+    """
     x = KcProject()
-    x.set("ZIM", "home")
+    x.set("DTN", "default")
     x.set_tool_config("multi", "KcSceneManager")
 
     print("")
     print("")
+
+    print(x.get_cameras())
 
     template = "<asset_root>/<category>/<asset_name>/MB/<category>_<asset_name>_t<take>_<version>.fbx"
     print(x.path_generate(template, 
@@ -220,9 +236,6 @@ if __name__ in ["__main__", "__builtin__"]:
                            "take": 1, 
                            "version": 1}))
 
-    print(x.get_cameras())
-
-    
     assets = x.get_assets() + x.get_cameras()
 
     print("")
@@ -287,7 +300,7 @@ if __name__ in ["__main__", "__builtin__"]:
         merge_assets.setdefault(asset["category"], []).append(asset)
         add_namespace.append(asset["namespace"])
 
-    keys = merge_assets.keys()
+    keys = list(merge_assets.keys())
     keys.sort()
 
     list_assets = []
@@ -298,6 +311,18 @@ if __name__ in ["__main__", "__builtin__"]:
     print("")
     print("")
 
+    print("________", x.path_generate(template, fields))
+
+
+    print("________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad"))
+
+    print(x.get_cameras())
+    x.change_camera("cam_s99c999", 0, 100, 24)
+
+    """
+    x = KcProject()
+    x.set("DTN", "default")
+    x.set_tool_config("multi", "KcSceneManager")
     fields = {u'category': u'CH',
                'config': {'export': False, 'plot': False},
                'cut': u'001',
@@ -312,10 +337,25 @@ if __name__ in ["__main__", "__builtin__"]:
                u'update_at': u'2021/11/18 01:17:16',
                u'update_by': u'amek'}
     template = "<root_directory>/3D/s<scene>/c<cut>/master/export/<project>_s<scene>c<cut>_anim_<namespace>.fbx"
-    print("________", x.path_generate(template, fields))
 
 
-    print("________AAAAAAAAAAA", x.get_asset("CH_tsukikoQuad"))
+    template = "<shot_root>/LO/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<take>_<version>_<progress>.fbx"
+    fields = {
+        "<shot_root>": "D:/",
+        "<part>": "A",
+        "<seq>": "S23",
+        "<cut>": "A0484-A0486",
+        "<take>": 1,
+        "<version>": 2,
+        "<progress>": "addAssets"
+    }
+    print("???????????")
+    print(x.path_generate(template, fields))
 
+    a = "K:/DTN/LO/A_S23_001/A_S23_001_01_01_test.fbx" 
+    b = "<shot_root>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<take>_<version>_<progress>.fbx"
+    print(x.field_generator.get_field_value(b, a))
+    print("!!")
     print(x.get_cameras())
-    x.change_camera("cam_s99c999", 0, 100, 24)
+    data = {}
+    context, results = x.puzzle_play(x.tool_config["puzzle"]["mobu_edit_export_varidate"], data)

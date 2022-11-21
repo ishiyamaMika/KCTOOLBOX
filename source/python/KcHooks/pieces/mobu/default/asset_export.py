@@ -25,31 +25,42 @@ TASK_NAME = "asset_export"
 
 def varidate(data, logger):
     export_path = data["export_path"]
+    logger.details.add_detail(str(data))
+
     if not export_path:
-        logger.details.set_header(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
-        logger.debug(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.details.set_header(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.debug(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         return {"return_code": 1}
 
     if not data["config"]["export"]:
-        logger.details.set_header(u"[error] 設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
-        logger.debug(u"[error] 設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.debug(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if not os.path.exists(data["config"]["export"]):
-        logger.details.set_header(u"[error] 設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
-        logger.debug(u"[error] 設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.debug(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
     
     asset_directory = os.path.normpath(os.path.join(data["config"]["export"], "../../"))
+    rig_paths = glob.glob(data["rig_path"])
+    if len(rig_paths) > 0:
+        asset_directory = os.path.dirname(rig_paths[0])
+    else:
+        logger.details.set_header(u"rigフォルダがみつけられませんでした: {}".format(data["namespace"]))
+        logger.debug(u"rigフォルダがみつけられませんでした: {}".format(data["namespace"]))
+        return {"return_code": 1}
     paths = data["project"].config["asset"]["mobu"]["paths"]
 
     asset_meta = data["project"].get_asset(data["namespace"])
     if not asset_meta:
-        logger.details.set_header(u"[error] metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
-        logger.debug(u"[error] metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.details.set_header(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.debug(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     take_versions = []
+    logger.details.add_detail("export: {}".format(data["config"]["export"]))
+    logger.details.add_detail("check : {}".format(asset_directory))
     for each in os.listdir(asset_directory):
         if not each.lower().endswith(".fbx"):
             continue
@@ -60,6 +71,8 @@ def varidate(data, logger):
             template = paths[data["category"]]["rig"]
         else:
             template = paths["default"]["rig"]
+        
+        logger.details.add_detail(template)
 
         fields = data["project"].path_split(template, asset_path)
         if "<take>" in fields:
@@ -70,13 +83,13 @@ def varidate(data, logger):
 
     take_versions.sort()
     if len(take_versions) == 0:
-        logger.details.set_header(u"[error] アセットファイルが存在しません: {}".format(data["namespace"]))
-        logger.debug(u"[error] アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.details.set_header(u"アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.debug(u"アセットファイルが存在しません: {}".format(data["namespace"]))
         return {"return_code": 1}
     
     if asset_meta["take"] != take_versions[-1][0]:
-        logger.details.set_header(u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
-        logger.debug(u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.details.set_header(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.debug(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         return {"return_code": 1}
 
     info, models = data["project"].sticky.read(data["config"]["export"])
@@ -86,9 +99,9 @@ def varidate(data, logger):
 
     if len(model_names) != len(models):
         diff = list(set(model_names) | set([l.LongName for l in models]))
-        logger.details.set_header(u"[error] 設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
+        logger.details.set_header(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
         logger.details.add_detail(u"以下のmodelがありません\n{}".format("\n".join(diff)))
-        logger.debug(u"[error] 設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
+        logger.debug(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
 
         return {"return_code": 1}
 
@@ -100,18 +113,18 @@ def varidate(data, logger):
 def master_varidate(data, logger):
     export_path = data["export_path"]
     if not export_path:
-        logger.details.set_header(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
-        logger.debug(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.details.set_header(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.debug(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         return {"return_code": 1}
 
     if not data["config"]["export"]:
-        logger.details.set_header(u"[error] 設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
-        logger.debug(u"[error] 設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.debug(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if not os.path.exists(data["config"]["export"]):
-        logger.details.set_header(u"[error] 設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
-        logger.debug(u"[error] 設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.debug(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     asset_directory = os.path.dirname(data["max_asset_path"])
@@ -119,8 +132,8 @@ def master_varidate(data, logger):
     asset_meta = data["project"].get_asset(data["namespace"])
 
     if not asset_meta:
-        logger.details.set_header(u"[error] metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
-        logger.debug(u"[error] metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.details.set_header(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.debug(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     take_versions = []
@@ -146,13 +159,13 @@ def master_varidate(data, logger):
     take_versions.sort()
 
     if len(take_versions) == 0:
-        logger.details.set_header(u"[error] アセットファイルが存在しません: {}".format(data["namespace"]))
-        logger.debug(u"[error] アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.details.set_header(u"アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.debug(u"アセットファイルが存在しません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if asset_meta["take"] != take_versions[-1][0]:
-        logger.details.set_header(u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
-        logger.debug(u"[error] シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.details.set_header(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.debug(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         return {"return_code": 1}
 
     info, models = data["project"].sticky.read(data["config"]["export"])
@@ -162,8 +175,8 @@ def master_varidate(data, logger):
 
     if len(model_names) != len(models):
         diff = list(set(model_names) | set([l.LongName for l in models if ignore_models(l["name"])]))
-        logger.details.set_header(u"[error] 設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
-        logger.debug(u"[error] 設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))        
+        logger.details.set_header(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
+        logger.debug(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))        
         logger.details.add_detail(u"以下のmodelがありません\n{}".format("\n".join(diff)))
         return {"return_code": 1}
     
@@ -222,7 +235,6 @@ def main(event={}, context={}):
     from pass_data: project, @camera, @width, @height
     """
     data = event.get("data", {})
-
     logger = context.get("logger")
     if not logger:
         logger = PzLog().logger
@@ -240,9 +252,10 @@ def main(event={}, context={}):
 
 
 
-if __name__ == "__builtin__":
+if __name__ in ["__builtin__", "builtins"]:
     x = KcProject()
     x.set("ZIM", "default")
+    from KcLibs.core.KcProject import KcProject
     def edit_varidate__test():
         piece_data = {'path': "E:/works/client/keica/data/assets", 
                     "mode": "varidate", 
@@ -274,37 +287,25 @@ if __name__ == "__builtin__":
         return data
     
     def master_varidate__test():
-        piece_data = {'description': 'export asset',
-                      'mode': 'master_varidate',
-                      'name': 'export asset',
-                      'paint': {'export_path': 'mobu_master_export_path'},
-                      'piece': 'KcHooks.pieces.mobu.default.asset_export'}
-        
-        data = {u'asset_name': u'tsukikoQuad',
-                u'category': u'CH',
-                'config': {'export': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_export.json',
-                            'plot': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/config/CH_tsukikoQuad_plot.json'},
-                'cut': u'999',
-                'end': 60,
-                'max_asset_path': 'X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad\\CH_tsukikoQuad_rig_t06_01.max',
-                'mobu_master_export_path': u'X:/Project/_942_ZIZ/3D/s99/c999/3D/master/import/ZIM_s99c999_anim_CH_tsukikoQuad_03.fbx',
-                u'namespace': u'CH_tsukikoQuad_03',
-                'scene': u'99',
-                u'selection': True,
-                'start': 0,
-                u'take': 6.0,
-                u'true_namespace': u'CH_tsukikoQuad',
-                u'type': u'both',
-                u'update_at': u'2022/01/07 17:21:03',
-                u'update_by': u'Naoki.ito',
-                u'variation': u'',
-                u"project": x,
-                u'version': '*'}
+        data = {'category': 'camera',
+                'config': {'export': 'K:/DTN/LO/Asset_keica/camera/MB/models/cam_s00c000_export.json',
+                      'plot': 'K:/DTN/LO/Asset_keica/camera/MB/models/cam_s00c000_plot.json'},
+                'cut': 'A9000-A9999',
+                'end': 120,
+                'export_path': 'K:/DTN/3D/s00/cA9000-A9999/master/export/DTN_s00cA9000-A9999_Cam_AA9000-A9999.fbx',
+                'sotai_path': 'K:/DTN/LO/Asset_keica/camera/MB/sotai/cam_sotai_t01.FBX',
+                'namespace': 'Cam_A9000-A9999',
+                'scene': 0,
+                "mode": "varidate",
+                'start': 0}
 
-        data.update(piece_data)
+        # data.update(piece_data)
         return data
     data = master_varidate__test()
-    data["export_path"] = data["mobu_master_export_path"]
+    x = KcProject()
+    x.set("DTN", "default")
+    data["project"] = x
+    # data["export_path"] = data["mobu_master_export_path"]
 
     main({"data": data})
 
