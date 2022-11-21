@@ -2686,6 +2686,8 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                     path = path.replace(key, "*")
                 for f in glob.glob(path):
                     f = f.replace("\\", "/")
+                    if "/_old" in f:
+                        continue
                     fields = self.project.path_split(base_path, f)
                     if fields:
                         if not "<category>" in fields:
