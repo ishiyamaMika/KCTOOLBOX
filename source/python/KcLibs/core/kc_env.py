@@ -8,6 +8,8 @@ import logging
 from logging import getLogger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 
+sys.dont_write_bytecode = True
+
 sys_path = "{}/source/python".format(os.environ["KEICA_TOOL_PATH"])
 sys_path = os.path.normpath(sys_path).replace("\\", "/")
 if sys_path not in sys.path: 

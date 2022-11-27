@@ -18,7 +18,6 @@ from puzzle2.PzLog import PzLog
 
 TASK_NAME = "render_scene"
 
-
 def main(event={}, context={}):
     data = event.get("data", {})
 
