@@ -51,6 +51,9 @@ data:
           edit_export: "<shot_root>/<part>_<seq>/<part>_<seq>_<cut>/master/export/<project>_<seq>_<cut>.fbx"
           master_export: "<root_directory>/UELO/MB_Data/<part>_<seq>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_cam_<take>_<version>.fbx"
 
+        birdsView:
+          rig: <asset_root>/<category>/MB/BirdsView_t<take>_<version>.FBX
+
   general:
     root_directory: "K:/DTN"
 
@@ -90,6 +93,13 @@ data:
           
           - name: rename camera
             module: KcHooks.pieces.mobu.projects.DTN.merge_rename_camera
+            conditions:
+              - asset_type: camera
+
+          - name: add birdsView
+            module: KcHooks.pieces.mobu.projects.DTN.merge_birds_view
+            conditions:
+              - asset_type: camera
 
     get_assets:
       - step: main

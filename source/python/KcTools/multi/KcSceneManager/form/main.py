@@ -193,12 +193,18 @@ class AssetDialog(QtWidgets.QDialog):
             # kc_file_io.file_merge(str(self.path), namespace=namespace_)
             context, result = self.project.puzzle_play(self.project.config["puzzle"]["mobu_merge_asset"], 
                                                        {"main": {
-                                                           "namespace": namespace_, 
-                                                           "asset_type": self.asset_type, 
+                                                           "namespace": namespace_,
+                                                           "asset_type": self.asset_type,
                                                            "asset_path": self.path}
                                                        })
             results.extend(result)
-        if sum([l[0] for l in results]) == 0:
+
+        ok = True
+        for result in results:
+            if result[0] not in [0, 2]:
+                ok = False
+
+        if ok:
             QtWidgets.QMessageBox.information(self, "info", u"追加しました", QtWidgets.QMessageBox.Ok)
             self.close()
 
