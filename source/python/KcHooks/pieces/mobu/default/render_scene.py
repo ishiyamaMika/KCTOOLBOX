@@ -75,6 +75,11 @@ def main(event={}, context={}):
             logger.debug("rename_movie_file: {} -> {}".format(k, v))
             logger.details.add_detail("rename_movie_file: {} -> {}".format(k, v))
             movie_path = movie_path.replace(k, v)
+    
+    if "add_suffix" in data:
+        d, f = os.path.split(movie_path)
+        f, ext = os.path.splitext(f)
+        movie_path = "{}/{}{}{}".format(d, f, data["add_suffix"], ext)
 
     result = render.execute(cam, movie_path)
     logger.debug(result)

@@ -37,7 +37,6 @@ data:
           edit_export: "<shot_root>/<part>_<seq>/<part>_<seq>_<cut>/master/export/<project>_<seq>_<cut>_anim_<namespace>.fbx"
           master_export: "<root_directory>/UELO/MB_Data/<part>_<seq>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<namespace>_<take>_<version>.fbx"
 
-
         BG:
           rig: <asset_root>/<category>/BG_<asset_name>_t<take>_<version>.fbx
           sotai: <asset_root>/<category>/sotai/BG_<asset_name>_sotai_t<take>.fbx
@@ -74,12 +73,12 @@ data:
 
     mobu:
       paths:
-        edit: <shot_root>/<part>_<seq>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<take>_<version>_<progress>.fbx
+        edit: <shot_root>/<part>_<seq>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<take>_<version>_<user>_<progress>.fbx
         master: <shot_root>/<part>_<seq>/<part>_<seq>_<cut>/master/<part>_<seq>_<cut>_<take>_<version>_<progress>.fbx
         publish: <root_directory>/UELO/MB_Data/<part>_<seq>/<part>_<seq>_<cut>/work/<part>_<seq>_<cut>_<take>_<version>_plot.fbx
 
-        edit_movie: <shot_root>/mov/<part>_<seq>_<cut>_<take>_<version>_<progress>_<user>.mov
-        master_movie: <shot_root>/mov/master/<part>_<seq>_<cut>_<take>_<version>_<progress>_<user>.mov
+        edit_movie: <shot_root>/<part>_<seq>/<part>_<seq>_<cut>/<part>_<seq>_<cut>_<take>_<version>_<user>_<progress>.mov
+        master_movie: <shot_root>/<part>_<seq>/<part>_<seq>_<cut>/master/<part>_<seq>_<cut>_<take>_<version>_<progress>.mov
         publish_movie: <root_directory>/UELO/MB_Data/<part>_<seq>/<part>_<seq>_<cut>/mov/<part>_<seq>_<cut>_<take>_<version>_LO.mov
 
   puzzle:

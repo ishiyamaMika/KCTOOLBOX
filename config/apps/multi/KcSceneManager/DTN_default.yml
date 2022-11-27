@@ -232,6 +232,18 @@ data:
               end: "context.end"
               fps: "context.fps"
 
+          - name: render scene bird view
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: ""
+            data_defaults:
+              camera_name: BirdsView
+              add_suffix: _BV
+
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+
     mobu_master_export:
       - step: primary
         tasks:
@@ -393,6 +405,18 @@ data:
             
             data_defaults:
               render_type: switcher
+
+          - name: render bird view
+            module: KcHooks.pieces.mobu.default.render_scene
+            comment: ""
+            data_defaults:
+              camera_name: BirdsView
+              add_suffix: _BV
+
+            data_key_replace:
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
 
       - step: closure
         tasks:

@@ -1256,6 +1256,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 item = QtWidgets.QTableWidgetItem()
                 if v:
                     item.setText(v)
+
                 self.ui.exist_asset_table.setItem(r, self.exist_asset_table_list.index(name), item)
                 item.row_data = data
                 item.asset_path = data["<path>"]
@@ -1614,8 +1615,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             data["movie_path"] = movie_path
 
             data["render_scale"] = render_scale
-
-
            
             context, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["mobu_edit_render"], 
                                                        {"primary": data})

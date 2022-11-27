@@ -2,6 +2,8 @@
 
 import os
 import sys
+import shutil
+import datetime
 
 from pyfbsdk import *
 
@@ -103,11 +105,14 @@ class KcRender(object):
         grabber_options.ShowCameraLabel = self.show_camera_label
         grabber_options.TimeSpan = _set_span(self.start, self.end)
         grabber_options.ShowTimeCode = self.show_time_code
+        now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        temp_path = "{}/KcToolBox/temp/mov/{}_{}".format(os.environ["TEMP"].split(";")[0], now, os.path.basename(path))
 
-        grabber_options.OutputFileName = str(path)
+        # grabber_options.OutputFileName = str(path)
+        grabber_options.OutputFileName = str(temp_path)
 
-        if not os.path.lexists(os.path.dirname(path)):
-            os.makedirs(os.path.dirname(path))
+        if not os.path.lexists(os.path.dirname(temp_path)):
+            os.makedirs(os.path.dirname(temp_path))
 
         app = FBApplication()
 
@@ -140,6 +145,13 @@ class KcRender(object):
         app.FileRender(grabber_options)
         if self.render_scale != 1 and cam != "switcher":
             _revert_resolution(cam, width, height)
+
+        if not os.path.lexists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        
+        shutil.copy2(temp_path, path)
+        os.remove(temp_path)
+        print("copy: {} to {}".format(temp_path, path))
 
         return True
 
