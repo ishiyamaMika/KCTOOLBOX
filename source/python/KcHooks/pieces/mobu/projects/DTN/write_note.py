@@ -2,6 +2,7 @@
 
 import os
 import sys
+from decimal import Decimal, ROUND_HALF_UP
 
 from pyfbsdk import *
 
@@ -54,6 +55,9 @@ def main(event={}, context={}):
     with open(readme_text_path, "w") as f:
         pass
 
+    def _round(value):
+        return Decimal(value).quantize(Decimal('0'), rounding=ROUND_HALF_UP)
+
     with open(bg_position_text_path, "w") as f:
         for model in data.get("BG_models", []):
             trs_all = kc_key.get_all(model, False)
@@ -68,7 +72,7 @@ def main(event={}, context={}):
                 else:
                     name = "Scaling"
                     default = [1, 1, 1]
-                each = [l for l in each]
+                each = [_round(l) for l in each]
                 if each == default:
                     continue
 

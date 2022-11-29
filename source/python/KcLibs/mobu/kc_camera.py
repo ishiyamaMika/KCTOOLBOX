@@ -70,6 +70,15 @@ def set_switcher(data_set, clear_all=False):
 
         t = FBTime(0, 0, 0, data["start"])
         anim_node.Nodes[0].KeyAdd(t, index)
+        
+    for key in anim_node.Nodes[0].FCurve.Keys:
+        key.Interpolation = FBInterpolation.kFBInterpolationConstant
+        key.LeftDerivative = 0
+        key.RightDerivative = 0
+        key.TangentClampMode = FBTangentClampMode.kFBTangentClampModeClamped
+        key.TangentConstantMode = FBTangentConstantMode.kFBTangentConstantModeNormal
+
+
 
     FBSystem().Scene.Evaluate()
 
@@ -109,9 +118,9 @@ if __name__ in ["__builtin__", "builtins"]:
     #for d in data:
     #    print("{}-{} {}".format(d["start"], d["end"], d["name"]))
     #print(data)
-    x = [{'name': 'Cam_A9000:Cam_A0000', 'start': 0, 'end': 64}, {'name': 'Cam_A9999:Cam_A9999', 'start': 65, 'end': 216}]
+    x = [{'name': 'Cam_A9000:Cam_A9000', 'start': 0, 'end': 64}, {'name': 'Cam_A9050:Cam_A9050', 'start': 65, 'end': 216}]
     # print(set_switcher(x, True))
 
     # change_cam("Cam_A9000:Cam_A0000")
-    change_cam("switcher")
+    set_switcher(x)
 

@@ -1594,7 +1594,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 data["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], data)
 
             if not data["path"]:
-                print("parse error:", self.project.config["shot"][kc_env.mode]["paths"]["master"])
+                print("parse error:", self.project.config["shot"][kc_env.mode]["paths"][mode])
                 continue
             if not os.path.exists(data["path"]):
                 print("master not exists:", data["path"])
@@ -1828,6 +1828,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 results_all.append([-1, {}, item["shot_name"], item["shot_name"], u"処理開始"])
                 results_all.extend(results)
                 results_all.append([-2, {}, "-", "-", u"処理停止しました"])
+
 
             if len(errors) > 0:
                 continue

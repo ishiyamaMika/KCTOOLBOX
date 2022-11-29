@@ -41,6 +41,8 @@ def main(event={}, context={}):
         kc_camera.set_switcher(data_, clear_all=True)
         logger.details.set_header(u"スイッチャーを作成しました")
     except BaseException:
+        import traceback
+        traceback.print_exc()
         logger.details.set_header(u"スイッチャーを作成できませんでした")    
 
     logger.details.add_detail(u"switcher path: {}".format(data["switcher_path"]))
@@ -52,4 +54,5 @@ def main(event={}, context={}):
 
 if __name__ in ["__main__", "__builtin__", "builtins"]:
     data = {"switcher_path": "K:/DTN/3D/s00/cA9000-A9999/master/export/DTN_s00cA9000-A9999_Cam_AA9000-A9999.fbx.switcher.json"}
+    data = {"switcher_path": "K:/DTN/LO/A_S99/A_S99_A9000-A9002/master/export/DTN_S99_A9000-A9002.fbx.switcher.json"}
     main(event={"data": data})
