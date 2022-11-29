@@ -25,21 +25,24 @@ TASK_NAME = "asset_export"
 
 def varidate(data, logger):
     export_path = data["export_path"]
-    logger.details.add_detail(str(data))
+    # logger.details.add_detail(str(data))
 
     if not export_path:
         logger.details.set_header(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         logger.debug(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.details.add_detail("{} > {}".format(data["namespace"], export_path))
         return {"return_code": 1}
 
     if not data["config"]["export"]:
         logger.details.set_header(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.details.add_detail("namespace: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if not os.path.exists(data["config"]["export"]):
         logger.details.set_header(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.details.add_detail("config: {}".format(data["confit"]["export"]))
         return {"return_code": 1}
     
     asset_directory = os.path.normpath(os.path.join(data["config"]["export"], "../../"))
@@ -47,8 +50,10 @@ def varidate(data, logger):
     if len(rig_paths) > 0:
         asset_directory = os.path.dirname(rig_paths[0])
     else:
-        logger.details.set_header(u"rigフォルダがみつけられませんでした: {}".format(data["namespace"]))
-        logger.debug(u"rigフォルダがみつけられませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(u"rigファイルがみつけられませんでした: {}".format(data["namespace"]))
+        logger.debug(u"rigファイルがみつけられませんでした: {}".format(data["namespace"]))
+        logger.details.add_detail("check this: {}".format(data["rig_path"]))
+        logger.details.add_detail("check this: {}".format(rig_paths))
         return {"return_code": 1}
     paths = data["project"].config["asset"]["mobu"]["paths"]
 
@@ -241,6 +246,11 @@ def main(event={}, context={}):
 
     return_code = 0
     logger.debug("mode: {}".format(data.get("mode")))
+    meta_name = "{}:meta".format(data["namespace"])
+    meta = kc_model.to_object(str(meta_name))
+    if meta:
+        data["take"] = "{:02d}".format(meta.PropertyList.Find("take").Data)
+        # "version", "take"
     if data.get("mode") == "varidate":
         return varidate(data, logger)
     elif data.get("mode") == "master_varidate":

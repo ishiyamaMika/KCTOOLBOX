@@ -1968,7 +1968,9 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
                 else:
                     asset["take"] = "*"
+                    asset["version"] = "*"
                     asset["mobu_sotai_path"] = self.project.path_generate(template["sotai"], asset)
+
                     """
                         TODO:
                             ハードコード
@@ -1980,6 +1982,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                         continue
 
                     asset["mobu_sotai_path"] = sotai_paths[-1]
+
                     asset["sub_category"] = "*"
                     asset["rig_path"] = self.project.path_generate(template["rig"], asset)
 

@@ -56,12 +56,18 @@ def main(event={}, context={}):
         pass
 
     def _round(value):
-        return Decimal(value).quantize(Decimal('0'), rounding=ROUND_HALF_UP)
+        return Decimal(value).quantize(Decimal('0.001'), rounding=ROUND_HALF_UP)
+
+    def _rem_0(value):
+        value_str = str(value)
+        if value_str.endswith(".000"):
+            return value_str.split(".")[0]
+        return value_str
 
     with open(bg_position_text_path, "w") as f:
         for model in data.get("BG_models", []):
             trs_all = kc_key.get_all(model, False)
-            f.write(u"■BG Translation\n\n")
+            f.write(u"\n■BG Transform\n{}\n\n".format(model.LongName))
             for i, each in enumerate(trs_all):
                 if i == 0:
                     name = "Translation"
@@ -76,9 +82,9 @@ def main(event={}, context={}):
                 if each == default:
                     continue
 
-                f.write(u"{}\n{}\n".format(name, "\n".join([str(l) for l in each])))
-                logger.debug(u"{}\n{}\n".format(name, "\n".join([str(l) for l in each])))
-                logger.details.add_detail(u"{}\n{}\n\n".format(name, "\n".join([str(l) for l in each])))
+                f.write(u"{}\n{}\n\n".format(name, ", ".join([_rem_0(l) for l in each])))
+                logger.debug(u"{}\n{}\n".format(name, "\n".join([_rem_0(l) for l in each])))
+                logger.details.add_detail(u"{}\n{}\n\n".format(name, "\n".join([_rem_0(l) for l in each])))
 
     if save_flg:
         logger.details.set_header(u"設定ファイルを書き出しました")
