@@ -249,7 +249,10 @@ def main(event={}, context={}):
     meta_name = "{}:meta".format(data["namespace"])
     meta = kc_model.to_object(str(meta_name))
     if meta:
-        data["take"] = "{:02d}".format(meta.PropertyList.Find("take").Data)
+        try:
+            data["take"] = "{:02d}".format(int(meta.PropertyList.Find("take").Data))
+        except:
+            pass
         # "version", "take"
     if data.get("mode") == "varidate":
         return varidate(data, logger)
