@@ -336,7 +336,7 @@ class RecordDialog(QtWidgets.QDialog):
             self.cam_check.setCheckState(QtCore.Qt.Checked)
         else:
             self.cam_check.setCheckState(QtCore.Qt.Unchecked)
-
+        self.cam_check.setVisible(False)
         layout.addWidget(self.cam_check)
 
 
@@ -1919,6 +1919,9 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
         create_master: マスターを作成するかどうか == edit to master
         """
         items = [l for l in self.get_shot_table_active_item_data()]
+        if len(items) == 0:
+            QtWidgets.QMessageBox.information(self, u"エクスポート", u"エクスポートするショットを選択してください。")
+            return
         render_scale = self.get_render_scale()
         results_all = []
         logger_name = "mobu_master_export_logger" if create_master else "mobu_edit_export_logger"
