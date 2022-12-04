@@ -55,7 +55,7 @@ def main(event={}, context={}):
                 if logger:
                     logger.debug(u"create failed   : {}".format(directory))
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
 
     return {"return_code": return_code}

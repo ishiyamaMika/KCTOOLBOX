@@ -119,6 +119,12 @@ class KcRender(object):
         selected_pane = FBSystem().Scene.Renderer.GetSelectedPaneIndex()
         if cam == "switcher":
             kc_camera.change_cam("switcher", pane=selected_pane)
+            if self.render_scale != 1:
+                switcher_cameras = kc_camera.get_switcher_data()
+                revert_cameras = {}
+                for each in switcher_cameras:
+                    width, height = _change_resolution(each["object"], self.render_scale)
+                    revert_cameras[each["object"]] = (width, height)
         else:
             if isinstance(cam, str):
                 cam = kc_model.find_model_by_name(cam)
@@ -143,8 +149,12 @@ class KcRender(object):
         FBSystem().Scene.Evaluate()
 
         app.FileRender(grabber_options)
-        if self.render_scale != 1 and cam != "switcher":
-            _revert_resolution(cam, width, height)
+        if self.render_scale != 1:
+            if cam != "switcher":
+                _revert_resolution(cam, width, height)
+            else:
+                for key, value in revert_cameras.items():
+                    _revert_resolution(key, value[0], value[1])
 
         if not os.path.lexists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))

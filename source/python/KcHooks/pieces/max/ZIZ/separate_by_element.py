@@ -264,7 +264,7 @@ def main(event={}, context={}):
             
             logger.details.add_detail("")
             logger.details.add_detail("")
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
 
     return {"return_code": return_code}
 

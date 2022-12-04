@@ -84,10 +84,10 @@ def main(event={}, context={}):
                     logger.details.add_detail("delete failed: {}".format(model.LongName))
 
     if i == 0:
-        logger.details.set_header(u"削除するものはありません")
+        logger.details.set_header(return_code, u"削除するものはありません")
 
     else:
-        logger.details.set_header(u"不要なアセットを削除しました: {}".format(i))
+        logger.details.set_header(return_code, u"不要なアセットを削除しました: {}".format(i))
 
     return {"return_code": return_code}
 

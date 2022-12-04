@@ -45,17 +45,22 @@ def main(event={}, context={}):
             if data["namespace"] == asset["namespace"]:
                 exists = True
 
-    current_constraints = [l for l in FBSystem().Scene.Constraints]
+    # current_constraints = [l for l in FBSystem().Scene.Constraints]
 
     if not exists:
-        logger.details.add_detail(u"assetを追加しました\n{}".format(asset_path))
-        kc_file_io.file_merge(asset_path, str(data["namespace"]))
+        if kc_file_io.file_merge(asset_path, str(data["namespace"])):
+            logger.debug("\nadd asset: {}".format(os.path.basename(asset_path)))
+            logger.details.add_detail(u"\nassetを追加しました\n{}".format(asset_path))
+        else:
+            logger.warning("\nadd asset failed: {}".format(os.path.basename(asset_path)))
+            logger.details.add_detail(u"\nassetを追加できませんでした\n{}".format(asset_path))
+            return_code = 1
     else:
         logger.details.add_detail(u"アセットはすでにシーンに存在します")
     
-    now_constraints = [l for l in FBSystem().Scene.Constraints]
 
     """
+    now_constraints = [l for l in FBSystem().Scene.Constraints]
     # 追加されたコンストレインのチェックを外す
     for const in now_constraints:
         if not const in current_constraints:
@@ -77,8 +82,8 @@ def main(event={}, context={}):
     if not plot_config_path:
         header = u"設定ファイルがありませんでした: {}".format(data["namespace"])
         detail = u"path: {}".format(plot_config_path)
-        logger.debug(header)
-        logger.details.set_header(header)
+        logger.debug("config 'plot' is not exists: {}".format(data["namespace"]))
+        logger.details.set_header(1, header)
         logger.details.add_detail(detail)
         return {"return_code": 1}
 
@@ -86,17 +91,17 @@ def main(event={}, context={}):
     model_names = ["{}:{}".format(data["namespace"], l["name"]) for l in models]
     track = kc_story.create_story_track(str(data["namespace"]), model_names)
 
-    kc_story.create_clip(track, str(data["export_path"]), offset=data["start"])
+    kc_story.create_clip(track, str(data["asset_export_path"]), offset=data["start"])
+    logger.debug("create story clip: {}".format(data["asset_export_path"]))
+    logger.details.add_detail(u"\nストーリークリップを作成しました\n{}".format(data["asset_export_path"]))
 
-    logger.debug("update: {}".format(data["namespace"]))
-
-    logger.details.set_header(u"storyのクリップを作成しました: {}".format(data["namespace"]))
+    logger.details.set_header(0, u"storyのクリップを作成しました: {}".format(data["namespace"]))
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 
 if __name__ == "__builtin__":
     piece_data = {"paint": {
-                        "asset_path": "mobu_sotai_path"
+                        "asset_export_path": "mobu_sotai_path"
                         }
                  }
     data = {
@@ -104,7 +109,7 @@ if __name__ == "__builtin__":
            "name": "", 
            "category": "CH", 
            "number": 1, 
-           "asset_path": ""
+           "asset_export_path": ""
             }
 
     data = {u'asset_name': u'CH_tsukikoQuad',

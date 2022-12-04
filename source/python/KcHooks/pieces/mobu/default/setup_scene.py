@@ -43,7 +43,7 @@ def main(event={}, context={}):
                 FBGetSelectedModels(m_list, child, False)
                 for m in m_list:
                     m.Show = False
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

@@ -415,7 +415,7 @@ class RecordDialog(QtWidgets.QDialog):
 
 class KcSceneManager(kc_qt.ROOT_WIDGET):
     NAME = "KcSceneManager"
-    VERSION = "2.0.7"
+    VERSION = "2.1.8"
 
     def __init__(self, parent=None):
         super(KcSceneManager, self).__init__(parent)
@@ -1708,12 +1708,17 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 asset["config"] = {"plot": self.project.path_generate(template["config"].replace("<config_type>", "plot"), asset), 
                                    "export": self.project.path_generate(template["config"].replace("<config_type>", "export"), asset)} 
 
-                asset["mobu_master_export_path"] = self.project.path_generate(template["master_export"], asset)
+                asset["asset_dependency_paths"] = {"plot": template["config"].replace("<config_type>", "plot"), 
+                                                   "export": template["config"].replace("<config_type>", "export")}
+
+                asset["shot_master_export_path"] = self.project.path_generate(template["master_export"], asset)
+                asset["asset_dependency_paths"]["shot_master_export_path"] = template["master_export"]
                 asset["max_asset_path"] = False
 
                 if asset["category"] == "camera":
                     camera_path = self.project.get_latest_camera_path("max")
                     asset["max_asset_path"] = camera_path
+                    asset["asset_dependency_paths"]["max_asset_path"] = camera_path
                     cam_asset = asset
                 else:
                     asset["version"] = "*"    
@@ -1728,6 +1733,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                         if len(files) > 0:
                             files.sort()
                             asset["max_asset_path"] = files[-1]
+                            asset["asset_dependency_paths"]["max_asset_path"] = max_template["rig"]
 
                 if not asset["max_asset_path"]:
                     errors.append([False, {}, "", u"[error] maxのパスを生成できません: {}".format(asset["namespace"]), max_template["rig"] + "\n" + asset])
@@ -1880,7 +1886,6 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             # if "convert" in orders:
             #     convert_app_data["order"] = orders["convert"]
             results_all.append([-1, {}, u"max処理", u"max処理", ""])
-
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["convert"], 
                                      {"main": convert_app_data},
                                      logger_name="convert_execute"
@@ -1935,7 +1940,10 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             data["primary"]["start"] = item["frame"]["start"]
             data["primary"]["end"] = item["frame"]["end"]
             data["primary"]["fps"] = item["frame"].get("fps", 24)
-
+            """
+            WARNING:
+              asset infos are not latest which in the scene file.
+            """
             for asset in item.get("assets", []):
                 if not asset.get("selection") and asset["category"] != "camera":
                     continue
@@ -1950,52 +1958,27 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
 
                 if not "config" in template:
                     continue
-
+                # generate paths inside scene file switch to config_paths
                 asset["config"] = {"plot": self.project.path_generate(template["config"].replace("<config_type>", "plot"), asset), 
                                    "export": self.project.path_generate(template["config"].replace("<config_type>", "export"), asset)} 
+
+                asset["asset_dependency_paths"] = {"asset_plot_config_path": template["config"].replace("<config_type>", "plot"), 
+                                                   "asset_export_config_path": template["config"].replace("<config_type>", "export"), 
+                                                   "asset_rig_path": template["rig"], 
+                                                   "asset_sotai_path": template["sotai"]}
+
                 if create_master:
-                    asset["mobu_edit_export_path"] = self.project.path_generate(template["edit_export"], asset)
+                    asset["asset_dependency_paths"]["shot_edit_export_path"] = template["edit_export"]
                 else:
-                    asset["mobu_master_export_path"] = self.project.path_generate(template["master_export"], asset)
-
-                
-                if asset["category"] == "camera":
-                    camera_path = self.project.get_latest_camera_path()
-                    cam_fields = self.project.path_split(self.project.config["asset"][kc_env.mode]["paths"]["camera"]["rig"], camera_path)
-                    cam_path = self.project.path_generate(self.project.config["asset"][kc_env.mode]["paths"]["camera"]["sotai"], cam_fields)
-                    asset["mobu_sotai_path"] = cam_path
-                    asset["rig_path"] = self.project.path_generate(self.project.config["asset"][kc_env.mode]["paths"]["camera"]["rig"], cam_fields)
-
-                else:
-                    asset["take"] = "*"
-                    asset["version"] = "*"
-                    asset["mobu_sotai_path"] = self.project.path_generate(template["sotai"], asset)
-
-                    """
-                        TODO:
-                            ハードコード
-                    """
-                    sotai_paths = glob.glob(asset["mobu_sotai_path"])
-                    sotai_paths.sort()
-                    if len(sotai_paths) == 0:
-                        print("sotai not found: {}".format(asset["namespace"]))
-                        continue
-
-                    asset["mobu_sotai_path"] = sotai_paths[-1]
-
-                    asset["sub_category"] = "*"
-                    asset["rig_path"] = self.project.path_generate(template["rig"], asset)
-
-
-                if not asset["mobu_sotai_path"]:
-                    errors.append([False, "", u"[error] sotaiのパスを生成できません: {}".format(asset["namespace"]), template["sotai"] + "\n" + asset])
-                elif not os.path.exists(asset["mobu_sotai_path"]):
-                    errors.append([False, "", u"[error] sotai pathがありません: {}".format(asset["namespace"]), asset["mobu_sotai_path"]])
+                    asset["asset_dependency_paths"]["shot_master_export_path"] = template["master_export"]
 
                 data["primary"].setdefault("assets", []).append(asset)
                 data["main"].append(asset)
 
             post_primary = {}
+            post_primary["start"] = item["frame"]["start"]
+            post_primary["end"] = item["frame"]["end"]
+            post_primary["fps"] = item["frame"].get("fps", 24)
             post_primary["path"] = self.project.path_generate(self.project.config["shot"][kc_env.mode]["paths"]["master"], item["fields"])
             post_primary["assets"] = item.get("assets", [])
 
@@ -2024,15 +2007,14 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                 continue
             
             varidate_name = "mobu_edit_export_varidate" if create_master else "mobu_master_export_varidate"
+
+
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"].get(varidate_name, "mobu_edit_export_varidate"), 
                                                           data, 
                                                           logger_name=logger_name)
-
             errors_ = []
             for result in results:
-                if result[2].startswith("[error]"):
-                    errors_.append(result[2])
-                elif not result[0] in [0, 2]:
+                if result[0] not in [0, 2]:
                     errors_.append(result[2])
                 elif result == "puzzle process stopped":
                     errors_.append(u"[error] 処理が予期せぬエラーで中止しました。")

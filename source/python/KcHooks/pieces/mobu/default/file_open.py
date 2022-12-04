@@ -47,22 +47,25 @@ def main(event={}, context={}):
 
         if os.path.normpath(current_path).lower() == os.path.normpath(data["path"]).lower() and not data.get("force", False):
             logger.debug("file was already opened: {}".format(data["path"]))
-            logger.details.set_header(u"開いているファイルが同じです: {}".format(os.path.basename(data["path"])))
-            logger.details.add_detail("file name:\n\n{}".format(data["path"]))
+            logger.details.set_header(return_code, u"開いているファイルが同じです: {}".format(os.path.basename(data["path"])))
+            logger.details.add_detail(u"開いているファイル:\n\n{}".format(data["path"]))
             update_context = {"{}.scene_times".format(TASK_NAME): get_time()}
             return {"return_code": return_code, "update_context": update_context}
 
         if file_io.file_open(data["path"]):
             logger.debug("file open: {}".format(data["path"]))
             file_path = data["path"]
+            logger.details.set_header(return_code, u"ファイルを開きました: {}".format(os.path.basename(data["path"])))
             update_context = {"{}.scene_times".format(TASK_NAME): get_time()}
 
         else:
             logger.debug("file open failed: {}".format(data["path"]))
-            return_code = 1
+            logger.details.set_header(1, u"ファイルを開けませんでした: {}".format(os.path.basename(data["path"])))
+            return {"return_code": 1}
 
     if "start" in data and "end" in data and "fps" in data:
         logger.debug("{} {} {}".format(data["start"], data["end"], data["fps"]))
+        logger.details.add_detail(u"start: {}\nend: {}\nfps: {}".format(data["start"], data["end"], data["fps"]))
         kc_transport_time.set_scene_time(loop_start=data["start"],
                                          loop_stop=data["end"],
                                          zoom_start=data["start"],
@@ -70,11 +73,11 @@ def main(event={}, context={}):
                                          fps=data["fps"])
 
     if data.get("new"):
-        logger.details.set_header(u"新規ファイルで開始しました:")
+        logger.details.set_header(return_code, u"新規ファイルで開始しました:")
         return {"return_code": return_code}
 
     else:
-        logger.details.set_header(u"ファイルを開きました:")
+        logger.details.set_header(return_code, u"ファイルを開きました:")
         logger.details.add_detail("file name:\n{}".format(file_path))
         return {"return_code": return_code, "update_context": update_context}
 

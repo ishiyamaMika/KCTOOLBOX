@@ -42,12 +42,14 @@ def main(event={}, context={}):
     save_flg = False
 
     if switcher:
+        logger.details.add_detail(u"note switcher:\n")
+        logger.details.add_detail(u"switcher情報を書き出します:")
         with open(cut_timing_text_path, "w") as f:
             f.write(u"■Cut Timing\n\n")
             for cam in switcher:
                 f.write(u"{} {}-{}\n".format(cam["name"].split(":")[0], cam["start"], cam["end"]))
-                logger.debug(u"{} {}-{}\n".format(cam["name"].split(":")[0], cam["start"], cam["end"]))
-                logger.details.add_detail(u"{} {}-{}\n".format(cam["name"].split(":")[0], cam["start"], cam["end"]))
+                logger.debug(u"{} {}-{}".format(cam["name"].split(":")[0], cam["start"], cam["end"]))
+                logger.details.add_detail(u"{} {}-{}".format(cam["name"].split(":")[0], cam["start"], cam["end"]))
 
             logger.debug(u"Cut Timingを書き出しました: {}".format(cut_timing_text_path))
             save_flg = True
@@ -64,6 +66,8 @@ def main(event={}, context={}):
             return value_str.split(".")[0]
         return value_str
 
+    logger.details.add_detail(u"\nnote BG Position:\n")
+    logger.details.add_detail(u"BG_positionを書き出します: \n{}\n".format(bg_position_text_path))
     with open(bg_position_text_path, "w") as f:
         for model in data.get("BG_models", []):
             trs_all = kc_key.get_all(model, False)
@@ -83,14 +87,14 @@ def main(event={}, context={}):
                     continue
 
                 f.write(u"{}\n{}\n\n".format(name, ", ".join([_rem_0(l) for l in each])))
-                logger.debug(u"{}\n{}\n".format(name, "\n".join([_rem_0(l) for l in each])))
-                logger.details.add_detail(u"{}\n{}\n\n".format(name, "\n".join([_rem_0(l) for l in each])))
+                logger.debug(u"{}\n{}".format(name, "\n".join([_rem_0(l) for l in each])))
+                logger.details.add_detail(u"{}\n{}\n".format(name, "\n".join([_rem_0(l) for l in each])))
 
     if save_flg:
-        logger.details.set_header(u"設定ファイルを書き出しました")
+        logger.details.set_header(return_code, u"設定ファイルを書き出しました")
     else:
-        logger.details.set_header(u"設定ファイルを書き出せませんでした")
         return_code = 1
+        logger.details.set_header(return_code, u"設定ファイルを書き出せませんでした")
 
     return {"return_code": return_code}
 

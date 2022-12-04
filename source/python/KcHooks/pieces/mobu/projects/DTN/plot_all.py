@@ -52,17 +52,20 @@ def main(event={}, context={}):
     model_names = []
     update_context = {}
     for asset in data.get("assets", []):
-        if not "config" in asset:
+        if "config" not in asset:
+            logger.error("asset config not found in data:")
             continue
 
         config = asset["config"].get("plot")
-        logger.debug("config path: {}".format(config))
         if not config:
+            logger.debug("config path is not in data: plot")
             continue
 
         if not os.path.lexists(config):
+            logger.debug("config path is not exists: {}".format(config))
             continue
         
+        logger.debug("config path: {}".format(config))
         info, data_ = data["project"].sticky.read(config)
         if asset["category"] == "camera":
             for cam in cams:
@@ -81,14 +84,15 @@ def main(event={}, context={}):
                 m = kc_model.to_object("{}:{}".format(asset["namespace"], d["name"]))
                 if m:
                     update_context.setdefault("plot_all.BG_models", []).append(m)
-
+    logger.debug("plot models count: {}".format(len(model_names)))
+    logger.details.add_detail("\nplotモデル数: {}\n".format(len(model_names)))
     kc_model.select(model_names)
 
     header = u"plotしました: {}".format(len(model_names))
     detail = "plot:\n" + "\n".join(model_names)
     kc_key.plot_selected()
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
 
     return {"return_code": return_code, "update_context": update_context}

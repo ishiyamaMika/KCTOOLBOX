@@ -190,7 +190,7 @@ class KcProject(object):
 
     def puzzle_play(self, task_set, data, logger_name=None):
         def _set(result):
-            return [result.get("return_code", 2), result["header"], u"\n".join(result.get("details", []))]
+            return [result.get("return_code", 2), result["header"], u"\n".join([l.replace(u"/", u"\\") for l in result.get("details", [])])]
         
         data["project"] = self
         if logger_name:
@@ -200,8 +200,8 @@ class KcProject(object):
         else:
             self.puzzle.play(task_set, data)
             results = [_set(l) for l in self.puzzle.logger.details.get_all()]
-        error = []
 
+        error = []
         for result in results:
             if result[0] != 0:
                 error.append("{}\n{}".format(u"{}".format(result[1]), result[2]))
@@ -211,6 +211,7 @@ class KcProject(object):
                 self.logger.error(u"\n".join(error))
             except BaseException:
                 self.logger.error(traceback.format_exc())
+
         if logger_name:
             return puzzle_.context, results
         else:

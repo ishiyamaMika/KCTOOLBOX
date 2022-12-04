@@ -76,7 +76,7 @@ def main(event={}, context={}):
             else:
                 source_path = data["path"]
                 destination_path = "{}/{}_{}{}".format(archive_path, file_time, f_, ext)
-                print(destination_path, f, ext, fs)
+
             source_f = os.path.basename(source_path)
             
             source_f_name = os.path.basename(source_path)
@@ -115,7 +115,7 @@ def main(event={}, context={}):
                 header = u"バックアップに失敗しました: {}".format(archive_path)
                 detail += u"\n".join(error)
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

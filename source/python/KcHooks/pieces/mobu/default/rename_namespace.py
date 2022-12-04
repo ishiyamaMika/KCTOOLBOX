@@ -27,12 +27,12 @@ def main(event={}, context={}):
     return_code = 0
 
     if data["category"] == "camera":
-        logger.details.set_header(u"cameraはリネームされません")
+        logger.details.set_header(1, u"cameraはリネームされません")
         return {"return_code": 1}
 
     namespace_s = data["namespace"].split("_")
     if not namespace_s[-1].isdigit():
-        logger.details.set_header(u"namespaceを変える必要がありません: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"namespaceを変える必要がありません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     FBApplication().FileNew()
@@ -56,10 +56,10 @@ def main(event={}, context={}):
                     renamed.append(u"{} -> {}".format(temp, m.LongName))
         
         header = u"namespaceを変更しました: {}({})".format(data["namespace"], len(renamed))
-        detail = u"renamed:\n{}".format("\n".join(renamed))
+        detail = u"renamed:\n\n{}".format("\n".join(renamed))
     kc_file_io.file_save(data["path"])
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

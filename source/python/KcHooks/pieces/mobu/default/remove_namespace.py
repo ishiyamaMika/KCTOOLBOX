@@ -10,18 +10,22 @@ def main(event={}, context={}):
 
     return_code = 0
     renamed = []
+    namespaces = []
     for root in FBSystem().Scene.RootModel.Children:
         m_list = FBModelList()
         FBGetSelectedModels(m_list, root, False, True)
         for m in m_list:
-            renamed.append(u"{} -> {}".format(m.LongName, m.Name))
-            m.LongName = m.Name
-    
+            if ":" in m.LongName:
+                renamed.append(u"{} -> {}".format(m.LongName, m.Name))
+                namespaces.append(m.LongName.split(":")[0])
+                m.LongName = m.Name
+
+    logger.details.add_detail("\nrenamed models:\n")
     logger.details.add_detail(u"\n".join(renamed))
     if len(renamed) > 0:
-        logger.details.set_header(u"namespaceを削除しました")
+        logger.details.set_header(return_code, u"namespaceを削除しました: {}".format(", ".join(list(set(namespaces)))))
     else:
-        logger.details.set_header(u"namespaceは設定されていませんでした")
+        logger.details.set_header(return_code, u"namespaceは設定されていませんでした")
 
     return {"return_code": return_code}
 

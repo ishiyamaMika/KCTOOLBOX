@@ -62,7 +62,7 @@ def main(event={}, context={}):
         for m in m_list:
             swap_model(m, logger)
 
-    logger.details.set_header(u"propのnullをsklに変換しました: {}".format("\n".join(convert_list)))
+    logger.details.set_header(return_code, u"propのnullをsklに変換しました: {}".format("\n".join(convert_list)))
 
     path = FBApplication().FBXFileName
     d, f = os.path.split(path)

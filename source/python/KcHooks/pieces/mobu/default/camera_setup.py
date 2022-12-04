@@ -47,7 +47,7 @@ def main(event={}, context={}):
         header = u"カメラの解像度を設定できませんでした"
         # detail = data
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

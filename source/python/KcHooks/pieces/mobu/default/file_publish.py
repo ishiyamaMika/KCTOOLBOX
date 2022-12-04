@@ -29,14 +29,14 @@ def main(event={}, context={}):
     return_code = 0
     kc_story.delete_tracks()
     if kc_file_io.file_save(data["publish_path"]):
-        logger.details.set_header(u"ファイルを保存しました: {}".format(data["publish_path"]))
+        logger.details.set_header(return_code, u"ファイルを保存しました: {}".format(os.path.basename(data["publish_path"])))
         logger.debug(u"ファイルを保存しました: {}".format(data["publish_path"]))
-        logger.details.add_detail(u"ファイルを保存しました: {}".format(data["publish_path"]))
+        logger.details.add_detail(u"\nファイルを保存しました: \n{}".format(data["publish_path"]))
     else:
-        logger.details.set_header(u"ファイルを保存できませんでした: {}".format(data["publish_path"]))
-        logger.warning(u"ファイルを保存できませんでした: {}".format(data["publish_path"]))
-        logger.details.add_detail(u"ファイルを保存できませんでした: {}".format(data["publish_path"]))
         return_code = 1
+        logger.details.set_header(return_code, u"ファイルを保存できませんでした: {}".format(os.path.basename(data["publish_path"])))
+        logger.warning(u"ファイルを保存できませんでした: {}".format(data["publish_path"]))
+        logger.details.add_detail(u"\nファイルを保存できませんでした: \n{}".format(data["publish_path"]))
 
     return {"return_code": return_code}
 

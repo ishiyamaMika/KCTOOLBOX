@@ -39,7 +39,7 @@ def main(event={}, context={}):
     header = u"ファイルを保存しました: {}".format(os.path.basename(path))
     detail = u"path\n{}".format(path)
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

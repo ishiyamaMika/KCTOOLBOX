@@ -54,7 +54,7 @@ def main(event={}, context={}):
         header = u"削除するkomaファイルがありませんでした"
     else:
         header = u"既存のkomaファイルを削除しました"
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

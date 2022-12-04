@@ -31,11 +31,11 @@ def main(event={}, context={}):
     return_code = 0
 
     if "namespace" not in data:
-        logger.details.set_header(u"ネームスペースが設定されていません")
+        logger.details.set_header(1, u"ネームスペースが設定されていません")
         return {"return_code": 1}
 
     if data["namespace"] == "":
-        logger.details.set_header(u"ネームスペースが設定されていません")
+        logger.details.set_header(1, u"ネームスペースが設定されていません")
         return {"return_code": 1}
 
     m_list = FBModelList()

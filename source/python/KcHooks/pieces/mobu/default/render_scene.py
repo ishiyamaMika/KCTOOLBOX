@@ -33,8 +33,12 @@ def main(event={}, context={}):
 
     if data.get("render_type") == "switcher":
         cam = "switcher"
+        logger.debug("render_type: switcher")
+        logger.details.add_detail("render_type: switcher\n")
 
     else:
+        logger.debug("render_type: camera")
+        logger.details.add_detail("render_type: camera\n")        
         for camera in FBSystem().Scene.Cameras:
             long_name = camera.LongName
             # if ":" not in long_name:
@@ -57,7 +61,7 @@ def main(event={}, context={}):
         else:
             logger.debug("cam is not exists: {}".format("cam_{}".format(data["shot_name"])))
             header = u"render シーンにカメラがありませんでした: {}".format(namespace)
-        logger.details.set_header(header)
+        logger.details.set_header(1, header)
         return {"return_code": 1}
 
     if data["fps"] != 24:
@@ -83,15 +87,14 @@ def main(event={}, context={}):
     result = render.execute(cam, movie_path)
     logger.debug(result)
     logger.debug("render to: {}".format(movie_path))
-    logger.details.add_detail("render to: {}".format(movie_path))
 
     header = u"renderしました: {}".format(os.path.basename(movie_path))
-    detail = u"path: \n{}\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(data["movie_path"],
-                                                                              data["start"],
-                                                                              data["end"],
-                                                                              data["fps"],
-                                                                              data["render_scale"])
-    logger.details.set_header(header)
+    detail = u"\npath: \n{}\n\nstart: {}\nend  : {}\nfps  : {}\nscale: {}".format(movie_path,
+                                                                                  data["start"],
+                                                                                  data["end"],
+                                                                                  data["fps"],
+                                                                                  data["render_scale"])
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
     return {"return_code": return_code}
 

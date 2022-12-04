@@ -44,6 +44,12 @@ def main(event={}, context={}):
                 meta_property = meta_model.PropertyList.Find("category").Data
                 if meta_property == "camera":
                     is_project_asset = True
+                else:
+                    logger.debug("category is not camera: {}".format(each.LongName))
+                    continue
+            else:
+                logger.debug("meta is not exists: {}".format(each.LongName))
+                continue
 
         if "BirdsView" in each.LongName:
             is_project_asset = True
@@ -52,9 +58,17 @@ def main(event={}, context={}):
             continue
         name = each.Name
         if data.get("include_model"):
-            cameras.append({"namespace": namespace, "name": name, "model": each, "category": "camera", "is_project_asset": is_project_asset})
+            cameras.append({"namespace": namespace,
+                            "name": name,
+                            "model": each,
+                            "category": "camera",
+                            "is_project_asset": is_project_asset})
         else:
-            cameras.append({"namespace": namespace, "name": name, "category": "camera", "is_project_asset": is_project_asset})
+            cameras.append({"namespace": namespace,
+                            "name": name,
+                            "category": "camera",
+                            "is_project_asset": is_project_asset})
+        logger.debug("append camera: {}".format(each.LongName))
 
     update_context = {}
     update_context["{}.cameras".format(TASK_NAME)] = cameras

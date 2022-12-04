@@ -62,7 +62,6 @@ class KcResultDialog(QtWidgets.QDialog):
         self.header_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.header_table.setShowGrid(False)
 
-
         self.header_table.itemSelectionChanged.connect(self.header_table_changed)
 
         btn = QtWidgets.QPushButton()
@@ -97,7 +96,7 @@ class KcResultDialog(QtWidgets.QDialog):
                     self.header_table.setItem(r, c, item)
                 continue
 
-            elif result[1].startswith("[error]"):
+            elif result[0] not in [-1, 0, 2]:
                 icon = self.x_icon
 
             elif result[0] == -1:
@@ -115,12 +114,6 @@ class KcResultDialog(QtWidgets.QDialog):
             item.detail_text = result[2]
 
             item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
-
-
-
-
-
-            
 
 
 if __name__ == "__builtin__":

@@ -26,7 +26,7 @@ def main(event={}, context={}):
     root_name = data["root_name"]
     root_model = kc_model.find_model_by_name(root_name, ignore_namespace=True)
     if root_model:
-        logger.details.set_header(u"rootモデルがすでに存在します")
+        logger.details.set_header(0, u"rootモデルがすでに存在します")
         return {"return_code": 0}
     
     

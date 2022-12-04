@@ -35,7 +35,7 @@ def main(event={}, context={}):
     detail = ""
 
     if not os.path.exists(data["source_directory"]):
-        logger.details.set_header(u"フォルダが存在しません: {}".format(data["source_directory"]))
+        logger.details.set_header(1, u"フォルダが存在しません: {}".format(data["source_directory"]))
         return {"return_code": 1}
     
     if not os.path.exists(data["destination_directory"]):

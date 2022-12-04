@@ -61,17 +61,24 @@ data:
 
       - step: main
         tasks:
-          - name: export asset
-            module: KcHooks.pieces.mobu.default.asset_export
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
+
+          - name: export asset varidate
+            module: KcHooks.pieces.mobu.projects.DTN.asset_export
             comment: export asset
             data_defaults:
               mode: varidate
 
             conditions:
-              - category: ["CH", "BG", "PROPS", "LO"]
+              - category: ["CH", "BG", "PROPS"]
             
             data_key_replace:
-              export_path: mobu_edit_export_path
+              asset_export_path: context.asset_path_generate.shot_edit_export_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
+
 
           - name: export multi camera asset
             module: KcHooks.pieces.mobu.default.multi_cameras_export
@@ -82,7 +89,11 @@ data:
               
 
             data_key_replace:
-              export_path: mobu_edit_export_path
+              asset_export_path: context.asset_path_generate.shot_edit_export_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
+
               start: "context.start"
               end: "context.end"
               fps: "context.fps"
@@ -100,31 +111,36 @@ data:
           - name: open_file
             module: KcHooks.pieces.mobu.default.file_open
             comment: open file
-            data_defaults:
-              force: true
+            # data_defaults:
+            #   force: true
 
           - name: plot_all
             module: KcHooks.pieces.mobu.projects.DTN.plot_all
             comment: plot all
             # interpolate: Stepped
 
-          - name: change scene time
-            module: KcHooks.pieces.mobu.default.change_time
-            comment: "change scene time. result set to pass_data"
-            data_defaults:
-              fps: 24
-              mode: change
+          # - name: change scene time
+            # module: KcHooks.pieces.mobu.default.change_time
+            # comment: "change scene time. result set to pass_data"
+            # data_defaults:
+              # fps: 24
+              # mode: change
 
       - step: main
+        comment: export asset step
         tasks:
+            - name: generate paths
+              module: KcHooks.pieces.win.asset_path_generate
+
             - name: export asset
-              module: KcHooks.pieces.mobu.default.asset_export
+              module: KcHooks.pieces.mobu.projects.DTN.asset_export
               comment: export
-              data_defaults:
-                key_name: plot
 
               data_key_replace:
-                export_path: mobu_edit_export_path
+                asset_export_path: context.asset_path_generate.shot_edit_export_path
+                asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+                asset_export_config_path: context.asset_path_generate.asset_export_config_path
+                asset_rig_path: context.asset_path_generate.asset_rig_path
                 start: "context.start"
                 end: "context.end"
                 fps: "context.fps"
@@ -144,7 +160,10 @@ data:
                 mode: export
 
               data_key_replace:
-                export_path: mobu_edit_export_path
+                asset_export_path: context.asset_path_generate.shot_edit_export_path
+                asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+                asset_export_config_path: context.asset_path_generate.asset_export_config_path
+                asset_rig_path: context.asset_path_generate.asset_rig_path
                 start: "context.start"
                 end: "context.end"
                 fps: "context.fps"
@@ -153,6 +172,7 @@ data:
                 - category: camera
 
       - step: post_primary
+        comment: open scene file and setup frames
         tasks:
           - name: create
             module: KcHooks.pieces.mobu.default.file_open
@@ -160,18 +180,18 @@ data:
 
             data_defaults:
               new: true
-
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+              force: true
 
           # - name: adject assets
           #   module: KcHooks.pieces.mobu.default.adjust_scene_assets
           #   comment: check assets and adject them. delete if not exists in asset list
 
       - step: post_main
+        comment: add sotai and create story clips
         tasks:
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate        
+
           - name: story clip create
             module: KcHooks.pieces.mobu.default.story_create
             comment: create story clip
@@ -180,11 +200,12 @@ data:
               key_name: plot
 
             data_key_replace:
-              export_path: mobu_edit_export_path
-              asset_path: mobu_sotai_path
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+              asset_export_path: context.asset_path_generate.shot_edit_export_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path            
+              asset_path: context.asset_path_generate.asset_sotai_path
+
             conditions:
               - category: 
                   - CH
@@ -198,8 +219,8 @@ data:
               - category: camera
             
             data_key_replace:
-              asset_path: mobu_edit_export_path
-            
+              asset_path: context.asset_path_generate.shot_edit_export_path
+ 
             data_override:
               namespace: null
           
@@ -211,15 +232,13 @@ data:
               switcher_path: context.camera_export.switcher_path
 
       - step: post_end
+        comment: save file and render twice
         tasks:
           - name: file_save
             module: KcHooks.pieces.mobu.default.file_save
             comment: ""
             data_key_replace:
               path: mobu_master_path
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
 
           - name: render_scene
             module: KcHooks.pieces.mobu.default.render_scene
@@ -227,10 +246,6 @@ data:
             data_defaults:
               render_type: switcher
 
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
 
           - name: render scene bird view
             module: KcHooks.pieces.mobu.default.render_scene
@@ -239,10 +254,6 @@ data:
               camera_name: BirdsView
               add_suffix: _BV
 
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
 
     mobu_master_export:
       - step: primary
@@ -250,15 +261,15 @@ data:
           - name: open
             module: KcHooks.pieces.mobu.default.file_open
             comment: ""
-
+            data_defaults:
+              force: true
+            
+            break_on_exceptions: true
 
           - name: plot_all
             module: KcHooks.pieces.mobu.projects.DTN.plot_all
             comment: "plot all. note: export BG models"
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+
           
           - name: render scene
             module: KcHooks.pieces.mobu.default.render_scene
@@ -294,14 +305,18 @@ data:
 
       - step: main
         tasks:
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
+
           - name: export asset
-            module: KcHooks.pieces.mobu.default.asset_export
+            module: KcHooks.pieces.mobu.projects.DTN.asset_export
             comment: export asset
             data_key_replace:
-              export_path: mobu_master_export_path
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+              asset_export_path: context.asset_path_generate.shot_master_export_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path              
+
             conditions:
                 - category: ["CH", "BG", "PROPS"]
 
@@ -313,29 +328,36 @@ data:
               mode: master_export
               save_switcher: false
             data_key_replace:
-              export_path: mobu_master_export_path
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+              asset_export_path: context.asset_path_generate.shot_master_export_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
             
             conditions:
               - category: camera
 
       - step: post_main
         tasks:
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
+
+
           - name: open file
             module: KcHooks.pieces.mobu.default.file_open
             data_key_replace:
-              path: mobu_master_export_path
+              path: context.asset_path_generate.shot_master_export_path
+
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
 
           - name: remove namespace
             module: KcHooks.pieces.mobu.default.remove_namespace
-            comment: remove namespace numbers
-            
+            comment: remove namespace from model
+
           - name: save file
             module: KcHooks.pieces.mobu.default.file_save
             data_key_replace:
-              path: mobu_master_export_path
+              path: context.asset_path_generate.shot_master_export_path
 
           - name: convert prop model to skl and save
             module: KcHooks.pieces.mobu.projects.DTN.convert_null_to_skl
@@ -353,16 +375,23 @@ data:
 
       - step: main
         tasks:
-          - name: export asset
-            module: KcHooks.pieces.mobu.default.asset_export
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
+
+          - name: export asset varidate
+            module: KcHooks.pieces.mobu.projects.DTN.asset_export
             comment: export asset
             data_defaults:
               mode: varidate
+
             conditions:
                 - category: ["CH", "BG", "PROPS"]
 
             data_key_replace:
-              export_path: mobu_master_export_path
+              asset_export_path: context.asset_path_generate.shot_master_export_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
 
           - name: export multi camera asset
             module: KcHooks.pieces.mobu.default.multi_cameras_export
@@ -370,13 +399,12 @@ data:
             data_defaults:
               key_name: plot
               mode: varidate
-              
 
             data_key_replace:
-              export_path: mobu_master_export_path
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+              asset_export_path: context.asset_path_generate.shot_master_export_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
             
             conditions:
               - category: camera
@@ -397,32 +425,23 @@ data:
 
           - name: render
             module: KcHooks.pieces.mobu.default.render_scene
-            comment: "render scene"
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
+            comment: "render swither"
             
             data_defaults:
               render_type: switcher
 
           - name: render bird view
             module: KcHooks.pieces.mobu.default.render_scene
-            comment: ""
+            comment: "render bird view camera"
             data_defaults:
               camera_name: BirdsView
               add_suffix: _BV
 
-            data_key_replace:
-              start: "context.start"
-              end: "context.end"
-              fps: "context.fps"
-
-      - step: closure
-        tasks:
-          - name: revert scene time
-            module: KcHooks.pieces.mobu.default.change_time
-            comment: "revert scene time"
-            mode: revert
-            data_key_replace:
-              revert_times: context.file_open.scene_times
+      # - step: closure
+      #   tasks:
+      #     - name: revert scene time
+      #       module: KcHooks.pieces.mobu.default.change_time
+      #       comment: "revert scene time"
+      #       mode: revert
+      #       data_key_replace:
+      #         revert_times: context.file_open.scene_times

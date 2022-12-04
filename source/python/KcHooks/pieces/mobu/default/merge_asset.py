@@ -16,10 +16,11 @@ kc_env.append_sys_paths()
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "merge_asset"
-DATA_KEY_REQUIRED = ["namespace", "asset_path"]
+DATA_KEY_REQUIRED = ["namespace"]
 
 def main(event={}, context={}):
     data = event.get("data", {})
+    import pprint
 
     logger = context.get("logger")
     if not logger:
@@ -28,14 +29,14 @@ def main(event={}, context={}):
     return_code = 0
 
     if kc_file_io.file_merge(str(data["asset_path"]), namespace=data["namespace"]):
-        logger.details.set_header(u"ファイルをマージしました: {}".format(data["asset_path"]))
+        logger.details.set_header(return_code, u"ファイルをマージしました: {}".format(data["asset_path"]))
         logger.debug(u"ファイルをマージしました: {}".format(data["asset_path"]))
-        logger.details.add_detail(u"ファイルをマージしました: {}".format(data["asset_path"]))
+        logger.details.add_detail(u"\nファイルをマージしました: \n{}".format(data["asset_path"]))
     else:
-        logger.details.set_header(u"ファイルをマージできませんでした: {}".format(data["asset_path"]))
-        logger.warning(u"ファイルをマージできませんでした: {}".format(data["asset_path"]))
-        logger.details.add_detail(u"ファイルをマージできませんでした: {}".format(data["asset_path"]))
         return_code = 1
+        logger.details.set_header(return_code, u"ファイルをマージできませんでした: {}".format(data["asset_path"]))
+        logger.warning(u"ファイルをマージできませんでした: {}".format(data["asset_path"]))
+        logger.details.add_detail(u"\nファイルをマージできませんでした: {}\n".format(data["asset_path"]))
 
     return {"return_code": return_code}
 

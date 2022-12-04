@@ -36,7 +36,7 @@ def main(event={}, context={}):
 
     category = data["properties"]["category"]
     if not "namespace" in data:
-        logger.details.set_header(u"namespaceが設定されていません")
+        logger.details.set_header(1, u"namespaceが設定されていません")
         return {"return_code": 1}
 
     if category in data["parent_name"]:

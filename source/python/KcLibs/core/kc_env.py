@@ -47,18 +47,25 @@ if mode is None:
     mode = "win"
 
 
+def get_temp_directory():
+    return "{}/kcToolBox/temp".format(os.path.normpath(os.environ["TEMP"]).replace("\\", "/"))
+
+
 def get_python_version():
     return sys.version_info
+
 
 def get_root_directory():
     return os.path.normpath(os.environ["KEICA_TOOL_PATH"]).replace("\\", "/")
 
-def append_sys_paths():
+def get_site_packages_path():
     if get_python_version().major == 2:
-        sys_paths = ["{}/source/python/site-packages/py2".format(get_root_directory())]
+        return "{}/source/python/site-packages/py2".format(get_root_directory())
     else:
-        sys_paths = ["{}/source/python/site-packages/py3".format(get_root_directory())]
+        return "{}/source/python/site-packages/py3".format(get_root_directory())
 
+def append_sys_paths():
+    sys_paths = [get_site_packages_path()]
     for sys_path in sys_paths:
         if sys_path not in sys.path:
             sys.path.append(sys_path)

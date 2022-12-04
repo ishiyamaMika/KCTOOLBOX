@@ -28,19 +28,19 @@ def varidate(data, logger):
     # logger.details.add_detail(str(data))
 
     if not export_path:
-        logger.details.set_header(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.details.set_header(1, u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         logger.debug(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         logger.details.add_detail("{} > {}".format(data["namespace"], export_path))
         return {"return_code": 1}
 
     if not data["config"]["export"]:
-        logger.details.set_header(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         logger.details.add_detail("namespace: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if not os.path.exists(data["config"]["export"]):
-        logger.details.set_header(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         logger.details.add_detail("config: {}".format(data["confit"]["export"]))
         return {"return_code": 1}
@@ -50,7 +50,7 @@ def varidate(data, logger):
     if len(rig_paths) > 0:
         asset_directory = os.path.dirname(rig_paths[0])
     else:
-        logger.details.set_header(u"rigファイルがみつけられませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"rigファイルがみつけられませんでした: {}".format(data["namespace"]))
         logger.debug(u"rigファイルがみつけられませんでした: {}".format(data["namespace"]))
         logger.details.add_detail("check this: {}".format(data["rig_path"]))
         logger.details.add_detail("check this: {}".format(rig_paths))
@@ -59,7 +59,7 @@ def varidate(data, logger):
 
     asset_meta = data["project"].get_asset(data["namespace"])
     if not asset_meta:
-        logger.details.set_header(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         logger.debug(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
@@ -88,12 +88,12 @@ def varidate(data, logger):
 
     take_versions.sort()
     if len(take_versions) == 0:
-        logger.details.set_header(u"アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"アセットファイルが存在しません: {}".format(data["namespace"]))
         logger.debug(u"アセットファイルが存在しません: {}".format(data["namespace"]))
         return {"return_code": 1}
     
     if asset_meta["take"] != take_versions[-1][0]:
-        logger.details.set_header(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.details.set_header(1, u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         logger.debug(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         return {"return_code": 1}
 
@@ -104,13 +104,13 @@ def varidate(data, logger):
 
     if len(model_names) != len(models):
         diff = list(set(model_names) | set([l.LongName for l in models]))
-        logger.details.set_header(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
+        logger.details.set_header(1, u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
         logger.details.add_detail(u"以下のmodelがありません\n{}".format("\n".join(diff)))
         logger.debug(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
 
         return {"return_code": 1}
 
-    logger.details.set_header(u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
+    logger.details.set_header(0, u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
     logger.debug(u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
     return {"return_code": 0}
 
@@ -118,17 +118,17 @@ def varidate(data, logger):
 def master_varidate(data, logger):
     export_path = data["export_path"]
     if not export_path:
-        logger.details.set_header(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
+        logger.details.set_header(1, u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         logger.debug(u"エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         return {"return_code": 1}
 
     if not data["config"]["export"]:
-        logger.details.set_header(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスを作成できませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if not os.path.exists(data["config"]["export"]):
-        logger.details.set_header(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         logger.debug(u"設定ファイルパスが存在しませんでした: {}".format(data["namespace"]))
         return {"return_code": 1}
 
@@ -137,7 +137,7 @@ def master_varidate(data, logger):
     asset_meta = data["project"].get_asset(data["namespace"])
 
     if not asset_meta:
-        logger.details.set_header(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         logger.debug(u"metaモデルがアセットに設定されていません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
@@ -164,12 +164,12 @@ def master_varidate(data, logger):
     take_versions.sort()
 
     if len(take_versions) == 0:
-        logger.details.set_header(u"アセットファイルが存在しません: {}".format(data["namespace"]))
+        logger.details.set_header(1, u"アセットファイルが存在しません: {}".format(data["namespace"]))
         logger.debug(u"アセットファイルが存在しません: {}".format(data["namespace"]))
         return {"return_code": 1}
 
     if asset_meta["take"] != take_versions[-1][0]:
-        logger.details.set_header(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
+        logger.details.set_header(1, u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         logger.debug(u"シーン中のアセットのテイクが違います: {} ({} {}) < ({} {})".format(data["namespace"], int(asset_meta["take"]), int(asset_meta["version"]), take_versions[-1][0], take_versions[-1][1]))
         return {"return_code": 1}
 
@@ -180,12 +180,12 @@ def master_varidate(data, logger):
 
     if len(model_names) != len(models):
         diff = list(set(model_names) | set([l.LongName for l in models if ignore_models(l["name"])]))
-        logger.details.set_header(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
+        logger.details.set_header(1, u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))
         logger.debug(u"設定ファイルとシーンのモデルの数が違います: {} ({})".format(data["namespace"], len(diff)))        
         logger.details.add_detail(u"以下のmodelがありません\n{}".format("\n".join(diff)))
         return {"return_code": 1}
     
-    logger.details.set_header(u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
+    logger.details.set_header(0, u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
     logger.debug(u"設定ファイルとシーンのモデル数は一致しています: {}".format(data["namespace"]))
     return {"return_code": 0}
 
@@ -229,7 +229,7 @@ def main_export(data, logger):
     header = u"ファイルをエクスポートしました: {}".format(data["namespace"])
     detail = u"path: \n{}\nexport key name: {}".format(data["export_path"], key_name)
 
-    logger.details.set_header(header)
+    logger.details.set_header(0, header)
     logger.details.add_detail(detail)
     return {"return_code": 0}
 

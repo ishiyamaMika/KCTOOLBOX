@@ -31,21 +31,22 @@ def main(event={}, context={}):
     logger = context.get("logger")
     if not logger:
         logger = PzLog().logger
-
+    logger.details.add_detail(u"switcher作成\n")
     info, data_ = kc_env.load_config(data["switcher_path"])
-    logger.debug("data: {}".format(data_))
-    logger.details.add_detail("data: {}".format(data_))
+    for each in data_:
+        logger.debug(each)
+        logger.details.add_detail(u"{}: {}-{}".format(each["name"], each["start"], each["end"]))
 
     return_code = 0
     try:
         kc_camera.set_switcher(data_, clear_all=True)
-        logger.details.set_header(u"スイッチャーを作成しました")
+        logger.details.set_header(return_code, u"スイッチャーを作成しました")
     except BaseException:
         import traceback
         traceback.print_exc()
-        logger.details.set_header(u"スイッチャーを作成できませんでした")    
+        return_code = 1
+        logger.details.set_header(return_code, u"スイッチャーを作成できませんでした")    
 
-    logger.details.add_detail(u"switcher path: {}".format(data["switcher_path"]))
 
     kc_camera.change_cam("switcher")
 

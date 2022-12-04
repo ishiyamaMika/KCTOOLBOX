@@ -18,7 +18,7 @@ from pyfbsdk import *
 def get_all():
     return FBSystem().Scene.Cameras
 
-def get_switcher_data(include_object=True):
+def get_switcher_data(include_object=True, max_is_loop_end=True):
     cams = [l for l in get_all() if not l.SystemCamera]
     anim_node = FBCameraSwitcher().AnimationNode
     if not anim_node:
@@ -26,15 +26,22 @@ def get_switcher_data(include_object=True):
     
     switcher_data = []
     keys = FBCameraSwitcher().AnimationNode.Nodes[0].FCurve.Keys
+    
+    loop_end_frame = FBPlayerControl().LoopStop.GetFrame()
+    break_flg = False
     for i, key in enumerate(keys):
         if i+1 < len(keys):
             next_key_frame = keys[i+1].Time.GetFrame() - 1
         else:
             next_key_frame = FBPlayerControl().LoopStop.GetFrame()
-
         index = int(key.Value) - 1
-
         frame = key.Time.GetFrame()
+
+        if max_is_loop_end:
+            if next_key_frame > loop_end_frame:
+                next_key_frame = loop_end_frame
+                break_flg = True
+        
         data = {"name": cams[index].LongName,
                 "start": frame,
                 "end": next_key_frame}
@@ -42,6 +49,8 @@ def get_switcher_data(include_object=True):
         if include_object:
             data["object"] = cams[index]
         switcher_data.append(data)
+        if break_flg:
+            break
         
     return switcher_data
 
@@ -122,5 +131,8 @@ if __name__ in ["__builtin__", "builtins"]:
     # print(set_switcher(x, True))
 
     # change_cam("Cam_A9000:Cam_A0000")
-    set_switcher(x)
+    import pprint
+    pprint.pprint(get_switcher_data())
+
+    
 

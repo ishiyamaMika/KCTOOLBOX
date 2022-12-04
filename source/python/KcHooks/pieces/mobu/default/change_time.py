@@ -84,7 +84,7 @@ def main(event={}, context={}):
         update_context["end"] = end
         update_context["fps"] = fps
 
-    logger.details.set_header(header)
+    logger.details.set_header(return_code, header)
     logger.details.add_detail(detail)
 
     return {"return_code": return_code, "update_context": update_context}

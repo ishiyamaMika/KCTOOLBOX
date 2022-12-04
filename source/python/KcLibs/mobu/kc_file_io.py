@@ -3,7 +3,7 @@
 import os
 import sys
 import re
-
+import traceback
 from pyfbsdk import *
 
 
@@ -29,6 +29,8 @@ def file_open(file_path):
         FBApplication().FileOpen(file_path)
         return True
     except:
+        print("error: {}".format(file_path))
+        print(traceback.format_exc())
         return False
 
 def file_new():
@@ -102,10 +104,11 @@ def file_merge(file_path, namespace=None, padding=2):
 
 
 if __name__ == "__builtin__":
-    FBApplication().FileNew()
+    # FBApplication().FileNew()
     namespace = "CH_tsukikoQuad"
     f = "E:/works/client/keica/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/CH_tsukikoQuad_t02_01.fbx"
     f = "X:/Project/_942_ZIZ/2020_ikimono_movie/_work/14_partC_Japan/26_animation/_3D_assets/CH/tsukikoQuad/MB/CH_tsukikoQuad_t06_01.fbx"
     # for i in range(2):
     namespace = "CH_tsukikoQuad_03"
+    f = "K:/DTN/LO/Asset_keica/PROPS/PROPS_HAM_Sword_A_t01_02.fbx"
     file_merge(f, namespace)
