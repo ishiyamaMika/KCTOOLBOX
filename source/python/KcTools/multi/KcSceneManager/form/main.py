@@ -1886,6 +1886,7 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
             # if "convert" in orders:
             #     convert_app_data["order"] = orders["convert"]
             results_all.append([-1, {}, u"max処理", u"max処理", ""])
+
             pass_data, results = self.project.puzzle_play(self.project.tool_config["puzzle"]["convert"], 
                                      {"main": convert_app_data},
                                      logger_name="convert_execute"
