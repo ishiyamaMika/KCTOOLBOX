@@ -94,7 +94,10 @@ def main_export(data, logger, asset_metas, to_master):
         switcher_data = kc_camera.get_switcher_data(include_object=False)
         if len(switcher_data):
             logger.debug(u"get switcher info: {}".format(switcher_data))
-            logger.details.add_detail(u"switcher情報を取得しました: {}".format(switcher_data))
+            logger.details.add_detail(u"switcher情報を取得しました: ")
+            for each in switcher_data:
+                logger.details.add_detail(u"{name} {start} - {end}".format(**each))
+
         switcher_path = "{}.switcher.json".format(data["asset_export_path"])
         kc_env.save_config(switcher_path,
                            "switcher data",

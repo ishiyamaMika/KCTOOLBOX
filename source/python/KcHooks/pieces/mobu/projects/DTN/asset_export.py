@@ -26,6 +26,7 @@ TASK_NAME = "asset_export"
 def varidate(data, logger):
     export_path = data["asset_export_path"]
     return_code = 0
+
     if not export_path:
         logger.details.add_detail(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
         logger.debug(u"[error] エクスポートパスを作成できませんでした: {} > {}".format(data["namespace"], export_path))
@@ -60,10 +61,11 @@ def varidate(data, logger):
     take_versions = []
     for f in glob.glob(template_path):
         f = f.replace("\\", "/")
-
         group = re.match(template_path.replace("*", "(.*)"), f, re.IGNORECASE)
         if group:
-            take_versions.append(group.groups())
+            group = [l for l in group.groups() if l.isdigit()]
+            if len(group) == 2:
+                take_versions.append(group)
 
     take_versions.sort()
     latest_take, latest_version = -1, -1

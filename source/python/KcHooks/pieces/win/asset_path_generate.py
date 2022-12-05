@@ -13,53 +13,69 @@ from KcLibs.core.KcProject import KcProject
 from puzzle2.PzLog import PzLog
 
 TASK_NAME = "asset_path_generate"
-
+from pyfbsdk import *
 def main(event={}, context={}):
     """
     this may create a new asset path
     then pass it to the next task
-    key required from data:
     """
     data = event.get("data", {})
 
     logger = context.get("logger")
     if not logger:
         logger = PzLog().logger
-
-    return_code = 0
-    asset_dependency_paths = data.get("asset_dependency_paths", {})
-    meta_name = "{}:meta".format(data["namespace"])
-    meta = kc_model.to_object(meta_name)
-    if meta:
-        take = meta.PropertyList.Find("take")
-        if take:
-            data["take"] = int(take.Data)
-
-        version = meta.PropertyList.Find("version")
-        if version:
-            data["version"] = int(version.Data)
-
-    if data["category"] == "CH":
-        data["sub_category"] = "*"
-
-    update_context = {}
-    for k, v in asset_dependency_paths.items():
-        path = data["project"].path_generate(v, data)
-        if "*" in path:
-            paths = glob.glob(path)
-            if len(paths) > 0:
-                paths.sort()
-                path = paths[-1]
-
-        update_context["{}.{}".format(TASK_NAME, k)] = path.replace("\\", "/")
-
-    for k, v in update_context.items():
-        logger.debug("{}: {}".format(k, v))
-        logger.details.add_detail("{}: {}".format(k, v))
-    logger.details.set_header(return_code, u"関連パスを生成しました")
     
-    # return code 2 for skipping to result view
-    return {"return_code": 2, "update_context": update_context}
+    return_code = 0
+    update_context = {}
+    asset_dependency_paths_cache = data.get("asset_dependency_paths_cache", {})
+    namespace_paths = asset_dependency_paths_cache.get(data["namespace"], {})
+    if len(namespace_paths) > 0:
+        for k, v in namespace_paths.items():
+            logger.debug("{}: {}".format(k, v))
+            logger.details.add_detail("{}: {}".format(k, v))
+            update_context[k] = v
+        logger.details.set_header(return_code, u"関連パスをcontextから取得しました")
+        # return code 2 for skipping to result view
+        return {"return_code": 2, "update_context": update_context}
+    else:
+        update_context.setdefault("asset_dependency_paths_cache", {})
+        update_context["asset_dependency_paths_cache"].setdefault(data["namespace"], {})
+        meta_name = "{}:meta".format(data["namespace"])
+        meta = kc_model.to_object(meta_name)
+        if meta:
+            take = meta.PropertyList.Find("take")
+            if take:
+                data["take"] = int(take.Data)
+
+        data["version"] = "*"
+        if data["category"] == "CH":
+            data["sub_category"] = "*"
+
+        asset_dependency_paths = data.get("asset_dependency_paths", {})
+        for k, v in asset_dependency_paths.items():
+            path = data["project"].path_generate(v, data)
+            if "*" in path:
+                paths = glob.glob(path)
+                paths.sort()
+                if len(paths) > 0:
+                    paths.sort()
+                    path = paths[-1]
+
+            update_context["{}.{}".format(TASK_NAME, k)] = path.replace("\\", "/")
+            update_context["asset_dependency_paths_cache"][data["namespace"]]["{}.{}".format(TASK_NAME, k)] = path.replace("\\", "/")
+
+        update_context["{}.take".format(TASK_NAME)] = data["take"]
+        update_context["asset_dependency_paths_cache"][data["namespace"]]["{}.take".format(TASK_NAME)] = data["take"]
+
+        for k, v in update_context.items():
+            if k == "asset_dependency_paths_cache":
+                continue
+            logger.debug("{}: {}".format(k, v))
+            logger.details.add_detail("{}: {}".format(k, v))
+
+        logger.details.set_header(return_code, u"関連パスを生成しました")
+
+        return {"return_code": 2, "update_context": update_context}
 
 
 if __name__ == "builtins":

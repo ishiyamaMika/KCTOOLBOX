@@ -78,6 +78,7 @@ data:
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
 
 
           - name: export multi camera asset
@@ -93,6 +94,7 @@ data:
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
 
               start: "context.start"
               end: "context.end"
@@ -129,47 +131,49 @@ data:
       - step: main
         comment: export asset step
         tasks:
-            - name: generate paths
-              module: KcHooks.pieces.win.asset_path_generate
+          - name: generate paths
+            module: KcHooks.pieces.win.asset_path_generate
 
-            - name: export asset
-              module: KcHooks.pieces.mobu.projects.DTN.asset_export
-              comment: export
+          - name: export asset
+            module: KcHooks.pieces.mobu.projects.DTN.asset_export
+            comment: export
 
-              data_key_replace:
-                asset_export_path: context.asset_path_generate.shot_edit_export_path
-                asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
-                asset_export_config_path: context.asset_path_generate.asset_export_config_path
-                asset_rig_path: context.asset_path_generate.asset_rig_path
-                start: "context.start"
-                end: "context.end"
-                fps: "context.fps"
-              
-              conditions:
-                - category: 
-                    - CH
-                    - PROPS
-                    - BG
+            data_key_replace:
+              asset_export_path: context.asset_path_generate.shot_edit_export_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            conditions:
+              - category: 
+                  - CH
+                  - PROPS
+                  - BG
 
-            - name: export multi camera asset
-              module: KcHooks.pieces.mobu.default.multi_cameras_export
-              comment: export camera
-              data_defaults:
-                key_name: plot
-                save_switcher: true
-                mode: export
+          - name: export multi camera asset
+            module: KcHooks.pieces.mobu.default.multi_cameras_export
+            comment: export camera
+            data_defaults:
+              key_name: plot
+              save_switcher: true
+              mode: export
 
-              data_key_replace:
-                asset_export_path: context.asset_path_generate.shot_edit_export_path
-                asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
-                asset_export_config_path: context.asset_path_generate.asset_export_config_path
-                asset_rig_path: context.asset_path_generate.asset_rig_path
-                start: "context.start"
-                end: "context.end"
-                fps: "context.fps"
-              
-              conditions:
-                - category: camera
+            data_key_replace:
+              asset_export_path: context.asset_path_generate.shot_edit_export_path
+              asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
+              asset_export_config_path: context.asset_path_generate.asset_export_config_path
+              asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
+              start: "context.start"
+              end: "context.end"
+              fps: "context.fps"
+            
+            conditions:
+              - category: camera
 
       - step: post_primary
         comment: open scene file and setup frames
@@ -190,7 +194,9 @@ data:
         comment: add sotai and create story clips
         tasks:
           - name: generate paths
-            module: KcHooks.pieces.win.asset_path_generate        
+            module: KcHooks.pieces.win.asset_path_generate
+            data_key_replace:
+              asset_dependency_paths_cache: context.asset_dependency_paths_cache 
 
           - name: story clip create
             module: KcHooks.pieces.mobu.default.story_create
@@ -205,6 +211,7 @@ data:
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path            
               asset_path: context.asset_path_generate.asset_sotai_path
+              take: context.asset_path_generate.take
 
             conditions:
               - category: 
@@ -315,7 +322,8 @@ data:
               asset_export_path: context.asset_path_generate.shot_master_export_path
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
-              asset_rig_path: context.asset_path_generate.asset_rig_path              
+              asset_rig_path: context.asset_path_generate.asset_rig_path 
+              take: context.asset_path_generate.take             
 
             conditions:
                 - category: ["CH", "BG", "PROPS"]
@@ -332,6 +340,7 @@ data:
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
             
             conditions:
               - category: camera
@@ -340,15 +349,13 @@ data:
         tasks:
           - name: generate paths
             module: KcHooks.pieces.win.asset_path_generate
-
+            data_key_replace:
+              asset_dependency_paths_cache: context.asset_dependency_paths_cache 
 
           - name: open file
             module: KcHooks.pieces.mobu.default.file_open
             data_key_replace:
               path: context.asset_path_generate.shot_master_export_path
-
-          - name: generate paths
-            module: KcHooks.pieces.win.asset_path_generate
 
           - name: remove namespace
             module: KcHooks.pieces.mobu.default.remove_namespace
@@ -392,6 +399,7 @@ data:
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
 
           - name: export multi camera asset
             module: KcHooks.pieces.mobu.default.multi_cameras_export
@@ -405,6 +413,7 @@ data:
               asset_export_config_path: context.asset_path_generate.asset_export_config_path
               asset_plot_config_path: context.asset_path_generate.asset_plot_config_path
               asset_rig_path: context.asset_path_generate.asset_rig_path
+              take: context.asset_path_generate.take
             
             conditions:
               - category: camera

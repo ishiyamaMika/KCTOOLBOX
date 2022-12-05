@@ -1972,10 +1972,11 @@ class KcSceneManager(kc_qt.ROOT_WIDGET):
                                                    "asset_sotai_path": template["sotai"]}
 
                 if create_master:
-                    asset["asset_dependency_paths"]["shot_edit_export_path"] = template["edit_export"]
+                    # asset["asset_dependency_paths"]["shot_edit_export_path"] = template["edit_export"]
+                    asset["asset_dependency_paths"]["shot_edit_export_path"] = self.project.path_generate(template["edit_export"], item["fields"], force=True)
                 else:
-                    asset["asset_dependency_paths"]["shot_master_export_path"] = template["master_export"]
-
+                    asset["asset_dependency_paths"]["shot_master_export_path"] = self.project.path_generate(template["master_export"], item["fields"], force=True)
+                
                 data["primary"].setdefault("assets", []).append(asset)
                 data["main"].append(asset)
 
