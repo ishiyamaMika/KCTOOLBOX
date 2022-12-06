@@ -27,12 +27,16 @@ def swap_model(model, logger=None):
     model.LongName = "{}_original".format(original_name)
 
     children = [l for l in model.Children]
-
     skl = FBModelSkeleton(original_name)
+
+    for each in model.PropertyList:
+        if each.Name in ["RotationOffset", "RotationPivot", "ScalingPivot", "ScalingOffset"]:
+            skl.PropertyList.Find(each.Name).Data = each.Data
+    kc_key.copy_local_animation(model, skl)
+
     if parent:
         parent.ConnectSrc(skl)
 
-    kc_key.copy_local_animation(model, skl)
     logger.details.add_detail(u"{}をsklに変換しました".format(original_name))
 
     for child in children:
@@ -55,6 +59,9 @@ def main(event={}, context={}):
     convert_list = []
 
     for root in FBSystem().Scene.RootModel.Children:
+        # if root.Name == "DEBUG":
+        #     print("debug")
+        #     continue
         m_list = FBModelList()
         FBGetSelectedModels(m_list, root, False)
         m_list = [l for l in m_list]
