@@ -122,9 +122,11 @@ class KcRender(object):
             if self.render_scale != 1:
                 switcher_cameras = kc_camera.get_switcher_data()
                 revert_cameras = {}
+
                 for each in switcher_cameras:
-                    width, height = _change_resolution(each["object"], self.render_scale)
-                    revert_cameras[each["object"]] = (width, height)
+                    if each["object"] not in revert_cameras:
+                        width, height = _change_resolution(each["object"], self.render_scale)
+                        revert_cameras[each["object"]] = (width, height)
         else:
             if isinstance(cam, str):
                 cam = kc_model.find_model_by_name(cam)
