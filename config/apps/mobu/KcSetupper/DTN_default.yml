@@ -108,7 +108,6 @@ data:
           module: KcHooks.pieces.mobu.default.characterize
           data_defaults:
             force: true
-            
 
         - name: add_folder
           view: "create/update folder"
