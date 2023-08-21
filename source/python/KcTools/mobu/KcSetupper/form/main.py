@@ -30,6 +30,7 @@ from KcLibs.win.kc_qt import QtWidgets, QtCore, QtGui
 
 from puzzle2.PzTask import PzTask
 
+from PySide2 import QtWidgets
 
 kc_env.append_sys_paths()
 
