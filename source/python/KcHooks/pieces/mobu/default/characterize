@@ -13,3 +13,4 @@ TASK_NAME = "characterize"
 if __name__ in ["builtins", "__builtin__"]:
     namespace = ""
     chara = FBCharacter(namespace)
+    
