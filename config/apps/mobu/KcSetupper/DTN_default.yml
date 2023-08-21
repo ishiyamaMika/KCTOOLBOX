@@ -103,6 +103,12 @@ data:
           data_defaults:
             force: true
 
+        - name: characterize
+          view: "characterize"
+          module: KcHooks.pieces.mobu.default.characterize
+          data_defaults:
+            force: true
+
         - name: add_folder
           view: "create/update folder"
           module: KcHooks.pieces.mobu.default.asset_create_folders
